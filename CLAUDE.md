@@ -6,6 +6,12 @@ Full context, scope, pipeline, stack, data model, eval plan and timeline: see [P
 
 Build mode: keep building phase after phase without teaching, quizzing, or asking the user to write section-9 parts. The user will learn at the end. Commit in small steps and push to GitHub as work progresses (user explicitly authorized commits and pushes). Still flag security/cost issues, keep NOTES.md updated, and keep notes detailed enough for the user to study later.
 
+## UI RULE (standing, set 2026-10-16)
+
+Build functional, clean but minimal/unstyled screens. NO visual polish yet. ALL styling is centralized: Tailwind v4 theme tokens (`@theme` in `apps/web/src/index.css`: colors, spacing, typography, radius) plus small reusable components in `apps/web/src/components/ui/` (Button, Card, Badge, Panel, Table). Pages use only semantic token classes (e.g. `bg-surface text-fg`), never raw palette colors, so a full redesign = change tokens + components, not pages.
+
+Design handoff: when it is time to design how the site looks, tell the user; they will send the designs. Do not invent a visual design.
+
 ## Working rules (brief section 13) — original, superseded by the mode above where they conflict
 
 - Teach first, then build: explain the concept simply, show where each tool fits and why, then plan, then code.
