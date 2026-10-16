@@ -101,3 +101,17 @@ def save_parse_results(conn: psycopg.Connection, repo_id: int,
                 [(repo_id, fid, i, im.specifier, im.kind, Jsonb(im.names), im.level, im.line, im.is_type_only)
                  for fid, r in results.items() for i, im in enumerate(r.imports)],
             )
+
+
+def save_resolutions(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int],
+                     resolutions) -> None:
+    """Attach resolution results to imports_raw rows (matched on file_id + idx). Idempotent."""
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.executemany(
+                """UPDATE imports_raw SET resolution=%s, targets=%s, package=%s, reason=%s
+                   WHERE repo_id=%s AND file_id=%s AND idx=%s""",
+                [(r.resolution.status, Jsonb(r.resolution.targets), r.resolution.package,
+                  r.resolution.reason, repo_id, file_ids[r.from_path], r.idx)
+                 for r in resolutions],
+            )

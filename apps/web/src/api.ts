@@ -37,6 +37,10 @@ export interface ImportRow {
   level: number;
   line: number;
   is_type_only: boolean;
+  resolution: "internal" | "external" | "unresolved" | null;
+  targets: string[];
+  package: string | null;
+  reason: string | null;
 }
 
 export interface FileDetail {

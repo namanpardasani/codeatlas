@@ -8,6 +8,8 @@ from .inventory import InventoryError, build_inventory
 from .parsing import supported
 from .parsing.runner import SandboxedParser
 from .parsing.types import ParseResult
+from .resolve import resolve_imports, summarize
+from .resolve.types import ImportItem
 
 log = logging.getLogger("analyzer.pipeline")
 
@@ -35,6 +37,27 @@ def parse_files(conn, r, job_id: int, root: Path, file_ids: dict[str, int],
             if n % step == 0:
                 db.update_progress(conn, r, job_id, "parsing", 50 + int(40 * n / len(targets)))
     return results
+
+
+def resolve_all(root: Path, file_ids: dict[str, int], results: dict[int, ParseResult]):
+    """Resolve every parsed import against the set of analysed files."""
+    root = root.resolve()
+    id_to_path = {fid: p for p, fid in file_ids.items()}
+
+    def read_text(path: str) -> str | None:  # tsconfig / package.json contents
+        full = (root / path).resolve()
+        if not full.is_relative_to(root):
+            return None
+        try:
+            return full.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            return None
+
+    items = [
+        ImportItem(id_to_path[fid], i, im.specifier, im.kind, im.names, im.level)
+        for fid, res in results.items() for i, im in enumerate(res.imports)
+    ]
+    return resolve_imports(set(file_ids), items, read_text)
 
 
 def run_job(conn, r, job_id: int) -> None:
@@ -69,11 +92,16 @@ def run_job(conn, r, job_id: int) -> None:
         results = parse_files(conn, r, job_id, dest, file_ids, records)
         db.save_parse_results(conn, repo_id, results)
 
+        db.update_progress(conn, r, job_id, "resolving", 92, commit_sha=sha)
+        resolutions = resolve_all(dest, file_ids, results)
+        db.save_resolutions(conn, repo_id, file_ids, resolutions)
+        counts = summarize(resolutions)
+
         db.set_repo_status(conn, repo_id, "ready", sha)
         db.update_progress(conn, r, job_id, "done", 100, "done", commit_sha=sha)
         bad = sum(1 for x in results.values() if x.status in ("failed", "partial"))
-        log.info("job %s done: %d files (%d parsed, %d with problems) @ %s",
-                 job_id, len(records), len(results), bad, sha[:8])
+        log.info("job %s done: %d files (%d parsed, %d with problems); imports %s @ %s",
+                 job_id, len(records), len(results), bad, counts, sha[:8])
     except (CloneError, InventoryError) as e:
         # Permanent, user-facing failure: don't retry.
         log.warning("job %s failed: %s", job_id, e)

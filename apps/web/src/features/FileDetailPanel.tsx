@@ -39,6 +39,21 @@ const importColumns: Column<ImportRow>[] = [
   { header: "Kind", render: (i) => <Badge>{i.kind}</Badge> },
   { header: "Names", render: (i) => <span className="font-mono">{i.names.join(", ") || "–"}</span> },
   { header: "Line", render: (i) => i.line },
+  {
+    header: "Resolved",
+    render: (i) => {
+      if (!i.resolution) return <span className="text-muted">–</span>;
+      const tone = { internal: "success", external: "neutral", unresolved: "warning" } as const;
+      const detail =
+        i.resolution === "internal" ? i.targets.join(", ") : i.resolution === "external" ? i.package : i.reason;
+      return (
+        <span className="flex flex-col gap-gap">
+          <Badge tone={tone[i.resolution]}>{i.resolution}</Badge>
+          <span className="font-mono text-small text-muted">{detail}</span>
+        </span>
+      );
+    },
+  },
 ];
 
 export function FileDetailPanel({ detail }: { detail: FileDetail }) {
