@@ -83,6 +83,57 @@ export function createApp() {
     res.json(r.rows[0]);
   });
 
+  const idParam = (v: unknown) => {
+    const n = Number(v);
+    return Number.isInteger(n) && n > 0 ? n : null;
+  };
+
+  app.get("/repos/:id/files", async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const r = await pool.query(
+      `SELECT f.id, f.path, f.language, f.lines, f.is_test, f.parse_status,
+              (SELECT count(*)::int FROM symbols s WHERE s.file_id = f.id) AS symbol_count,
+              (SELECT count(*)::int FROM imports_raw i WHERE i.file_id = f.id) AS import_count
+       FROM files f WHERE f.repo_id = $1 ORDER BY f.path`,
+      [id],
+    );
+    res.json(r.rows);
+  });
+
+  app.get("/files/:id/symbols", async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid file id" });
+      return;
+    }
+    const file = await pool.query(
+      "SELECT id, repo_id, path, language, parse_status, parse_error, exports FROM files WHERE id = $1",
+      [id],
+    );
+    if (!file.rows[0]) {
+      res.status(404).json({ error: "File not found" });
+      return;
+    }
+    const [symbols, imports] = await Promise.all([
+      pool.query(
+        `SELECT name, kind, start_line, end_line, params, parent_name, is_exported,
+                is_default_export, has_doc, signature
+         FROM symbols WHERE file_id = $1 ORDER BY idx`,
+        [id],
+      ),
+      pool.query(
+        `SELECT specifier, kind, names, level, line, is_type_only
+         FROM imports_raw WHERE file_id = $1 ORDER BY idx`,
+        [id],
+      ),
+    ]);
+    res.json({ file: file.rows[0], symbols: symbols.rows, imports: imports.rows });
+  });
+
   // Server-Sent Events: current state first, then live updates published by the worker.
   app.get("/jobs/:id/events", async (req, res) => {
     const id = Number(req.params.id);
