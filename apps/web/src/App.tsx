@@ -1,94 +1,64 @@
 import { useEffect, useRef, useState } from "react";
-
-interface JobEvent {
-  id?: string | number;
-  status: "queued" | "running" | "done" | "failed";
-  stage: string;
-  progress: number;
-  error?: string | null;
-}
+import {
+  getFileDetail, getFiles, submitRepo, watchJob,
+  type FileDetail, type FileRow, type JobEvent,
+} from "./api";
+import { SubmitPanel } from "./features/SubmitPanel";
+import { JobProgress } from "./features/JobProgress";
+import { FilesPanel } from "./features/FilesPanel";
+import { FileDetailPanel } from "./features/FileDetailPanel";
 
 export default function App() {
-  const [url, setUrl] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [job, setJob] = useState<JobEvent | null>(null);
-  const esRef = useRef<EventSource | null>(null);
+  const [files, setFiles] = useState<FileRow[]>([]);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [detail, setDetail] = useState<FileDetail | null>(null);
+  const stop = useRef<(() => void) | null>(null);
 
-  useEffect(() => () => esRef.current?.close(), []);
+  useEffect(() => () => stop.current?.(), []);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
+  async function submit(url: string) {
     setError(null);
     setJob(null);
-    setSubmitting(true);
+    setFiles([]);
+    setSelected(null);
+    setDetail(null);
+    setBusy(true);
     try {
-      const res = await fetch("/api/repos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url }),
+      const { repoId, jobId } = await submitRepo(url);
+      stop.current?.();
+      stop.current = watchJob(jobId, (e) => {
+        setJob(e);
+        if (e.status === "done") getFiles(repoId).then(setFiles).catch((err) => setError(String(err.message)));
       });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.error ?? `Request failed (${res.status})`);
-      watch(body.jobId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
-      setSubmitting(false);
+      setBusy(false);
     }
   }
 
-  function watch(jobId: string | number) {
-    esRef.current?.close();
-    const es = new EventSource(`/api/jobs/${jobId}/events`);
-    esRef.current = es;
-    es.onmessage = (m) => {
-      const data = JSON.parse(m.data) as JobEvent;
-      setJob(data);
-      if (data.status === "done" || data.status === "failed") es.close();
-    };
-    es.onerror = () => es.close();
+  async function select(f: FileRow) {
+    setSelected(f.id);
+    try {
+      setDetail(await getFileDetail(f.id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not load file");
+    }
   }
 
-  const failed = job?.status === "failed";
   return (
-    <main className="mx-auto max-w-2xl px-4 py-16">
-      <h1 className="text-3xl font-bold tracking-tight">CodeAtlas</h1>
-      <p className="mt-2 text-slate-600">Paste a public GitHub repo to analyse its architecture.</p>
-
-      <form onSubmit={submit} className="mt-8 flex gap-2">
-        <input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          placeholder="https://github.com/owner/repo"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 outline-none focus:border-indigo-500"
-        />
-        <button
-          disabled={submitting || !url.trim()}
-          className="rounded-md bg-indigo-600 px-4 py-2 font-medium text-white disabled:opacity-50"
-        >
-          {submitting ? "Starting…" : "Analyse"}
-        </button>
-      </form>
-
-      {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-
-      {job && (
-        <section className="mt-8" aria-live="polite">
-          <div className="flex justify-between text-sm text-slate-600">
-            <span className="capitalize">{job.stage}</span>
-            <span>{job.progress}%</span>
-          </div>
-          <div className="mt-1 h-2 overflow-hidden rounded bg-slate-200">
-            <div
-              className={`h-full transition-all ${failed ? "bg-red-500" : "bg-indigo-600"}`}
-              style={{ width: `${job.progress}%` }}
-            />
-          </div>
-          {failed && <p className="mt-2 text-sm text-red-600">{job.error ?? "Analysis failed"}</p>}
-          {job.status === "done" && <p className="mt-2 text-sm text-green-700">Analysis complete.</p>}
-        </section>
-      )}
+    <main className="mx-auto flex max-w-5xl flex-col gap-section p-gutter">
+      <header>
+        <h1 className="text-display font-bold">CodeAtlas</h1>
+        <p className="text-muted">Paste a public GitHub repo to analyse its architecture.</p>
+      </header>
+      <SubmitPanel busy={busy} error={error} onSubmit={submit} />
+      {job && <JobProgress job={job} />}
+      {files.length > 0 && <FilesPanel files={files} selectedId={selected} onSelect={select} />}
+      {detail && <FileDetailPanel detail={detail} />}
     </main>
   );
 }
