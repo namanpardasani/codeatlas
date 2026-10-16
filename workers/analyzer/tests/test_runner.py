@@ -34,3 +34,11 @@ def test_unsupported_and_empty_input():
     assert parse_source("a.rs", b"fn main() {}").status == "skipped"
     r = parse_source("a.py", b"")
     assert r.status == "ok" and r.symbols == []
+
+
+def test_tree_sitter_is_pinned_below_0_26():
+    """tree-sitter 0.26.0 segfaults while walking real files (found on sindresorhus/p-limit's
+    test.js: native crash after Node.text on a generator function). 0.25.2 is fine.
+    Upgrade only after re-running a real-repo parse."""
+    import importlib.metadata as md
+    assert md.version("tree-sitter").startswith("0.25."), md.version("tree-sitter")

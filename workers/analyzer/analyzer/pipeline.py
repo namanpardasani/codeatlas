@@ -5,8 +5,36 @@ from pathlib import Path
 from . import config, db
 from .clone import CloneError, clone
 from .inventory import InventoryError, build_inventory
+from .parsing import supported
+from .parsing.runner import SandboxedParser
+from .parsing.types import ParseResult
 
 log = logging.getLogger("analyzer.pipeline")
+
+
+def parse_files(conn, r, job_id: int, root: Path, file_ids: dict[str, int],
+                records) -> dict[int, ParseResult]:
+    """Parse every supported file; one bad file never fails the job."""
+    targets = [f for f in records if supported(f.path)]
+    results: dict[int, ParseResult] = {}
+    step = max(1, len(targets) // 20)
+    root = root.resolve()
+    with SandboxedParser() as parser:
+        for n, f in enumerate(targets, 1):
+            fid = file_ids[f.path]
+            full = (root / f.path).resolve()
+            if not full.is_relative_to(root):  # inventory never yields these; belt and braces
+                results[fid] = ParseResult(status="failed", error="path escapes repo")
+                continue
+            try:
+                source = full.read_bytes()
+            except OSError as e:
+                results[fid] = ParseResult(status="failed", error=f"read error: {e}"[:300])
+                continue
+            results[fid] = parser.parse(f.path, source)
+            if n % step == 0:
+                db.update_progress(conn, r, job_id, "parsing", 50 + int(40 * n / len(targets)))
+    return results
 
 
 def run_job(conn, r, job_id: int) -> None:
@@ -31,15 +59,21 @@ def run_job(conn, r, job_id: int) -> None:
         db.update_progress(conn, r, job_id, "cloning", 5)
         sha = clone(url, dest)
 
-        db.update_progress(conn, r, job_id, "inventory", 40, commit_sha=sha)
+        db.update_progress(conn, r, job_id, "inventory", 30, commit_sha=sha)
         records = build_inventory(dest)
 
-        db.update_progress(conn, r, job_id, "saving", 85, commit_sha=sha)
-        db.save_files(conn, repo_id, sha, records)
+        db.update_progress(conn, r, job_id, "saving", 45, commit_sha=sha)
+        file_ids = db.save_files(conn, repo_id, sha, records)
+
+        db.update_progress(conn, r, job_id, "parsing", 50, commit_sha=sha)
+        results = parse_files(conn, r, job_id, dest, file_ids, records)
+        db.save_parse_results(conn, repo_id, results)
 
         db.set_repo_status(conn, repo_id, "ready", sha)
         db.update_progress(conn, r, job_id, "done", 100, "done", commit_sha=sha)
-        log.info("job %s done: %d files @ %s", job_id, len(records), sha[:8])
+        bad = sum(1 for x in results.values() if x.status in ("failed", "partial"))
+        log.info("job %s done: %d files (%d parsed, %d with problems) @ %s",
+                 job_id, len(records), len(results), bad, sha[:8])
     except (CloneError, InventoryError) as e:
         # Permanent, user-facing failure: don't retry.
         log.warning("job %s failed: %s", job_id, e)
