@@ -1,0 +1,19 @@
+[project]
+name = "codeatlas-analyzer"
+version = "0.1.0"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+  "psycopg[binary]>=3.2",
+  "redis>=5.0",
+  "pathspec>=0.12",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
