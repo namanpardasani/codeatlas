@@ -12,7 +12,18 @@
 - Parsing stage: cloning 5 -> inventory 30 -> saving 45 -> parsing 50..90 -> done 100.
 - UI: all styling in `apps/web/src/index.css` (`@theme` tokens) and `components/ui/*`; feature panels use only semantic classes.
 
+- Resolution layer (`analyzer/resolve/`): `js.py` (TS/JS), `python.py`, `jsonc.py` (tsconfig parsing); `resolve_imports()` returns per-import `Resolution(status internal|external|unresolved, targets, package, reason)`. Stored on `imports_raw` (migration 003). Pipeline stage "resolving" (92%).
+- Graph layer (`analyzer/graph/`): `types.py` (Edge, DependencyGraph), `builder.py` + `cycles.py` are USER-WRITTEN TODO stubs, `reference.py` is a networkx reference used only to cross-check in tests.
+
 ## Decisions and tradeoffs
+- Never guess: an import that looks internal but matches no file is `unresolved` with a reason (shown in the UI), not silently dropped or mapped to a "closest" file. Unresolved rate is itself a quality metric for the eval.
+- External packages (npm, Node builtins, Python stdlib/third-party) are a separate list (`resolution='external'`, `package`), NOT graph nodes: they are not our code, would swamp the graph (react imported by 300 files), and cannot form cycles with our files.
+- Python `from pkg import name`: edge to `pkg/__init__.py` AND to `pkg/name.py` if `name` is a submodule (otherwise the real dependency on the submodule would be missed).
+- `./a.js` imported from TS means `a.ts` (TS ESM convention): try the TS twin first. If only a.js exists, resolve to it. We resolve `./index.js` to the real `index.js` even when `index.d.ts` exists (TypeScript would pick the .d.ts) because the graph should point at implementation files.
+- tsconfig: nearest config up the tree; `extends` (relative) followed up to 5 levels; `paths` relative to `baseUrl` if set else the config's dir; longest-prefix pattern wins; Vite-style solution configs (`references`) are followed. NOT supported: `extends` from packages, package.json `exports`/`imports` (#), `main` pointing at build output (we fall back to src/index).
+- Monorepo workspace packages: `package.json` name -> directory, resolved via source/module/main/types then src/index, index.
+- Python import roots: repo root, parent of every top-level package (src layouts), src/, lib/, plus the importing file's own directory (scripts import siblings via sys.path[0]). Regular package beats same-named module.
+- Cycles are SCCs of size >= 2 (self-imports dropped); output deterministic; algorithm must be iterative (5,000-deep chains in tests).
 - tree-sitter: manual tree WALK for symbols and JS/TS imports (need parent/export context; require()/import() can appear anywhere); QUERIES are the natural fit for flat "find all X" patterns, so the Python import extraction (user-written TODO) is a query exercise.
 - Parse in a child process, not in-process: the Python binding has no parse timeout and native code can hang/segfault on hostile input. Parent kills on timeout, survives crashes, records a per-file failure.
 - Pinned `tree-sitter==0.25.2`: 0.26.0 segfaulted on a normal real file (sindresorhus/p-limit `test.js`). Found because the sandbox contained it and the job reported `parser process crashed`.
@@ -29,6 +40,10 @@
 - Ports 5433/6380 chosen because FlagForge containers already use 5432/6379.
 
 ## What happens if X fails
+- Import cannot be resolved (typo, generated file, path alias we don't understand, file ignored/too large): recorded as `unresolved` + reason; the edge is simply absent from the graph; job continues.
+- tsconfig is malformed/unreadable: JSONC parse returns None; we proceed without aliases (alias imports then show as external/unresolved) instead of failing.
+- Circular `extends` in tsconfig: cycle guard + depth limit 5.
+- Python relative import above the repo root: `unresolved: beyond the repository root`.
 - A file has syntax errors: tree-sitter still returns a tree with ERROR nodes; we extract what we can, `parse_status='partial'`, `parse_error='syntax error near line N'`.
 - A file is huge/minified: skipped (`parse_status='skipped'`) before parsing (512 KB cap; avg line length > 1000 bytes).
 - A parse hangs: killed after PARSE_TIMEOUT_S (10s); file marked `failed: parse timed out`; a fresh child process takes over; job continues.
@@ -43,6 +58,9 @@
 - XREADGROUP block longer than the client socket timeout looks like a connection failure; socket_timeout (30s) > block (5s).
 
 ## Interview Q&A
+- Hard cases in import resolution? Extension-less imports and directory index files; TS ESM `.js`->`.ts`; tsconfig paths/baseUrl/extends/references; monorepo workspace packages; Python src layouts, relative levels, `from pkg import submodule`, namespace packages, stdlib vs third-party.
+- Why not resolve everything by guessing? A wrong edge silently corrupts every downstream metric (cycles, centrality, hotspots). A recorded failure is measurable and fixable.
+- Why exclude external packages from the graph? Not our code; would dominate fan-in; cannot create cycles with our files; kept as a separate list for a dependency report.
 - What is a syntax tree? A tree of nodes (function_definition, import_statement, ...) with exact source positions, produced by a parser; nodes have named fields (e.g. `name`, `parameters`, `body`).
 - Why tree-sitter over regex? Regex can't handle nesting, strings/comments or multi-line constructs; tree-sitter is incremental, gives positions, and recovers from syntax errors with partial trees.
 - How do you handle syntax errors? Keep the partial tree, extract valid parts, flag the file `partial` with the first error line.
@@ -58,3 +76,4 @@
 - 2026-10-16 Day 1, Step 1: monorepo folders, docker-compose.yml, .env.example. Postgres+pgvector (0.8.7) and Redis healthy.
 - 2026-10-16 Day 1 complete: schema + migrate.sh, Express API (POST /repos, GET /jobs/:id, SSE), Python worker (Streams, safe clone, inventory), React progress UI. Verified end to end on octocat/Hello-World. 21 API tests + 22 worker tests pass.
 - 2026-10-16 Day 2 complete: parser plugins (TS/TSX/JS symbols+imports+exports, Python symbols+exports), sandboxed parsing, migration 002, parsing stage, file list + symbol/import UI, token-based UI components. Python import extraction left as TODO stub with 3 xfail tests (user writes it). Verified on sindresorhus/p-limit (6 files, 42 symbols). Found and worked around a tree-sitter 0.26.0 segfault (pinned 0.25.2).
+- 2026-10-16 Day 3 steps 1-2: import resolution (TS/JS + Python) stored and shown in UI; verified on p-limit (4 internal, 20 external, 0 unresolved). Graph scaffold ready (types, contracts, fixtures, networkx reference, 85 skipped tests waiting for the user's build_graph + find_cycles). PAUSED: steps 3-6 (metrics, storage/API, React Flow UI) wait for the user's implementation.
