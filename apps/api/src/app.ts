@@ -126,7 +126,7 @@ export function createApp() {
         [id],
       ),
       pool.query(
-        `SELECT specifier, kind, names, level, line, is_type_only
+        `SELECT specifier, kind, names, level, line, is_type_only, resolution, targets, package, reason
          FROM imports_raw WHERE file_id = $1 ORDER BY idx`,
         [id],
       ),
