@@ -1,0 +1,135 @@
+import express from "express";
+import cors from "cors";
+import rateLimit from "express-rate-limit";
+import { z } from "zod";
+import { pool } from "./db.js";
+import { redis, createSubscriber } from "./redis.js";
+import { config, eventsChannel } from "./config.js";
+import { parseGithubUrl } from "./github.js";
+
+const submitSchema = z.object({ url: z.string().min(1).max(200) });
+
+export function createApp() {
+  const app = express();
+  app.disable("x-powered-by");
+  app.use(cors({ origin: config.corsOrigin }));
+  app.use(express.json({ limit: "10kb" }));
+
+  app.get("/health", async (_req, res) => {
+    try {
+      await pool.query("SELECT 1");
+      await redis.ping();
+      res.json({ ok: true });
+    } catch {
+      res.status(503).json({ ok: false });
+    }
+  });
+
+  // Submissions are expensive (clone + parse): tight per-IP limit.
+  const submitLimiter = rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: true, legacyHeaders: false });
+
+  app.post("/repos", submitLimiter, async (req, res) => {
+    const body = submitSchema.safeParse(req.body);
+    const parsed = body.success ? parseGithubUrl(body.data.url) : null;
+    if (!parsed) {
+      res.status(400).json({ error: "Provide a public GitHub URL like https://github.com/owner/repo" });
+      return;
+    }
+
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      const repo = await client.query(
+        `INSERT INTO repos (url, full_name) VALUES ($1, $2)
+         ON CONFLICT (url) DO UPDATE SET url = EXCLUDED.url
+         RETURNING id, url, full_name, status`,
+        [parsed.url, parsed.fullName],
+      );
+      const repoId = repo.rows[0].id as number;
+      const job = await client.query(
+        `INSERT INTO analysis_jobs (repo_id) VALUES ($1) RETURNING id`,
+        [repoId],
+      );
+      await client.query("COMMIT");
+      const jobId = job.rows[0].id as number;
+      // Row is the source of truth; the stream message only wakes a worker.
+      await redis.xadd(config.jobStream, "*", "jobId", String(jobId));
+      res.status(202).json({ repoId, jobId, repo: repo.rows[0] });
+    } catch (err) {
+      await client.query("ROLLBACK").catch(() => {});
+      console.error(err);
+      res.status(500).json({ error: "Could not create job" });
+    } finally {
+      client.release();
+    }
+  });
+
+  app.get("/jobs/:id", async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      res.status(400).json({ error: "Invalid job id" });
+      return;
+    }
+    const r = await pool.query(
+      `SELECT j.id, j.repo_id, j.status, j.stage, j.progress, j.error, j.commit_sha,
+              j.created_at, j.started_at, j.finished_at, r.full_name
+       FROM analysis_jobs j JOIN repos r ON r.id = j.repo_id WHERE j.id = $1`,
+      [id],
+    );
+    if (!r.rows[0]) {
+      res.status(404).json({ error: "Job not found" });
+      return;
+    }
+    res.json(r.rows[0]);
+  });
+
+  // Server-Sent Events: current state first, then live updates published by the worker.
+  app.get("/jobs/:id/events", async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isInteger(id) || id <= 0) {
+      res.status(400).json({ error: "Invalid job id" });
+      return;
+    }
+    res.set({
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+    });
+    res.flushHeaders();
+
+    const send = (data: unknown) => res.write(`data: ${JSON.stringify(data)}\n\n`);
+
+    const sub = createSubscriber();
+    await sub.subscribe(eventsChannel(id));
+    sub.on("message", (_ch, message) => {
+      res.write(`data: ${message}\n\n`);
+      try {
+        const s = JSON.parse(message).status;
+        if (s === "done" || s === "failed") res.end();
+      } catch {
+        /* ignore malformed */
+      }
+    });
+
+    // Subscribe before reading the row so no update is missed in between.
+    const r = await pool.query(
+      "SELECT id, status, stage, progress, error FROM analysis_jobs WHERE id = $1",
+      [id],
+    );
+    if (r.rows[0]) {
+      send(r.rows[0]);
+      if (["done", "failed"].includes(r.rows[0].status)) res.end();
+    } else {
+      send({ status: "failed", error: "Job not found" });
+      res.end();
+    }
+
+    const ping = setInterval(() => res.write(": ping\n\n"), 15_000);
+    req.on("close", () => {
+      clearInterval(ping);
+      sub.disconnect();
+    });
+  });
+
+  return app;
+}
