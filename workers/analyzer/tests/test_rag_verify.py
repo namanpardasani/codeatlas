@@ -62,9 +62,9 @@ def test_builtins_and_expressions_in_backticks_are_not_treated_as_symbols():
 
 
 def test_uncited_claims_are_kept_but_flagged_not_silently_trusted():
-    r = v("`retry_with_backoff` sleeps between attempts [C1]. The loop uses the delay between attempts and doubles it.")
+    r = v("`retry_with_backoff` sleeps between attempts [C1]. That is what the code does at this point.")
     assert r.status == "partial" and "uncited_claim" in r.issues
-    assert any(c.status == "uncited" for c in r.claims) and "doubles it" in r.text
+    assert any(c.status == "uncited" for c in r.claims) and "what the code does" in r.text
 
 
 def test_an_uncited_sentence_naming_a_symbol_that_does_not_exist_is_removed():
@@ -224,3 +224,39 @@ def test_real_parroted_or_invented_sentences_are_removed_even_when_they_name_a_r
 def test_identifier_overlap_alone_does_not_count_as_support():
     r = verify_answer("The `prepare_body` method `PreparedRequest` bills remote customers monthly [C1].", REAL)
     assert r.status == "not_found"                                   # only identifiers match, none of what it says
+
+
+# ---- small models loop and forget to cite -----------------------------------------------------------------
+def test_repeated_sentences_are_said_once():
+    loop = "`retry_with_backoff` sleeps between attempts [C1]. " * 6
+    r = v(loop + "Passwords are hashed with sha256 [C2].")
+    assert r.text.count("sleeps between attempts") == 1 and r.duplicates == 5
+    assert r.status == "answered"                                                   # looping is noise, not a trust problem
+
+
+def test_an_uncited_sentence_without_identifiers_is_attributed_to_its_best_supporting_chunk():
+    r = v("The helper sleeps for a delay and doubles that delay after each failed attempt.")
+    c = r.citations[0]
+    assert c.label == "C1" and c.inferred and r.claims[0].status == "inferred"
+    assert 4 <= c.start_line <= c.end_line <= 14 and f"[C1:{c.start_line}-{c.end_line}]" in r.text
+
+
+def test_attribution_picks_the_right_chunk_among_several():
+    r = v("A password is hashed with sha256 and compared to the stored hash.")
+    assert [c.label for c in r.citations] == ["C2"] and r.citations[0].inferred
+
+
+def test_nothing_is_attributed_when_no_chunk_supports_the_wording():
+    r = v("Customers receive invoices through an external billing platform nightly.")
+    assert r.citations == [] and r.status == "not_found"
+
+
+def test_an_identifier_match_is_not_enough_the_wording_must_be_supported_by_that_chunk_too():
+    """Real case: a follow-up about the 303 handling named `resolve_redirects`, which lives in one chunk, while the
+    303 logic lives in another; linking it to the identifier's chunk would be a confidently wrong citation."""
+    chunks = [
+        chunk("C1", "src/sessions.py", 10, 20, "def resolve_redirects(self, resp, req):\n    url = self.get_redirect_target(resp)\n    yield resp\n", "resolve_redirects"),
+        chunk("C2", "src/sessions.py", 40, 50, "def rebuild_method(self, prepared_request, response):\n    # 303 See Other: switch the method to GET\n    if response.status_code == 303 and method != 'HEAD':\n        method = 'GET'\n", "rebuild_method"),
+    ]
+    r = verify_answer("When the status is 303 the `resolve_redirects` method switches the request method to GET.", chunks)
+    assert not any(c.label == "C1" and c.inferred for c in r.citations)          # never mis-attributed to the identifier's chunk

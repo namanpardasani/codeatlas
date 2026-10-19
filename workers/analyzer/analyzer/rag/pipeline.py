@@ -4,6 +4,7 @@
              -> citation verification -> final answer
 
 Events (dicts): status | retrieval | delta | final | error. Weak evidence is refused WITHOUT calling the LLM."""
+import re
 from collections.abc import Callable, Iterator
 
 from .. import config
@@ -15,7 +16,7 @@ from . import evidence as evidence_mod
 from .context import ContextChunk, assemble
 from .prompt import build_messages
 from .rerank import rerank as rerank_hits
-from .rewrite import needs_rewrite, rewrite_query
+from .rewrite import clean_history, needs_rewrite, rewrite_query
 from .verify import verify_answer
 
 NOT_FOUND_TEXT = "I couldn't find this in the repo."
@@ -33,7 +34,7 @@ def answer(conn, embedder, llm, repo_id: int, question: str, *, history: list[tu
            client_key: str = "anonymous", min_similarity: float | None = None, rewrite: str | None = None,
            reranker: Callable[[str, list[str]], list[float]] | None = None) -> Iterator[dict]:
     question = (question or "").strip()
-    history = (history or [])[-config.RAG_HISTORY_TURNS:]
+    history = clean_history((history or [])[-config.RAG_HISTORY_TURNS:])
     if not question or len(question) > MAX_QUESTION:
         yield {"type": "error", "kind": "bad_request", "message": f"Question must be 1..{MAX_QUESTION} characters."}
         return
@@ -59,7 +60,10 @@ def answer(conn, embedder, llm, repo_id: int, question: str, *, history: list[tu
 
         # 2. retrieval (+ optional rerank)
         yield {"type": "status", "stage": "retrieving"}
-        result = search(conn, embedder, repo_id, query, mode="hybrid", chunking="ast", limit=config.RAG_CANDIDATES)
+        # "how does X work" is answered by source code; test files and docs would otherwise crowd it out
+        wants_tests = bool(re.search(r"\b(tests?|testing|pytest|spec|unit)\b", f"{question} {query}", re.I))
+        result = search(conn, embedder, repo_id, query, mode="hybrid", chunking="ast", limit=config.RAG_CANDIDATES,
+                        exclude_tests=not wants_tests)
         hits = result.hits
         if reranker and hits:
             hits = rerank_hits(hits, query, reranker)

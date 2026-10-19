@@ -58,7 +58,11 @@ def get_llm(env: dict | None = None) -> LLMClient:
             raise LLMError("paid_not_allowed", "This endpoint bills your account. Set LLM_ALLOW_PAID=1 to confirm.")
         if needs_key and not key:
             raise LLMError("config", f"LLM_API_KEY is required for {provider} (create a free key at the provider).")
-        return OpenAICompatClient(base, model, key, name=provider, paid=paid, read_timeout=timeout)
+        penalty = env.get("LLM_FREQUENCY_PENALTY")
+        if penalty is None and provider in ("ollama", "llamacpp"):
+            penalty = "0.4"  # local small models loop ("... is called again ... is called again ...") without it
+        return OpenAICompatClient(base, model, key, name=provider, paid=paid, read_timeout=timeout,
+                                  frequency_penalty=float(penalty) if penalty else None)
     raise LLMError("config", f"Unknown LLM_PROVIDER {provider!r}.")
 
 

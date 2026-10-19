@@ -190,3 +190,17 @@ def test_global_budget_protects_the_whole_service(clean_usage, monkeypatch):
     with pytest.raises(LLMError):
         usage_mod.reserve(conn, "test-e")
     assert conn.execute("SELECT requests FROM llm_usage WHERE client_key='test-e' AND day=current_date").fetchone()[0] == 0
+
+
+def test_frequency_penalty_is_sent_only_when_configured(provider):
+    collect(OpenAICompatClient(provider.url, "m", None))
+    assert "frequency_penalty" not in provider.requests[-1]["body"]
+    collect(OpenAICompatClient(provider.url, "m", None, frequency_penalty=0.4))
+    assert provider.requests[-1]["body"]["frequency_penalty"] == 0.4
+
+
+def test_local_providers_default_to_a_repetition_penalty_hosted_ones_do_not():
+    assert get_llm({"LLM_PROVIDER": "llamacpp"}).frequency_penalty == 0.4
+    assert get_llm({"LLM_PROVIDER": "ollama"}).frequency_penalty == 0.4
+    assert get_llm({"LLM_PROVIDER": "groq", "LLM_API_KEY": "k"}).frequency_penalty is None
+    assert not get_llm({"LLM_PROVIDER": "llamacpp", "LLM_FREQUENCY_PENALTY": "0"}).frequency_penalty      # 0 = disabled
