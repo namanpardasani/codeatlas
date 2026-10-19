@@ -112,9 +112,9 @@ class PythonPlugin(LanguagePlugin):
             s.name for s in result.symbols if s.is_exported]
         result.exports.extend(names)
 
-    # ---- imports: TODO(user) -----------------------------------------------
+    # ---- imports -----------------------------------------------------------
     def extract_imports(self, root: ts.Node, source: bytes, result: ParseResult) -> None:
-        """TODO(user): write the Python import extraction (tree-sitter query).
+        """Python import extraction (implemented in python_imports.py).
 
         Append a RawImport to result.imports for each of:
           import os                    -> RawImport("os", "import", line, [])
@@ -128,6 +128,6 @@ class PythonPlugin(LanguagePlugin):
           import_statement, import_from_statement, dotted_name, aliased_import,
           relative_import (import_prefix + optional dotted_name), wildcard_import.
         Specifiers are stored UNRESOLVED. Resolution to files is Day 3.
-        The tests in tests/test_python_imports.py are xfail until this is done.
         """
-        return
+        from .python_imports import collect_imports
+        collect_imports(root, result)
