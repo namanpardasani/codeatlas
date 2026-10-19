@@ -52,32 +52,103 @@ export function createApp() {
       return;
     }
 
+    try {
+      const out = await enqueueAnalysis({ url: parsed.url, fullName: parsed.fullName }, "auto");
+      res.status(202).json(out);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Could not create job" });
+    }
+  });
+
+  // Create (or reuse) the analysis job of a repo. The schema allows ONE queued/running job per repo: when one is already
+  // active its id is returned, so clicking "analyse" twice just watches the same job.
+  async function enqueueAnalysis(target: { url?: string; fullName?: string; repoId?: number }, mode: "auto" | "full") {
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
-      const repo = await client.query(
-        `INSERT INTO repos (url, full_name) VALUES ($1, $2)
-         ON CONFLICT (url) DO UPDATE SET url = EXCLUDED.url
-         RETURNING id, url, full_name, status`,
-        [parsed.url, parsed.fullName],
-      );
-      const repoId = repo.rows[0].id as number;
-      const job = await client.query(
-        `INSERT INTO analysis_jobs (repo_id) VALUES ($1) RETURNING id`,
-        [repoId],
-      );
-      await client.query("COMMIT");
-      const jobId = job.rows[0].id as number;
+      let repoId = target.repoId;
+      let repoRow: Record<string, unknown> | undefined;
+      if (repoId === undefined) {
+        const repo = await client.query(
+          `INSERT INTO repos (url, full_name) VALUES ($1, $2)
+           ON CONFLICT (url) DO UPDATE SET url = EXCLUDED.url
+           RETURNING id, url, full_name, status`,
+          [target.url, target.fullName],
+        );
+        repoRow = repo.rows[0];
+        repoId = Number(repo.rows[0].id);
+      }
+      const active = await client.query(
+        "SELECT id FROM analysis_jobs WHERE repo_id = $1 AND status IN ('queued', 'running') LIMIT 1", [repoId]);
+      if (active.rowCount) {
+        await client.query("COMMIT");
+        return { repoId, jobId: active.rows[0].id, alreadyRunning: true, repo: repoRow };
+      }
+      let jobId: string;
+      try {
+        const job = await client.query("INSERT INTO analysis_jobs (repo_id, requested_mode) VALUES ($1, $2) RETURNING id", [repoId, mode]);
+        jobId = job.rows[0].id;
+        await client.query("COMMIT");
+      } catch (e) {
+        if ((e as { code?: string }).code !== "23505") throw e;          // lost a race with another submit: reuse that job
+        await client.query("ROLLBACK");
+        const again = await pool.query("SELECT id FROM analysis_jobs WHERE repo_id = $1 AND status IN ('queued', 'running') LIMIT 1", [repoId]);
+        return { repoId, jobId: again.rows[0].id, alreadyRunning: true, repo: repoRow };
+      }
       // Row is the source of truth; the stream message only wakes a worker.
       await redis.xadd(config.jobStream, "*", "jobId", String(jobId));
-      res.status(202).json({ repoId, jobId, repo: repo.rows[0] });
+      return { repoId, jobId, alreadyRunning: false, repo: repoRow };
     } catch (err) {
       await client.query("ROLLBACK").catch(() => {});
-      console.error(err);
-      res.status(500).json({ error: "Could not create job" });
+      throw err;
     } finally {
       client.release();
     }
+  }
+
+  const reanalyzeSchema = z.object({ mode: z.enum(["auto", "full"]).default("auto") });
+  const reanalyzeLimiter = rateLimit({ windowMs: 60_000, limit: 6, standardHeaders: true, legacyHeaders: false });
+
+  // Re-analyse an existing repo. mode=auto re-processes only what changed since the last analysis; mode=full redoes everything.
+  app.post("/repos/:id/reanalyze", reanalyzeLimiter, async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const body = reanalyzeSchema.safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "mode must be 'auto' or 'full'" });
+      return;
+    }
+    const exists = await pool.query("SELECT 1 FROM repos WHERE id = $1", [id]);
+    if (exists.rowCount === 0) {
+      res.status(404).json({ error: "Repo not found" });
+      return;
+    }
+    try {
+      res.status(202).json(await enqueueAnalysis({ repoId: id }, body.data.mode));
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: "Could not create job" });
+    }
+  });
+
+  // Recent analyses of a repo with their mode, change counts and timings (quote "re-index time reduced by X%" from these).
+  app.get("/repos/:id/analyses", async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const r = await pool.query(
+      `SELECT id, status, mode, requested_mode, commit_sha, files_total, files_added, files_modified, files_deleted, files_renamed,
+              files_reused, duration_ms, stage_timings, chunks_total, chunks_embedded, chunks_cached, created_at, finished_at
+       FROM analysis_jobs WHERE repo_id = $1 ORDER BY id DESC LIMIT 20`,
+      [id],
+    );
+    res.json(r.rows);
   });
 
   app.get("/jobs/:id", async (req, res) => {
@@ -88,7 +159,9 @@ export function createApp() {
     }
     const r = await pool.query(
       `SELECT j.id, j.repo_id, j.status, j.stage, j.progress, j.error, j.commit_sha,
-              j.created_at, j.started_at, j.finished_at, r.full_name
+              j.created_at, j.started_at, j.finished_at, r.full_name,
+              j.requested_mode, j.mode, j.files_total, j.files_added, j.files_modified, j.files_deleted, j.files_renamed,
+              j.files_reused, j.duration_ms, j.stage_timings, j.docs_llm_calls, j.docs_cached, j.docs_extractive
        FROM analysis_jobs j JOIN repos r ON r.id = j.repo_id WHERE j.id = $1`,
       [id],
     );
