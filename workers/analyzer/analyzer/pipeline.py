@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 
 from . import config, db
-from .clone import CloneError, clone
+from .clone import CloneError, LimitError, clone
 from .inventory import InventoryError, build_inventory
 from .graph.edges import edges_from_resolutions
 from .graph.metrics import analyze
@@ -82,7 +82,11 @@ def run_job(conn, r, job_id: int) -> None:
     try:
         db.set_repo_status(conn, repo_id, "analyzing")
         db.update_progress(conn, r, job_id, "cloning", 5)
-        sha = clone(url, dest)
+        try:
+            sha = clone(url, dest)  # bounded history (for churn)
+        except LimitError as e:
+            log.warning("job %s: history clone hit a limit (%s); retrying with HEAD only", job_id, e)
+            sha = clone(url, dest, history=False)
 
         db.update_progress(conn, r, job_id, "inventory", 30, commit_sha=sha)
         records = build_inventory(dest)
