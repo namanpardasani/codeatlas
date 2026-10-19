@@ -12,7 +12,7 @@ from dataclasses import dataclass, field
 
 WINDOW = 50          # min tokens in a duplicate
 MIN_LINES = 6        # min lines in a reported block
-MIN_DISTINCT = 6     # windows with fewer distinct token kinds are boilerplate/data tables
+MIN_DISTINCT = 10    # windows with fewer distinct token kinds are boilerplate/data tables (style dicts...)
 MAX_TOTAL_TOKENS = 1_500_000
 MAX_GROUPS = 200
 MAX_LOCATIONS = 20

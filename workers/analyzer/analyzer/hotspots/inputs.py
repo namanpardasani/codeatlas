@@ -29,7 +29,7 @@ def build_inputs(records: list[FileRecord], results: dict[str, ParseResult], ana
             path=rec.path, is_test=rec.is_test, lines=lines,
             code_lines=m.code_lines if m else 0, comment_ratio=m.comment_ratio if m else 0.0,
             **agg,
-            churn=fg.commits_window if fg else 0, authors=fg.authors if fg else 0, days_since_modified=days,
+            churn=fg.commits_window if fg else 0, commits_total=fg.commits_total if fg else 0, authors=fg.authors if fg else 0, days_since_modified=days,
             in_cycle=cyc is not None, cycle_size=len(analysis.cycles[cyc]) if cyc is not None else 0,
             fan_in=fan_in, fan_out=fan_out, pagerank=analysis.pagerank.get(rec.path, 0.0),
             has_test=test_file is not None, test_file=test_file,
