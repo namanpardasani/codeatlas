@@ -115,3 +115,41 @@ def save_resolutions(conn: psycopg.Connection, repo_id: int, file_ids: dict[str,
                   r.resolution.reason, repo_id, file_ids[r.from_path], r.idx)
                  for r in resolutions],
             )
+
+
+def save_graph(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int], analysis, edges) -> None:
+    """Replace a repo's graph atomically (idempotent): dependencies, cycles, module edges and the
+    per-file metrics. Files that are not graph nodes get NULL metrics."""
+    kinds: dict[tuple[str, str], set[str]] = {}
+    for e in edges:
+        if e.source != e.target:
+            kinds.setdefault((e.source, e.target), set()).add(e.kind)
+
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM dependencies WHERE repo_id = %s", (repo_id,))
+            cur.execute("DELETE FROM dependency_cycles WHERE repo_id = %s", (repo_id,))
+            cur.execute("DELETE FROM module_edges WHERE repo_id = %s", (repo_id,))
+            cur.execute("UPDATE files SET module=NULL, fan_in=NULL, fan_out=NULL, pagerank=NULL, "
+                        "cycle_idx=NULL WHERE repo_id = %s", (repo_id,))
+            cur.executemany(
+                "UPDATE files SET module=%s, fan_in=%s, fan_out=%s, pagerank=%s, cycle_idx=%s WHERE id=%s",
+                [(analysis.modules[p], analysis.fan[p][0], analysis.fan[p][1], analysis.pagerank[p],
+                  analysis.cycle_of.get(p), file_ids[p]) for p in analysis.graph.nodes],
+            )
+            cur.executemany(
+                "INSERT INTO dependencies (repo_id, from_file_id, to_file_id, kinds) VALUES (%s,%s,%s,%s)",
+                [(repo_id, file_ids[a], file_ids[b], Jsonb(sorted(k))) for (a, b), k in sorted(kinds.items())
+                 if b in analysis.graph.successors[a]],
+            )
+            cur.executemany(
+                "INSERT INTO dependency_cycles (repo_id, cycle_idx, size, file_ids) VALUES (%s,%s,%s,%s)",
+                [(repo_id, i, len(group), Jsonb([file_ids[p] for p in group]))
+                 for i, group in enumerate(analysis.cycles)],
+            )
+            rows = [(repo_id, a, b, n) for (a, b), n in analysis.cross_module_edges.items()]
+            rows += [(repo_id, m, m, n) for m, n in analysis.internal_module_edges.items()]
+            cur.executemany(
+                "INSERT INTO module_edges (repo_id, from_module, to_module, edge_count) VALUES (%s,%s,%s,%s)",
+                rows,
+            )

@@ -5,6 +5,8 @@ from pathlib import Path
 from . import config, db
 from .clone import CloneError, clone
 from .inventory import InventoryError, build_inventory
+from .graph.edges import edges_from_resolutions
+from .graph.metrics import analyze
 from .parsing import supported
 from .parsing.runner import SandboxedParser
 from .parsing.types import ParseResult
@@ -97,11 +99,18 @@ def run_job(conn, r, job_id: int) -> None:
         db.save_resolutions(conn, repo_id, file_ids, resolutions)
         counts = summarize(resolutions)
 
+        db.update_progress(conn, r, job_id, "graph", 96, commit_sha=sha)
+        code_files = {f.path for f in records if supported(f.path)}
+        edges = edges_from_resolutions(resolutions, code_files)
+        analysis = analyze(sorted(code_files), edges)
+        db.save_graph(conn, repo_id, file_ids, analysis, edges)
+
         db.set_repo_status(conn, repo_id, "ready", sha)
         db.update_progress(conn, r, job_id, "done", 100, "done", commit_sha=sha)
         bad = sum(1 for x in results.values() if x.status in ("failed", "partial"))
-        log.info("job %s done: %d files (%d parsed, %d with problems); imports %s @ %s",
-                 job_id, len(records), len(results), bad, counts, sha[:8])
+        log.info("job %s done: %d files (%d parsed, %d with problems); imports %s; graph %d nodes, %d cycles @ %s",
+                 job_id, len(records), len(results), bad, counts,
+                 len(analysis.graph.nodes), len(analysis.cycles), sha[:8])
     except (CloneError, InventoryError) as e:
         # Permanent, user-facing failure: don't retry.
         log.warning("job %s failed: %s", job_id, e)
