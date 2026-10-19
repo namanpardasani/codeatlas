@@ -3,76 +3,11 @@ import pytest
 
 from analyzer import db, indexing
 from analyzer.embeddings import HashEmbedder
-from analyzer.indexing import SourceFile, embed_pending, index_repo
-from analyzer.parsing import parse_source
+from analyzer.indexing import embed_pending, index_repo
 from analyzer.search import rrf_fuse, search
 from analyzer.textutil import expand_identifiers, query_terms, to_tsquery
 
-FILES = {
-    "src/retry.py": '''import time
-
-
-def retry_with_backoff(fn, attempts=5, base_delay=0.5):
-    """Call fn again after a failure, waiting twice as long each time (exponential backoff)."""
-    delay = base_delay
-    for attempt in range(attempts):
-        try:
-            return fn()
-        except Exception:
-            if attempt == attempts - 1:
-                raise
-            time.sleep(delay)
-            delay *= 2
-''',
-    "src/auth.py": '''import hashlib
-
-
-def verify_password(plain, hashed):
-    """Check that a user supplied password matches the stored hash."""
-    return hashlib.sha256(plain.encode()).hexdigest() == hashed
-
-
-def create_session_token(user_id):
-    """Issue a signed session token for a logged in user."""
-    return f"token-{user_id}"
-''',
-    "src/config.ts": '''export function parseConfig(text: string): Record<string, string> {
-  const out: Record<string, string> = {};
-  for (const line of text.split("\\n")) {
-    const [key, value] = line.split("=");
-    if (key) out[key.trim()] = (value ?? "").trim();
-  }
-  return out;
-}
-
-export function loadConfigFile(path: string) {
-  return parseConfig(require("fs").readFileSync(path, "utf8"));
-}
-''',
-    "src/pool.py": '''class ConnectionPool:
-    """Keeps database connections open and hands them out to callers."""
-
-    def __init__(self, size):
-        self.free = [object() for _ in range(size)]
-
-    def acquire(self):
-        return self.free.pop()
-
-    def release(self, conn):
-        self.free.append(conn)
-''',
-    "README.md": "# Demo\n\nA tiny demo project.\n\n## Installation\n\nRun pip install demo to get started.\n\n## Configuration\n\nSet the DEMO_HOME variable.\n",
-}
-LANG = {"py": "python", "ts": "typescript", "md": "markdown"}
-
-
-def source_files(files=None):
-    out = []
-    for path, text in (files or FILES).items():
-        lang = LANG[path.rsplit(".", 1)[-1]]
-        syms = parse_source(path, text.encode()).symbols if lang != "markdown" else []
-        out.append(SourceFile(path, lang, len(text), text, syms))
-    return out
+from fixture_repo import FILES, LANG, source_files
 
 
 try:
