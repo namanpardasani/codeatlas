@@ -235,6 +235,33 @@ def test_urls_are_allowed_only_when_the_material_contains_them():
     assert check_summary("`Server` is documented at https://evil.example/x.", material, set())[0] is None
 
 
+def test_a_specific_technical_construct_the_material_never_mentions_is_an_invention():
+    """Measured with a real 1.5B model: 'index.js includes a generator function' (there is none) passed word overlap."""
+    material = "FILE: index.js\nDEFINES:\n- `pLimit` (function): queue of promises\nCODE:\nexport default function pLimit(concurrency) { const queue = []; }"
+    text, issues = check_summary("`index.js` provides `pLimit`, which limits concurrency with a queue. "
+                                 "It also includes a generator function that creates new limiters.", material, {"index.js"})
+    assert text == "`index.js` provides `pLimit`, which limits concurrency with a queue." and any("generator" in i for i in issues)
+    assert check_summary("`index.js` caches every result in redis.", material, {"index.js"})[0] is None
+    with_it = material + "\nfunction* walk() { yield 1 } // a generator"
+    assert check_summary("It also includes a generator function `walk`.", with_it, set())[0] is not None   # fine when the code has it
+
+
+def test_entry_point_claims_may_only_name_known_entry_points():
+    from analyzer.docs.guard import check_entry_points
+    eps = [{"path": "index.js", "why": "conventional entry file name"}]
+    text, issues = check_entry_points("The package has two entry points: `index.js` and `benchmark.js`. It limits concurrency.", eps)
+    assert text == "It limits concurrency." and len(issues) == 1
+    assert check_entry_points("The entry point is `index.js`.", eps)[0] == "The entry point is `index.js`."
+    assert check_entry_points("`benchmark.js` measures speed.", eps)[0] == "`benchmark.js` measures speed."     # not an entry claim
+
+
+def test_the_repo_summary_goes_through_the_entry_point_check(h):
+    liar = ScriptedLLM(lambda u: "`pkg/core.py` and `main.py` are the entry points of `acme/demo`. It sums prices from `pkg/models.py`.")
+    docs(h, liar, max_calls=100)
+    repo_text = rows(h)[("repo", "")][1]
+    assert "entry points" not in repo_text.lower() or "pkg/core.py" not in repo_text
+
+
 # ---- extractive helpers and facts ---------------------------------------------------------------------------------------
 def test_docstring_and_jsdoc_extraction():
     py = ["def f(a, b):", '    """Add two numbers. Extra detail."""', "    return a + b"]

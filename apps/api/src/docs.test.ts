@@ -50,7 +50,8 @@ describe("docs renderers", () => {
   it("every page ends with the 'generated from commit X on date' footer", () => {
     for (const md of [renderRepo(DATA, link), renderFolder(DATA, "pkg", link), renderFile(DATA, "pkg/core.py", link)]) {
       expect(md).toContain("generated from commit `abcdef1` on 2026-10-19 (model `m-1`)");
-      expect(md).toContain("checked against the source");
+      expect(md).toContain("screened automatically");
+      expect(md).toContain("cannot catch every inaccuracy");
     }
     expect(footer({ ...DATA.repo, docs_commit_sha: null, docs_generated_at: null, docs_model: null })).toContain("unknown commit");
   });

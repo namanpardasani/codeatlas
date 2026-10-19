@@ -73,8 +73,10 @@ export function footer(repo: DocsRepo): string {
   return [
     "---",
     `*Documentation generated from commit \`${sha}\` on ${when}${repo.docs_model ? ` (model \`${repo.docs_model}\`)` : ""}. ` +
-      "Summaries marked *extractive* were assembled from names, docstrings and the import graph without an LLM; every other " +
-      "summary was checked against the source it describes. Metrics, hotspots and dependencies are computed from the code.*",
+      "Summaries marked *extractive* were assembled from names, docstrings and the import graph without an LLM. The others were " +
+      "drafted by a model and screened automatically (code names, file paths and wording are compared with the source); screening " +
+      "cannot catch every inaccuracy, so check important details in the code. Metrics, hotspots and dependencies are computed from " +
+      "the code, not written by a model.*",
   ].join("\n");
 }
 

@@ -5,7 +5,7 @@ import secrets
 from ..llm import Message
 from ..rag.prompt import neutralise
 
-PROMPT_VERSION = "docs-v1"   # mirrored in config.DOCS_PROMPT_VERSION; bump both when wording changes
+PROMPT_VERSION = "docs-v2"   # mirrored in config.DOCS_PROMPT_VERSION; bump both when wording changes
 
 SYSTEM = """You write short technical documentation for ONE part of a code repository, using ONLY the material in the user message.
 
