@@ -56,6 +56,43 @@ export interface FileDetail {
   imports: ImportRow[];
 }
 
+export interface FileGraphNode {
+  id: string;
+  path: string;
+  module: string;
+  fan_in: number;
+  fan_out: number;
+  pagerank: number;
+  cycle_idx: number | null;
+}
+export interface FolderGraphNode {
+  id: string;
+  files: number;
+  files_in_cycles: number;
+  pagerank: number | null;
+  internal_edges: number;
+}
+export interface GraphEdge {
+  source: string;
+  target: string;
+  kinds?: string[];
+  count?: number;
+}
+export interface GraphResponse<N> {
+  mode: "files" | "folders";
+  truncated: boolean;
+  total_nodes: number;
+  nodes: N[];
+  edges: GraphEdge[];
+  cycles: { id: number; size: number; file_ids: string[] }[];
+}
+export interface FileGraphDetail {
+  file: FileGraphNode & { repo_id: string };
+  imports: { id: string; path: string; kinds: string[] }[];
+  imported_by: { id: string; path: string; kinds: string[] }[];
+  cycle: { id: string; path: string }[];
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, init);
   const body = await res.json();
@@ -83,3 +120,9 @@ export function watchJob(jobId: string, onEvent: (e: JobEvent) => void): () => v
   es.onerror = () => es.close();
   return () => es.close();
 }
+
+export const getFileGraphOverview = (repoId: string, limit = 300) =>
+  request<GraphResponse<FileGraphNode>>(`/repos/${repoId}/graph?mode=files&limit=${limit}`);
+export const getFolderGraph = (repoId: string) =>
+  request<GraphResponse<FolderGraphNode>>(`/repos/${repoId}/graph?mode=folders`);
+export const getFileGraph = (fileId: string) => request<FileGraphDetail>(`/files/${fileId}/graph`);

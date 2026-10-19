@@ -6,3 +6,4 @@ export type { Tone } from "./Badge";
 export { Table } from "./Table";
 export type { Column } from "./Table";
 export { ProgressBar } from "./ProgressBar";
+export { token } from "./tokens";
