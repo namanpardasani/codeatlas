@@ -7,14 +7,23 @@ For every sentence of the answer:
     of its citations is removed entirely (an unsupported claim);
   * a sentence that cites real chunks but names a code identifier (in backticks) that appears nowhere in the
     retrieved code is removed (a hallucinated symbol);
-  * a sentence with no citation at all that makes a claim is kept but flagged `uncited` (downgraded);
+  * the words a sentence says ABOUT the code must appear in the chunk(s) it cites (>= RAG_MIN_SUPPORT of them): a sentence
+    that says something its cited code does not contain is removed (a cheap stand-in for entailment checking);
+  * a sentence with no citation that names code identifiers is checked the same way (a symbol that exists in
+    none of the retrieved code removes it); if all its identifiers occur in ONE retrieved chunk, that chunk is
+    attached as an INFERRED citation (narrowest matching lines, flagged `inferred`, never passed off as the
+    model's own citation): small models often answer correctly but forget to cite;
+  * any other uncited claim is kept but flagged `uncited` (downgraded);
   * if NO valid citation survives anywhere, the whole answer is replaced by "I couldn't find this in the repo".
 Code blocks are kept; if most of their lines are not in the retrieved code the answer is marked partial.
 """
 import re
 from dataclasses import dataclass, field
 
+from .. import config
+from ..textutil import STOPWORDS, split_identifier
 from .context import ContextChunk
+from .evidence import IDENT_LIKE
 
 GROUP = re.compile(r"\[\s*(C\d+(?::\d+(?:-\d+)?)?(?:\s*[,;]\s*C\d+(?::\d+(?:-\d+)?)?)*)\s*\]")
 REF = re.compile(r"C(\d+)(?::(\d+)(?:-(\d+))?)?")
@@ -39,6 +48,7 @@ class Citation:
     end_line: int
     symbol: str | None = None
     kind: str | None = None
+    inferred: bool = False      # attached by us (identifier match), not cited by the model
 
     def to_dict(self) -> dict:
         return self.__dict__.copy()
@@ -47,7 +57,7 @@ class Citation:
 @dataclass
 class Claim:
     text: str
-    status: str                 # supported | uncited | neutral | removed
+    status: str                 # supported | inferred | uncited | neutral | removed
     citations: list[str] = field(default_factory=list)
     reason: str | None = None
 
@@ -77,9 +87,52 @@ def is_not_found(text: str) -> bool:
 
 def _is_claim(sentence: str) -> bool:
     words = re.findall(r"\w+", sentence)
-    if len(words) < 5 or sentence.rstrip().endswith("?") or sentence.rstrip().endswith(":"):
-        return False
-    return bool(BACKTICK.search(sentence) or re.search(r"\d", sentence) or CLAIM_HINTS.search(sentence))
+    # any ordinary statement counts: questions, headings and very short connective sentences do not
+    return not (len(words) < 5 or sentence.rstrip().endswith(("?", ":")))
+
+
+GENERIC = frozenset("""method function class code file files returns return takes take used uses using use which that this
+these those with from into also when then them they there their have has been being will would should could does doing
+done first second next after before while where about other more most some such only both each every other based like
+object value values parameter parameters argument arguments instance call called calls calling result results""".split())
+WORD = re.compile(r"[A-Za-z][A-Za-z0-9_]{2,}")
+
+
+def _stem(w: str) -> str:
+    """Crude suffix stripping so `sleeps`/`sleep`, `attempts`/`attempt`, `redirected`/`redirect` match."""
+    if w.endswith("ies") and len(w) > 5:
+        return w[:-3] + "y"
+    for suffix, minlen in (("ing", 6), ("ed", 5), ("es", 5)):
+        if w.endswith(suffix) and len(w) >= minlen:
+            return w[: -len(suffix)]
+    if w.endswith("s") and not w.endswith("ss") and len(w) > 4:
+        return w[:-1]
+    return w
+
+
+def _content_words(text: str) -> set[str]:
+    words: set[str] = set()
+    for tok in WORD.findall(GROUP.sub("", text)):
+        for w in (split_identifier(tok) if ("_" in tok or tok != tok.lower()) else [tok.lower()]):
+            if len(w) >= 4 and w not in STOPWORDS and w not in GENERIC:
+                words.add(_stem(w))
+    return words
+
+
+def _support(sentence: str, chunks: list[ContextChunk]) -> tuple[float, float] | None:
+    """(score, required): how much of what the sentence says is found in `chunks`.
+
+    A sentence that names `resolve_redirects` gets overlap "for free" from the identifier, so when it has at least 3
+    OTHER content words the score uses only those (what it claims ABOUT the code, e.g. "encrypts", "billing",
+    "caches"). Measured on real model output: honest sentences scored 50-100%, invented or parroted ones 0-25%.
+    Very short sentences are judged on all their words with a lenient bar. None = too little to judge."""
+    text = GROUP.sub("", sentence)
+    prose = _content_words(BACKTICK.sub(" ", text))
+    words, required = (prose, config.RAG_MIN_SUPPORT) if len(prose) >= 3 else (_content_words(text), config.RAG_MIN_SUPPORT_SHORT)
+    if len(words) < 3:
+        return None
+    hay = _content_words(" ".join(c.hit.content + " " + c.hit.path + " " + (c.hit.symbol or "") for c in chunks))
+    return len(words & hay) / len(words), required
 
 
 def _split_sentences(line: str) -> list[str]:
@@ -141,7 +194,7 @@ def verify_answer(answer: str, chunks: list[ContextChunk]) -> Verified:
         prefix = bullet.group(1) if bullet else ""
         kept: list[str] = []
         for sentence in _split_sentences(raw[len(prefix):]):
-            clean, claim = _check_sentence(sentence, by_label, blob, used)
+            clean, claim = _check_sentence(sentence, by_label, blob, used, chunks)
             v.claims.append(claim)
             if claim.status == "removed":
                 v.removed.append(sentence)
@@ -149,6 +202,8 @@ def verify_answer(answer: str, chunks: list[ContextChunk]) -> Verified:
                 continue
             if claim.status == "uncited":
                 v.issues.append("uncited_claim")
+            if claim.status == "inferred":
+                v.issues.append("citations_inferred")
             kept.append(clean)
         if kept:
             out_lines.append(prefix + " ".join(kept))
@@ -164,11 +219,13 @@ def verify_answer(answer: str, chunks: list[ContextChunk]) -> Verified:
         v.issues.append("no_valid_citation")
         return v
     v.text = text
+    v.issues = list(dict.fromkeys(v.issues))
     v.status = "partial" if v.issues else "answered"
     return v
 
 
-def _check_sentence(sentence: str, by_label: dict[str, ContextChunk], blob: str, used: dict) -> tuple[str, Claim]:
+def _check_sentence(sentence: str, by_label: dict[str, ContextChunk], blob: str, used: dict,
+                    chunks: list[ContextChunk] | None = None) -> tuple[str, Claim]:
     valid: list[tuple[str, int, int]] = []
     problems: list[str] = []
     for m in GROUP.finditer(sentence):
@@ -201,13 +258,66 @@ def _check_sentence(sentence: str, by_label: dict[str, ContextChunk], blob: str,
     if not valid:
         if had_citations:
             return "", Claim(sentence, "removed", [], "; ".join(problems) or "all citations invalid")
-        if _is_claim(sentence):
-            return clean, Claim(clean, "uncited", [], "no citation")
-        return clean, Claim(clean, "neutral")
+        if not _is_claim(sentence):
+            return clean, Claim(clean, "neutral")
+        missing = _symbols_missing(sentence, blob)
+        if missing:
+            return "", Claim(sentence, "removed", [], f"names {', '.join('`' + m + '`' for m in missing)}, which is not in the retrieved code")
+        inferred = _infer_citation(clean, chunks or [])
+        if inferred:
+            label, lo, hi = inferred
+            ch = by_label[label]
+            used.setdefault((label, lo, hi), Citation(label, ch.chunk_id, ch.path, lo, hi, ch.hit.symbol, ch.hit.kind, inferred=True))
+            tagged = re.sub(r"([.!?]?)$", rf" [{label}:{lo}-{hi}]\1", clean, count=1)
+            return tagged, Claim(tagged, "inferred", [f"{label}:{lo}-{hi}"], "citation inferred from identifiers")
+        support = _support(sentence, chunks or [])
+        if support is not None and support[0] < support[1]:
+            return "", Claim(sentence, "removed", [], f"not supported by any retrieved code (support {support[0]:.0%})")
+        return clean, Claim(clean, "uncited", [], "no citation")
     missing = _symbols_missing(sentence, blob)
     if missing:
         return "", Claim(sentence, "removed", [], f"names {', '.join('`' + m + '`' for m in missing)}, which is not in the retrieved code")
+    cited = [by_label[label] for label in dict.fromkeys(l for l, _, _ in valid)]
+    support = _support(sentence, cited)
+    if support is not None and support[0] < support[1]:
+        return "", Claim(sentence, "removed", [], f"the cited code does not contain what it says (support {support[0]:.0%})")
     for label, lo, hi in valid:
         ch = by_label[label]
         used.setdefault((label, lo, hi), Citation(label, ch.chunk_id, ch.path, lo, hi, ch.hit.symbol, ch.hit.kind))
     return clean, Claim(clean, "supported", [f"{l}:{lo}-{hi}" for l, lo, hi in valid])
+
+
+def _identifiers(sentence: str) -> list[str]:
+    """Code identifiers a sentence talks about: backticked single identifiers and bare snake_case / CamelCase / dotted names."""
+    text = GROUP.sub("", sentence)
+    found = [t.strip().removesuffix("()") for t in BACKTICK.findall(text)]
+    found += [m.group(0) for m in IDENT_LIKE.finditer(BACKTICK.sub(" ", text))]
+    out = []
+    for tok in found:
+        if IDENT.fullmatch(tok) and tok not in COMMON and len(tok) >= 3:
+            out.append(tok)
+    return list(dict.fromkeys(out))
+
+
+def _infer_citation(sentence: str, chunks: list[ContextChunk]) -> tuple[str, int, int] | None:
+    """The retrieved chunk that contains every identifier of the sentence, with the narrowest matching lines."""
+    idents = _identifiers(sentence)
+    if not idents:
+        return None
+    best = None
+    for c in chunks:
+        hay = c.hit.content + "\n" + (c.hit.symbol or "")
+        if not all(i.split(".")[-1] in hay for i in idents):
+            continue
+        lines = c.hit.content.split("\n")[: c.shown_end - c.shown_start + 1]
+        hit_lines = [n for n, ln in enumerate(lines) if any(i.split(".")[-1] in ln for i in idents)]
+        if hit_lines:
+            lo, hi = c.shown_start + hit_lines[0], c.shown_start + hit_lines[-1]
+            if hi - lo > 40:
+                hi = lo + 40
+        else:   # identifiers only appear in the chunk's symbol name: point at the chunk's first lines
+            lo, hi = c.shown_start, min(c.shown_end, c.shown_start + 10)
+        score = (len(hit_lines), -int(c.label[1:]))
+        if best is None or score > best[0]:
+            best = (score, c.label, lo, hi)
+    return best[1:] if best else None

@@ -248,6 +248,7 @@ export interface ChatCitation {
   end_line: number;
   symbol: string | null;
   kind: string | null;
+  inferred?: boolean;   // matched automatically from identifiers, not cited by the model
 }
 export interface ChatChunkInfo {
   label: string;

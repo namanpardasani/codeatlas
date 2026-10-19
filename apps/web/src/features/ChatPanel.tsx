@@ -49,10 +49,10 @@ function AnswerText({ text, citations, onOpen }: { text: string; citations: Chat
         const c = find(p.ref);
         if (!c) return <Fragment key={i}>[{p.ref}]</Fragment>;
         return (
-          <button key={i} className="mx-0.5 rounded-ui bg-subtle px-gap font-mono text-small text-info"
-                  title={`${c.path}:${c.start_line}-${c.end_line}`}
+          <button key={i} className={`mx-0.5 rounded-ui bg-subtle px-gap font-mono text-small ${c.inferred ? "text-muted" : "text-info"}`}
+                  title={`${c.path}:${c.start_line}-${c.end_line}${c.inferred ? " (matched automatically: the model did not cite this)" : ""}`}
                   onClick={() => onOpen({ path: c.path, start: c.start_line, end: c.end_line })}>
-            {p.ref}
+            {c.inferred ? "≈" : ""}{p.ref}
           </button>
         );
       })}
@@ -150,6 +150,7 @@ export function ChatPanel({ repoId, onOpen }: { repoId: string; onOpen: (t: View
               <p className="text-warning">
                 <Badge tone="warning">partly verified</Badge>{" "}
                 {t.removed.length > 0 && `${t.removed.length} unsupported statement(s) were removed. `}
+                {t.issues.includes("citations_inferred") && "The model did not cite its sources, so citations marked ≈ were matched automatically from the code names it mentions. "}
                 {t.issues.includes("uncited_claim") && "Some statements have no citation. "}
                 {t.issues.includes("code_not_in_repo") && "A code block is not from the retrieved code."}
               </p>
@@ -161,7 +162,7 @@ export function ChatPanel({ repoId, onOpen }: { repoId: string; onOpen: (t: View
                 {t.citations.map((c) => (
                   <button key={`${c.label}-${c.start_line}-${c.end_line}`} className="font-mono text-info"
                           onClick={() => onOpen({ path: c.path, start: c.start_line, end: c.end_line })}>
-                    {c.path}:{c.start_line}–{c.end_line}
+                    {c.inferred ? "≈ " : ""}{c.path}:{c.start_line}–{c.end_line}
                   </button>
                 ))}
               </div>
