@@ -10,12 +10,56 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from . import config, db
 from .embeddings import LazyEmbedder
+from .llm import LLMError, get_llm
+from .rag.pipeline import answer
 from .search import CHUNKINGS, MODES, search
 
 log = logging.getLogger("analyzer.service")
 MAX_BODY = 16 * 1024
 MAX_QUERY = 500
 embedder = LazyEmbedder()
+_llm = None
+_reranker = None
+
+
+def llm_client():
+    """Built lazily so the service starts (and search works) even when no LLM is configured yet."""
+    global _llm
+    if _llm is None:
+        _llm = get_llm()
+    return _llm
+
+
+def reranker():
+    global _reranker
+    if config.RAG_RERANK != "cross-encoder":
+        return None
+    if _reranker is None:
+        from .rag.rerank import CrossEncoderReranker
+        _reranker = CrossEncoderReranker().scores
+    return _reranker
+
+
+def chat_events(body: dict):
+    """Validate a /chat request and yield RAG events (dicts)."""
+    try:
+        repo_id, question = int(body["repo_id"]), str(body["question"])
+    except (KeyError, TypeError, ValueError):
+        yield {"type": "error", "kind": "bad_request", "message": "repo_id and question are required"}
+        return
+    history = []
+    for turn in (body.get("history") or [])[-config.RAG_HISTORY_TURNS:]:
+        if isinstance(turn, dict):
+            history.append((str(turn.get("q", ""))[:500], str(turn.get("a", ""))[:700]))
+    client_key = str(body.get("client_key") or "anonymous")[:64]
+    try:
+        llm = llm_client()
+    except LLMError as e:
+        yield {"type": "error", **e.to_dict()}
+        return
+    with db.connect() as conn:
+        yield from answer(conn, embedder.get(), llm, repo_id, question, history=history, client_key=client_key,
+                          reranker=reranker())
 
 
 def handle_search(body: dict) -> tuple[int, dict]:
@@ -56,8 +100,27 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(200, {"ok": True, "model": e.name if e else None, "vector_ready": e is not None})
         self._send(404, {"error": "not found"})
 
+    def _stream(self, events) -> None:
+        """NDJSON stream: one JSON event per line, flushed immediately (the Node API relays it as SSE)."""
+        self.send_response(200)
+        self.send_header("Content-Type", "application/x-ndjson")
+        self.send_header("Cache-Control", "no-cache")
+        self.end_headers()
+        try:
+            for ev in events:
+                self.wfile.write((json.dumps(ev) + "\n").encode())
+                self.wfile.flush()
+        except (BrokenPipeError, ConnectionResetError):
+            events.close()  # client went away: stop generating (and record the tokens used so far)
+        except Exception:  # noqa: BLE001
+            log.exception("chat stream failed")
+            try:
+                self.wfile.write((json.dumps({"type": "error", "kind": "unavailable", "message": "Internal error"}) + "\n").encode())
+            except OSError:
+                pass
+
     def do_POST(self):  # noqa: N802
-        if self.path != "/search":
+        if self.path not in ("/search", "/chat"):
             return self._send(404, {"error": "not found"})
         length = int(self.headers.get("Content-Length") or 0)
         if length <= 0 or length > MAX_BODY:
@@ -68,6 +131,8 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError
         except ValueError:
             return self._send(400, {"error": "invalid JSON"})
+        if self.path == "/chat":
+            return self._stream(chat_events(body))
         try:
             status, payload = handle_search(body)
         except Exception:  # noqa: BLE001

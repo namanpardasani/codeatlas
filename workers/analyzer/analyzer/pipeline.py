@@ -157,6 +157,7 @@ def run_job(conn, r, job_id: int, embedders=None) -> None:
 
         db.update_progress(conn, r, job_id, "chunking", 90, commit_sha=sha)
         sources = load_sources(dest, records, by_path)
+        db.save_file_contents(conn, repo_id, file_ids, sources)
         embedder = embedders.get() if embedders else None
         index = index_repo(conn, embedder, repo_id, file_ids, sources,
                            on_progress=lambda f: db.update_progress(conn, r, job_id, "embedding", 91 + int(8 * f),

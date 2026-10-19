@@ -295,3 +295,13 @@ def save_index_stats(conn: psycopg.Connection, job_id: int, stats) -> None:
     conn.execute("""UPDATE analysis_jobs SET chunks_total=%s, chunks_embedded=%s, chunks_cached=%s,
                     embed_model=%s, index_partial=%s WHERE id=%s""",
                  (stats.chunks_total, stats.embedded, stats.cached, stats.model, stats.partial, job_id))
+
+
+def save_file_contents(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int], sources) -> None:
+    """Keep the text of indexable files so the UI can open a citation at its lines (the clone is deleted)."""
+    rows = [(file_ids[f.path], f.text) for f in sources if f.path in file_ids]
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM file_contents WHERE file_id IN (SELECT id FROM files WHERE repo_id = %s)", (repo_id,))
+            cur.executemany("INSERT INTO file_contents (file_id, content) VALUES (%s, %s) ON CONFLICT (file_id) DO UPDATE "
+                            "SET content = EXCLUDED.content", rows)
