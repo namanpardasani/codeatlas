@@ -3,6 +3,7 @@ import tree_sitter as ts
 import tree_sitter_python as tsp
 
 from .base import MAX_DEPTH, LanguagePlugin, signature, text
+from .complexity import PY_RULES, measure
 from .types import ParseResult, RawImport, Symbol
 
 
@@ -36,6 +37,17 @@ def _has_docstring(body: ts.Node | None) -> bool:
 class PythonPlugin(LanguagePlugin):
     name = "python"
     extensions = (".py",)
+    IMPORT_TYPES = frozenset({"import_statement", "import_from_statement", "future_import_statement"})
+
+    def is_docstring(self, node: ts.Node) -> bool:
+        if node.type != "expression_statement" or not node.named_children or node.named_children[0].type != "string":
+            return False
+        parent = node.parent
+        if parent is None or not parent.named_children or parent.named_children[0].id != node.id:
+            return False
+        return parent.type == "module" or (
+            parent.type == "block" and parent.parent is not None
+            and parent.parent.type in ("function_definition", "class_definition"))
 
     def __init__(self):
         super().__init__(tsp.language())
@@ -86,14 +98,19 @@ class PythonPlugin(LanguagePlugin):
         if not name:
             return
         top_level = parent is None
-        result.symbols.append(Symbol(
+        sym = Symbol(
             name=name, kind=kind,
             start_line=node.start_point.row + 1, end_line=node.end_point.row + 1,
             params=params, parent=parent,
             # Python convention: public top-level names are the module's exports
             is_exported=top_level and not name.startswith("_"),
             has_doc=has_doc, signature=signature(node),
-        ))
+        )
+        n_params = len(params) - (1 if kind == "method" and params and params[0] in ("self", "cls") else 0)
+        sym.param_count = n_params
+        if kind in ("function", "method"):
+            sym.complexity, sym.max_nesting = measure(node, PY_RULES)
+        result.symbols.append(sym)
 
     @staticmethod
     def _exports(root, result):
