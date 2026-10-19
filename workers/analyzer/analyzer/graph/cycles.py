@@ -2,21 +2,57 @@ from .types import DependencyGraph
 
 
 def find_cycles(graph: DependencyGraph) -> list[list[str]]:
-    """TODO(user): find circular dependencies = strongly connected components (SCCs) of size >= 2.
+    """Tarjan's strongly-connected-components algorithm, written without recursion.
 
-    Contract (tests/test_cycles.py checks each line):
-      1. Return one list per SCC that has 2 or more files (a cycle group). Files that are
-         not part of any cycle are not returned.
-      2. Inside each group: files sorted. Across groups: sorted by their first file.
-         (so the result is deterministic and easy to compare)
-      3. Overlapping cycles (a->b->c->a and b->d->b) are ONE group {a,b,c,d}: an SCC is the
-         maximal set of files that can all reach each other.
-      4. Must be ITERATIVE: a 5,000-file chain or ring must not hit Python's recursion limit.
-      5. O(N + E): Tarjan's or Kosaraju's algorithm. (Don't enumerate every simple cycle: the
-         number of simple cycles can be exponential.)
-
-    Hints: Tarjan needs an index, a lowlink, an "on stack" flag and an explicit work stack of
-    (node, next-neighbour-position). Kosaraju needs a finish order + the transpose graph
-    (you already have `predecessors`).
+    A group of files that can all reach each other (A -> B -> C -> A) is one SCC.
+    Any SCC with 2+ files is a circular dependency. O(N + E). Groups are sorted inside and
+    by first file across, so the output is deterministic.
     """
-    raise NotImplementedError("TODO(user): implement find_cycles")
+    index: dict[str, int] = {}   # order in which each file was first visited
+    low: dict[str, int] = {}     # lowest index reachable from this file
+    on_stack: set[str] = set()
+    stack: list[str] = []        # files visited but not yet assigned to a group
+    cycles: list[list[str]] = []
+    counter = 0
+
+    for root in graph.nodes:
+        if root in index:
+            continue
+        index[root] = low[root] = counter
+        counter += 1
+        stack.append(root)
+        on_stack.add(root)
+        work = [(root, 0)]  # (file, position of the next neighbour to look at)
+
+        while work:
+            node, i = work.pop()
+            neighbours = graph.successors[node]
+
+            if i < len(neighbours):
+                work.append((node, i + 1))          # come back for the next neighbour later
+                nxt = neighbours[i]
+                if nxt not in index:                # unvisited: go deeper
+                    index[nxt] = low[nxt] = counter
+                    counter += 1
+                    stack.append(nxt)
+                    on_stack.add(nxt)
+                    work.append((nxt, 0))
+                elif nxt in on_stack:               # points back into the current path: cycle
+                    low[node] = min(low[node], index[nxt])
+            else:
+                # finished all neighbours of `node`
+                if low[node] == index[node]:        # `node` is the root of a group
+                    group = []
+                    while True:
+                        member = stack.pop()
+                        on_stack.discard(member)
+                        group.append(member)
+                        if member == node:
+                            break
+                    if len(group) >= 2:
+                        cycles.append(sorted(group))
+                if work:                            # tell the parent what we learned
+                    parent = work[-1][0]
+                    low[parent] = min(low[parent], low[node])
+
+    return sorted(cycles, key=lambda g: g[0])

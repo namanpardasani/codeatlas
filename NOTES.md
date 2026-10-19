@@ -13,7 +13,7 @@
 - UI: all styling in `apps/web/src/index.css` (`@theme` tokens) and `components/ui/*`; feature panels use only semantic classes.
 
 - Resolution layer (`analyzer/resolve/`): `js.py` (TS/JS), `python.py`, `jsonc.py` (tsconfig parsing); `resolve_imports()` returns per-import `Resolution(status internal|external|unresolved, targets, package, reason)`. Stored on `imports_raw` (migration 003). Pipeline stage "resolving" (92%).
-- Graph layer (`analyzer/graph/`): `types.py` (Edge, DependencyGraph), `builder.py` + `cycles.py` are USER-WRITTEN TODO stubs, `reference.py` is a networkx reference used only to cross-check in tests.
+- Graph layer (`analyzer/graph/`): `types.py` (Edge, DependencyGraph), `builder.py` + `cycles.py` are the implementations (Tarjan SCC, iterative), `reference.py` is a networkx reference used only to cross-check in tests.
 
 ## Decisions and tradeoffs
 - Never guess: an import that looks internal but matches no file is `unresolved` with a reason (shown in the UI), not silently dropped or mapped to a "closest" file. Unresolved rate is itself a quality metric for the eval.

@@ -41,15 +41,6 @@ def test_malformed_python_returns_partial_results():
     assert {"ok", "After"} <= {s.name for s in r.symbols}
 
 
-def test_python_import_stub_does_not_crash():
-    # While the stub is unimplemented the parse still succeeds with no imports.
-    assert parse("sample.py").status == "ok"
-
-
-XFAIL = pytest.mark.xfail(reason="TODO(user): implement PythonPlugin.extract_imports", strict=False)
-
-
-@XFAIL
 def test_python_plain_imports():
     r = parse("sample.py")
     got = {(i.specifier, i.kind, i.level): i.names for i in r.imports}
@@ -57,7 +48,6 @@ def test_python_plain_imports():
     assert got[("os.path", "import", 0)] == []
 
 
-@XFAIL
 def test_python_from_imports_and_relative_levels():
     r = parse("sample.py")
     got = {(i.specifier, i.kind, i.level): i.names for i in r.imports}
@@ -67,7 +57,6 @@ def test_python_from_imports_and_relative_levels():
     assert got[("m", "from", 0)] == ["*"]
 
 
-@XFAIL
 def test_python_import_lines():
     r = parse("sample.py")
     assert sorted(i.line for i in r.imports) == [2, 3, 4, 5, 6, 7]

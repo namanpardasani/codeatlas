@@ -2,21 +2,29 @@ from .types import DependencyGraph, Edge
 
 
 def build_graph(nodes: list[str], edges: list[Edge]) -> DependencyGraph:
-    """TODO(user): build the dependency graph from files and resolved edges.
+    """Build the dependency graph from files (nodes) and resolved imports (edges).
 
-    Contract (the tests in tests/test_graph_builder.py check each line):
-      1. `nodes` may contain duplicates and be unsorted. Output nodes: sorted, unique.
-         Isolated files (no edges) must still be nodes.
-      2. `edges` may contain duplicates (same source/target, possibly different `kind`).
-         Collapse them: one edge per (source, target). `kind` is not kept in the graph.
-      3. Self-edges (source == target) are DROPPED.
-      4. An edge whose source or target is not in `nodes` -> raise ValueError.
-      5. Every node has an entry in `successors` and in `predecessors`, even if empty.
-         Neighbour lists are sorted and unique.
-      6. Deterministic: the same inputs in any order give the same graph.
-      7. O(N + E): no scanning all edges per node.
-
-    Hints: sets while collecting, sort once at the end. Think about why you need BOTH maps
-    (fan-out is len(successors[n]); fan-in is len(predecessors[n]); "what depends on X?" is predecessors).
+    Contract: nodes sorted + unique (isolated files kept); duplicate edges collapse (kind is
+    not kept); self-edges dropped; an edge to/from an unknown file raises ValueError; every
+    node has a sorted successors AND predecessors entry; deterministic; O(N + E).
     """
-    raise NotImplementedError("TODO(user): implement build_graph")
+    node_list = sorted(set(nodes))  # sorted + unique
+    known = set(node_list)
+
+    # sets collapse duplicate edges automatically; every node gets an entry (even if empty)
+    successors = {n: set() for n in node_list}
+    predecessors = {n: set() for n in node_list}
+
+    for edge in edges:
+        if edge.source not in known or edge.target not in known:
+            raise ValueError(f"edge points at an unknown file: {edge.source} -> {edge.target}")
+        if edge.source == edge.target:
+            continue  # a file importing itself is not a useful dependency
+        successors[edge.source].add(edge.target)
+        predecessors[edge.target].add(edge.source)
+
+    return DependencyGraph(
+        nodes=node_list,
+        successors={n: sorted(v) for n, v in successors.items()},
+        predecessors={n: sorted(v) for n, v in predecessors.items()},
+    )
