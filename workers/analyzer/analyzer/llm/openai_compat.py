@@ -14,9 +14,10 @@ RETRY_STATUS = {429, 500, 502, 503, 504}
 class OpenAICompatClient:
     def __init__(self, base_url: str, model: str, api_key: str | None = None, *, name: str = "openai_compat",
                  paid: bool = False, connect_timeout: float = 10, read_timeout: float = 120, retries: int = 2,
-                 extra_headers: dict | None = None):
+                 extra_headers: dict | None = None, frequency_penalty: float | None = None):
         self.base_url, self.model, self.name, self.paid = base_url.rstrip("/"), model, name, paid
         self.retries = retries
+        self.frequency_penalty = frequency_penalty
         self._timeout = httpx.Timeout(connect=connect_timeout, read=read_timeout, write=15, pool=10)
         self._headers = {"Content-Type": "application/json", **(extra_headers or {})}
         if api_key:
@@ -45,6 +46,8 @@ class OpenAICompatClient:
         payload = {"model": self.model, "stream": True, "max_tokens": max_tokens, "temperature": temperature,
                    "stream_options": {"include_usage": True},
                    "messages": [{"role": m.role, "content": m.content} for m in messages]}
+        if self.frequency_penalty:  # small local models fall into repetition loops without it
+            payload["frequency_penalty"] = self.frequency_penalty
         attempt = 0
         while True:
             started = False

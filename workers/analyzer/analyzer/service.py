@@ -6,6 +6,7 @@ embedding model lives in Python.
 import json
 import logging
 import os
+import socketserver
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 from . import config, db
@@ -85,6 +86,15 @@ def handle_search(body: dict) -> tuple[int, dict]:
     return 200, result.to_dict()
 
 
+class NoReverseDNSServer(ThreadingHTTPServer):
+    """http.server.HTTPServer.server_bind() calls socket.getfqdn(host): a reverse DNS lookup that blocks when the
+    resolver is flaky (WSL), stalling startup and leaving resolver sockets behind. We only need the address."""
+
+    def server_bind(self) -> None:
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[0], self.server_address[1]
+
+
 class Handler(BaseHTTPRequestHandler):
     def _send(self, status: int, payload: dict) -> None:
         data = json.dumps(payload).encode()
@@ -149,7 +159,7 @@ def main() -> None:
     host = os.environ.get("SEARCH_HOST", "127.0.0.1")
     embedder.get()  # load the model before accepting traffic
     log.info("search service on %s:%s", host, config.SEARCH_PORT)
-    ThreadingHTTPServer((host, config.SEARCH_PORT), Handler).serve_forever()
+    NoReverseDNSServer((host, config.SEARCH_PORT), Handler).serve_forever()
 
 
 if __name__ == "__main__":

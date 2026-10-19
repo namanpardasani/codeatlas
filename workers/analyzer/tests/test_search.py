@@ -1,4 +1,6 @@
 """Indexing + retrieval on a tiny fixture repo with known answers (hash embedder: no model download needed)."""
+import os
+
 import pytest
 
 from analyzer import db, indexing
@@ -209,6 +211,8 @@ def test_hnsw_and_gin_indexes_are_used(repo):
 
 # ---- the real model (skipped when it cannot be loaded, e.g. offline) ------------------------------
 def _real_embedder():
+    if os.environ.get("TEST_NO_REAL_MODEL"):
+        return None
     try:
         from analyzer.embeddings import FastEmbedder
         return FastEmbedder()

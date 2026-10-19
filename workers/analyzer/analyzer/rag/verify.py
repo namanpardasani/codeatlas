@@ -69,12 +69,14 @@ class Verified:
     citations: list[Citation] = field(default_factory=list)
     claims: list[Claim] = field(default_factory=list)
     removed: list[str] = field(default_factory=list)       # sentences dropped as unsupported
+    duplicates: int = 0                                     # repeated sentences dropped (small models loop)
     issues: list[str] = field(default_factory=list)
     discarded: str | None = None                            # the original answer when it was thrown away
 
     def to_dict(self) -> dict:
         return {"text": self.text, "status": self.status, "citations": [c.to_dict() for c in self.citations],
-                "claims": [c.__dict__ for c in self.claims], "removed": self.removed, "issues": self.issues}
+                "claims": [c.__dict__ for c in self.claims], "removed": self.removed, "issues": self.issues,
+                "duplicates": self.duplicates}
 
 
 def _norm(s: str) -> str:
@@ -168,6 +170,7 @@ def verify_answer(answer: str, chunks: list[ContextChunk]) -> Verified:
         return v
 
     used: dict[tuple, Citation] = {}
+    seen: set[str] = set()
     out_lines: list[str] = []
     in_fence = False
     fence: list[str] = []
@@ -194,6 +197,11 @@ def verify_answer(answer: str, chunks: list[ContextChunk]) -> Verified:
         prefix = bullet.group(1) if bullet else ""
         kept: list[str] = []
         for sentence in _split_sentences(raw[len(prefix):]):
+            key = re.sub(r"\W+", " ", GROUP.sub("", sentence)).strip().lower()
+            if key and key in seen:      # a looping model repeats itself: say it once
+                v.duplicates += 1
+                continue
+            seen.add(key)
             clean, claim = _check_sentence(sentence, by_label, blob, used, chunks)
             v.claims.append(claim)
             if claim.status == "removed":
@@ -273,6 +281,15 @@ def _check_sentence(sentence: str, by_label: dict[str, ContextChunk], blob: str,
         support = _support(sentence, chunks or [])
         if support is not None and support[0] < support[1]:
             return "", Claim(sentence, "removed", [], f"not supported by any retrieved code (support {support[0]:.0%})")
+        # A sentence that names code identifiers no single chunk contains must NOT be attributed by wording to one of
+        # the chunks it only partly matches: only the identifier rule above may link such a sentence.
+        attributed = None if _identifiers(clean) else _attribute(clean, chunks or [])
+        if attributed:
+            label, lo, hi = attributed
+            ch = by_label[label]
+            used.setdefault((label, lo, hi), Citation(label, ch.chunk_id, ch.path, lo, hi, ch.hit.symbol, ch.hit.kind, inferred=True))
+            tagged = re.sub(r"([.!?]?)$", rf" [{label}:{lo}-{hi}]\1", clean, count=1)
+            return tagged, Claim(tagged, "inferred", [f"{label}:{lo}-{hi}"], "citation inferred from wording")
         return clean, Claim(clean, "uncited", [], "no citation")
     missing = _symbols_missing(sentence, blob)
     if missing:
@@ -309,6 +326,9 @@ def _infer_citation(sentence: str, chunks: list[ContextChunk]) -> tuple[str, int
         hay = c.hit.content + "\n" + (c.hit.symbol or "")
         if not all(i.split(".")[-1] in hay for i in idents):
             continue
+        sup = _support(sentence, [c])      # naming the same function is not enough: what the sentence SAYS must be there too
+        if sup is not None and sup[0] < sup[1]:
+            continue
         lines = c.hit.content.split("\n")[: c.shown_end - c.shown_start + 1]
         hit_lines = [n for n, ln in enumerate(lines) if any(i.split(".")[-1] in ln for i in idents)]
         if hit_lines:
@@ -320,4 +340,23 @@ def _infer_citation(sentence: str, chunks: list[ContextChunk]) -> tuple[str, int
         score = (len(hit_lines), -int(c.label[1:]))
         if best is None or score > best[0]:
             best = (score, c.label, lo, hi)
+    return best[1:] if best else None
+
+
+def _attribute(sentence: str, chunks: list[ContextChunk]) -> tuple[str, int, int] | None:
+    """For a sentence with no citation and no identifiers: the single chunk that best supports its wording
+    (same support measure and bar as for cited sentences), with the lines that contain the matching words."""
+    words = _content_words(BACKTICK.sub(" ", GROUP.sub("", sentence)))
+    best = None
+    for c in chunks:
+        sup = _support(sentence, [c])
+        if sup is None or sup[0] < sup[1]:
+            continue
+        lines = c.hit.content.split("\n")[: c.shown_end - c.shown_start + 1]
+        hit_lines = [n for n, ln in enumerate(lines) if _content_words(ln) & words]
+        lo = c.shown_start + (hit_lines[0] if hit_lines else 0)
+        hi = c.shown_start + (min(hit_lines[-1], hit_lines[0] + 25) if hit_lines else min(len(lines) - 1, 10))
+        key = (sup[0], len(hit_lines), -int(c.label[1:]))
+        if best is None or key > best[0]:
+            best = (key, c.label, lo, hi)
     return best[1:] if best else None

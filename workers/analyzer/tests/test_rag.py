@@ -288,8 +288,45 @@ def test_bad_questions_are_rejected_before_any_work(repo, q):
 @needs_db
 def test_history_is_limited_to_the_last_turns(repo):
     llm = FakeLLM(script=["exponential backoff retry delay", "`retry_with_backoff` retries [C1]."])
-    hist = [(f"old question {i}", f"old answer {i}") for i in range(10)]
+    hist = [(f"backoff question {i} about exponential retry delay", f"old answer {i}") for i in range(10)]
     run(repo, llm, "and how long does it wait?", history=hist)
     sent = llm.calls[1][1].content
-    assert "old question 9" in sent and "old question 0" not in sent
-    assert len(re.findall(r"^User: old question", sent, re.M)) <= config.RAG_HISTORY_TURNS
+    assert "backoff question 9" in sent and "backoff question 0" not in sent
+    assert len(re.findall(r"^User: backoff question", sent, re.M)) <= config.RAG_HISTORY_TURNS
+
+
+# ---- follow-up hygiene (found with a real 1.5B model) ----------------------------------------------------
+from analyzer.rag.rewrite import clean_history, enrich_question, rewrite_query, sane_rewrite  # noqa: E402
+
+
+def test_history_citation_tags_are_removed_because_labels_refer_to_a_previous_turn():
+    h = clean_history([("how are redirects followed?", "[The code in [C1] shows `resolve_redirects` [C2:5-9], see [C1, C3].")])
+    assert "[C" not in h[0][1] and not h[0][1].startswith("[") and "`resolve_redirects`" in h[0][1]
+
+
+def test_a_garbage_rewrite_falls_back_to_a_deterministic_enriched_question():
+    hist = [("how are redirects followed?", "`resolve_redirects` in `SessionRedirectMixin` handles it [C1].")]
+    echo = FakeLLM(script=["`resolve_redirects` method in [C1] is responsible for this process. The `resolve_redirects` method in [C1] is"])
+    q, _ = rewrite_query(echo, hist, "and what about a 303?")
+    assert "[" not in q and "`" not in q and "resolve_redirects" in q and "303" in q          # question + names from the last turn
+    good = FakeLLM(script=["how redirects handle a 303 status"])
+    assert rewrite_query(good, hist, "and what about a 303?")[0] == "how redirects handle a 303 status"
+
+
+def test_rewrite_sanity_rules():
+    hist = [("how are redirects followed?", "by `resolve_redirects`")]
+    assert sane_rewrite("how redirects handle a 303 status", "and a 303?", hist)
+    for bad in ["", "see [C1]", "uses `x`", "word " * 40, "completely unrelated zebra poetry"]:
+        assert not sane_rewrite(bad, "and a 303?", hist)
+    assert "resolve_redirects" in enrich_question(hist, "and a 303?")
+
+
+@needs_db
+def test_test_files_do_not_crowd_out_source_in_chat_retrieval_unless_asked(repo):
+    conn.execute("UPDATE chunks SET path = 'tests/test_retry.py' WHERE repo_id = %s AND path = 'src/retry.py'", (repo,))
+    llm = FakeLLM(script=["x", "y"])
+    ev = run(repo, llm, "how does exponential backoff retry work")
+    paths = [c["path"] for c in next(e for e in ev if e["type"] == "retrieval")["chunks"]]
+    assert "tests/test_retry.py" not in paths                                         # excluded by default
+    ev = run(repo, FakeLLM(script=["x"]), "how do the tests for exponential backoff retry work")
+    assert "tests/test_retry.py" in [c["path"] for c in next(e for e in ev if e["type"] == "retrieval")["chunks"]]

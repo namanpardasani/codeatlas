@@ -2,7 +2,17 @@
 import json
 import threading
 import time
+import socketserver
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+
+class NoReverseDNSServer(ThreadingHTTPServer):
+    """Skip HTTPServer.server_bind()'s socket.getfqdn(): a reverse DNS lookup that hangs when the resolver is flaky
+    (it caused intermittent hangs of the whole test run)."""
+
+    def server_bind(self):
+        socketserver.TCPServer.server_bind(self)
+        self.server_name, self.server_port = self.server_address[0], self.server_address[1]
 
 
 class FakeProvider:
@@ -57,7 +67,7 @@ class FakeProvider:
                     self._w("event: content_block_delta\ndata: " + json.dumps({"type": "content_block_delta", "delta": {"type": "text_delta", "text": t}}) + "\n\n")
                 self._w("event: message_delta\ndata: " + json.dumps({"type": "message_delta", "usage": {"output_tokens": 7}}) + "\n\n")
 
-        self.server = ThreadingHTTPServer(("127.0.0.1", 0), H)
+        self.server = NoReverseDNSServer(("127.0.0.1", 0), H)
         self.url = f"http://127.0.0.1:{self.server.server_address[1]}"
         threading.Thread(target=self.server.serve_forever, daemon=True).start()
 

@@ -67,8 +67,12 @@ def _like_prefix(prefix: str) -> str:
     return prefix.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
 
 
-def _filters(language, path_prefix, kind) -> tuple[str, dict]:
-    sql, params = "", {}
+TEST_PATH_SQL = (r" AND NOT (path ~* '(^|/)(tests?|__tests__|specs?)/' OR path ~* '(^|/)test_[^/]*$'"
+                 r" OR path ~* '[._](test|spec)\.[a-z]+$')")
+
+
+def _filters(language, path_prefix, kind, exclude_tests=False) -> tuple[str, dict]:
+    sql, params = (TEST_PATH_SQL if exclude_tests else ""), {}
     if language:
         sql += " AND language = %(language)s"
         params["language"] = language
@@ -83,7 +87,7 @@ def _filters(language, path_prefix, kind) -> tuple[str, dict]:
 
 def search(conn, embedder: Embedder | None, repo_id: int, query: str, *, mode: str = "hybrid",
            chunking: str = "ast", limit: int = 10, language: str | None = None, path_prefix: str | None = None,
-           kind: str | None = None, candidates: int = 50) -> SearchResult:
+           kind: str | None = None, candidates: int = 50, exclude_tests: bool = False) -> SearchResult:
     if mode not in MODES:
         raise ValueError(f"mode must be one of {MODES}")
     if chunking not in CHUNKINGS:
@@ -91,7 +95,7 @@ def search(conn, embedder: Embedder | None, repo_id: int, query: str, *, mode: s
     limit = max(1, min(limit, MAX_LIMIT))
     terms = query_terms(query)
     out = SearchResult([], terms, mode, chunking)
-    fsql, fparams = _filters(language, path_prefix, kind)
+    fsql, fparams = _filters(language, path_prefix, kind, exclude_tests)
     base = {"repo": repo_id, "strategy": chunking, "k": candidates, **fparams}
 
     vec: list[tuple[int, float]] = []
