@@ -344,3 +344,36 @@ export const reanalyze = (repoId: string, mode: "auto" | "full") =>
     body: JSON.stringify({ mode }),
   });
 export const getAnalyses = (repoId: string) => request<AnalysisRun[]>(`/repos/${repoId}/analyses`);
+
+// ---- Documentation -------------------------------------------------------------------------------------
+export interface DocsStatus {
+  docs_status: "running" | "ready" | "partial" | "failed" | null;
+  docs_commit_sha: string | null;
+  docs_model: string | null;
+  docs_generated_at: string | null;
+  targets: number;
+  llm: number;
+  extractive: number;
+}
+export interface DocNode {
+  type: "folder" | "file";
+  path: string;
+  name: string;
+  summary: string;
+  source: "llm" | "extractive" | string;
+  children?: DocNode[];
+}
+export interface DocPage {
+  type: "repo" | "folder" | "file";
+  path: string;
+  markdown: string;
+  source: string | null;
+  model: string | null;
+  commit: string | null;
+  generated_at: string | null;
+}
+export const getDocsStatus = (repoId: string) => request<DocsStatus>(`/repos/${repoId}/docs/status`);
+export const getDocsTree = (repoId: string) => request<{ name: string; summary: string; tree: DocNode[] }>(`/repos/${repoId}/docs/tree`);
+export const getDocPage = (repoId: string, type: DocPage["type"], path: string) =>
+  request<DocPage>(`/repos/${repoId}/docs/page?type=${type}&path=${encodeURIComponent(path)}`);
+export const docsExportUrl = (repoId: string) => `/api/repos/${repoId}/docs/export.md`;

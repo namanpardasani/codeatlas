@@ -12,6 +12,7 @@ import { HotspotsPanel } from "./features/HotspotsPanel";
 import { SearchPanel } from "./features/SearchPanel";
 import { ChatPanel } from "./features/ChatPanel";
 import { ReanalyzePanel } from "./features/ReanalyzePanel";
+import { DocsPanel } from "./features/DocsPanel";
 import { CodeViewer, type ViewerTarget } from "./features/CodeViewer";
 import { FileMetricsPanel } from "./features/FileMetricsPanel";
 
@@ -86,6 +87,7 @@ export default function App() {
           onStart={(jobId) => { setJob(null); follow(repoId, jobId); }}
         />
       )}
+      {repoId && <DocsPanel repoId={repoId} refreshKey={refreshKey} />}
       {repoId && <ChatPanel repoId={repoId} onOpen={setViewer} />}
       {repoId && viewer && <CodeViewer repoId={repoId} target={viewer} onClose={() => setViewer(null)} />}
       {repoId && <SearchPanel repoId={repoId} onOpen={setViewer} />}

@@ -24,7 +24,7 @@ from .. import config
 from ..llm import LLMError, Message
 from ..llm.types import Delta, Usage
 from . import extractive
-from .guard import check_summary
+from .guard import check_entry_points, check_summary
 from .prompts import build
 
 log = logging.getLogger("analyzer.docs")
@@ -286,6 +286,9 @@ def generate_docs(conn, llm, repo_id: int, sha: str, *, max_calls: int | None = 
                 log.warning("docs: LLM disabled for the rest of this run (%s)", stats.llm_disabled_reason)
                 break
             clean, issues = check_summary(raw, material, known_paths)
+            if clean is not None and t.type == "repo":
+                clean, more = check_entry_points(clean, facts.get("entry_points", []))
+                issues += more
             if clean is None:
                 stats.guard_rejected += 1
                 log.info("docs: guard rejected the summary of %s %s (%s)", t.type, t.ref or "(repo)", "; ".join(issues[:2]))

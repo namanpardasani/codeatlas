@@ -9,3 +9,4 @@ export { Stat } from "./Stat";
 export { ProgressBar } from "./ProgressBar";
 export { token } from "./tokens";
 export { CodeBlock } from "./CodeBlock";
+export { Markdown } from "./Markdown";
