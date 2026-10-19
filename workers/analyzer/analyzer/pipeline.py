@@ -5,8 +5,12 @@ from pathlib import Path
 from . import config, db
 from .clone import CloneError, LimitError, clone
 from .inventory import InventoryError, build_inventory
+from . import gitstats
+from .duplication import find_duplicates
 from .graph.edges import edges_from_resolutions
 from .graph.metrics import analyze
+from .hotspots import HotspotConfig, RepoContext, map_tests, score_all, score_file
+from .hotspots.inputs import build_inputs
 from .parsing import supported
 from .parsing.runner import SandboxedParser
 from .parsing.types import ParseResult
@@ -37,7 +41,7 @@ def parse_files(conn, r, job_id: int, root: Path, file_ids: dict[str, int],
                 continue
             results[fid] = parser.parse(f.path, source)
             if n % step == 0:
-                db.update_progress(conn, r, job_id, "parsing", 50 + int(40 * n / len(targets)))
+                db.update_progress(conn, r, job_id, "parsing", 50 + int(34 * n / len(targets)))
     return results
 
 
@@ -98,23 +102,45 @@ def run_job(conn, r, job_id: int) -> None:
         results = parse_files(conn, r, job_id, dest, file_ids, records)
         db.save_parse_results(conn, repo_id, results)
 
-        db.update_progress(conn, r, job_id, "resolving", 92, commit_sha=sha)
+        db.update_progress(conn, r, job_id, "resolving", 86, commit_sha=sha)
         resolutions = resolve_all(dest, file_ids, results)
         db.save_resolutions(conn, repo_id, file_ids, resolutions)
         counts = summarize(resolutions)
 
-        db.update_progress(conn, r, job_id, "graph", 96, commit_sha=sha)
+        db.update_progress(conn, r, job_id, "graph", 89, commit_sha=sha)
         code_files = {f.path for f in records if supported(f.path)}
         edges = edges_from_resolutions(resolutions, code_files)
         analysis = analyze(sorted(code_files), edges)
         db.save_graph(conn, repo_id, file_ids, analysis, edges)
 
+        db.update_progress(conn, r, job_id, "git history", 92, commit_sha=sha)
+        git = gitstats.collect(dest, tracked=set(file_ids))
+        db.save_git_stats(conn, repo_id, job_id, file_ids, git)
+
+        db.update_progress(conn, r, job_id, "duplication", 95, commit_sha=sha)
+        path_of = {fid: p for p, fid in file_ids.items()}
+        by_path = {path_of[fid]: res for fid, res in results.items()}
+        dups = find_duplicates({p: (x.token_hashes, x.token_lines) for p, x in by_path.items()})
+        db.save_duplicates(conn, repo_id, file_ids, {p: (x.metrics.lines if x.metrics else 0) for p, x in by_path.items()}, dups)
+
+        db.update_progress(conn, r, job_id, "hotspots", 97, commit_sha=sha)
+        tests = map_tests([f.path for f in records if f.path in by_path and not f.is_test],
+                          [f.path for f in records if f.is_test])
+        hs_inputs = build_inputs(records, by_path, analysis, git, dups, tests)
+        hs_config = HotspotConfig.from_env()
+        hs_ctx = RepoContext.build(hs_inputs, history_available=git.commits_seen > 0, window_days=git.window_days)
+        scored = score_all(hs_inputs, hs_ctx, hs_config, score_file)
+        db.save_hotspots(conn, repo_id, job_id, file_ids, scored, hs_config)
+        if scored and scored[0][1] is None:
+            log.info("job %s: hotspot formula not implemented yet; scores left empty", job_id)
+
         db.set_repo_status(conn, repo_id, "ready", sha)
         db.update_progress(conn, r, job_id, "done", 100, "done", commit_sha=sha)
         bad = sum(1 for x in results.values() if x.status in ("failed", "partial"))
-        log.info("job %s done: %d files (%d parsed, %d with problems); imports %s; graph %d nodes, %d cycles @ %s",
+        log.info("job %s done: %d files (%d parsed, %d with problems); imports %s; graph %d nodes, %d cycles; history %d commits%s; %d duplicate groups @ %s",
                  job_id, len(records), len(results), bad, counts,
-                 len(analysis.graph.nodes), len(analysis.cycles), sha[:8])
+                 len(analysis.graph.nodes), len(analysis.cycles), git.commits_seen,
+                 " (truncated)" if git.truncated else "", len(dups.groups), sha[:8])
     except (CloneError, InventoryError) as e:
         # Permanent, user-facing failure: don't retry.
         log.warning("job %s failed: %s", job_id, e)

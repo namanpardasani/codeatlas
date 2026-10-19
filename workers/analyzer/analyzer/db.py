@@ -6,6 +6,7 @@ from psycopg.types.json import Jsonb
 
 from . import config
 from .inventory import FileRecord
+from .parsing.aggregate import file_aggregates
 from .parsing.types import ParseResult
 
 
@@ -84,15 +85,25 @@ def save_parse_results(conn: psycopg.Connection, repo_id: int,
             cur.execute("DELETE FROM symbols WHERE repo_id = %s", (repo_id,))
             cur.execute("DELETE FROM imports_raw WHERE repo_id = %s", (repo_id,))
             cur.executemany(
-                "UPDATE files SET parse_status=%s, parse_error=%s, exports=%s WHERE id=%s",
-                [(r.status, r.error, Jsonb(r.exports), fid) for fid, r in results.items()],
+                """UPDATE files SET parse_status=%s, parse_error=%s, exports=%s,
+                          code_lines=%s, comment_lines=%s, comment_ratio=%s, total_complexity=%s,
+                          max_complexity=%s, max_nesting=%s, function_count=%s, longest_function=%s
+                   WHERE id=%s""",
+                [(r.status, r.error, Jsonb(r.exports),
+                  r.metrics.code_lines if r.metrics else None, r.metrics.comment_lines if r.metrics else None,
+                  r.metrics.comment_ratio if r.metrics else None,
+                  *((a["total_complexity"], a["max_complexity"], a["max_nesting"], a["function_count"],
+                     a["longest_function"]) if r.metrics else (None,) * 5),
+                  fid) for fid, r in ((fid, r) for fid, r in results.items()) for a in [file_aggregates(r)]],
             )
             cur.executemany(
                 """INSERT INTO symbols (repo_id, file_id, idx, name, kind, start_line, end_line, params,
-                                        parent_name, is_exported, is_default_export, has_doc, signature)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                                        parent_name, is_exported, is_default_export, has_doc, signature,
+                                        complexity, max_nesting, param_count)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 [(repo_id, fid, i, s.name, s.kind, s.start_line, s.end_line, Jsonb(s.params),
-                  s.parent, s.is_exported, s.is_default_export, s.has_doc, s.signature)
+                  s.parent, s.is_exported, s.is_default_export, s.has_doc, s.signature,
+                  s.complexity, s.max_nesting if s.complexity is not None else None, s.param_count)
                  for fid, r in results.items() for i, s in enumerate(r.symbols)],
             )
             cur.executemany(
@@ -153,3 +164,64 @@ def save_graph(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int],
                 "INSERT INTO module_edges (repo_id, from_module, to_module, edge_count) VALUES (%s,%s,%s,%s)",
                 rows,
             )
+
+
+def save_git_stats(conn: psycopg.Connection, repo_id: int, job_id: int, file_ids: dict[str, int], stats) -> None:
+    """Churn/authors/last-modified per file + co-change pairs. Without usable history the columns
+    are NULL (unknown), never 0 (which would claim "stable")."""
+    history = stats.commits_seen > 0
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("UPDATE files SET churn=NULL, commits_total=NULL, authors=NULL, last_modified=NULL "
+                        "WHERE repo_id=%s", (repo_id,))
+            if history:
+                rows = []
+                for path, fid in file_ids.items():
+                    g = stats.files.get(path)
+                    rows.append((g.commits_window if g else 0, g.commits_total if g else 0,
+                                 g.authors if g else 0, g.last_modified if g else None, fid))
+                cur.executemany("UPDATE files SET churn=%s, commits_total=%s, authors=%s, last_modified=%s "
+                                "WHERE id=%s", rows)
+            cur.execute("DELETE FROM file_cochange WHERE repo_id=%s", (repo_id,))
+            cur.executemany(
+                "INSERT INTO file_cochange (repo_id, file_a_id, file_b_id, count, coupling) VALUES (%s,%s,%s,%s,%s)",
+                [(repo_id, file_ids[c.file_a], file_ids[c.file_b], c.count, c.coupling)
+                 for c in stats.cochange if c.file_a in file_ids and c.file_b in file_ids])
+            cur.execute("UPDATE analysis_jobs SET history_commits=%s, history_window_days=%s, history_truncated=%s "
+                        "WHERE id=%s", (stats.commits_seen, stats.window_days, stats.truncated, job_id))
+
+
+def save_duplicates(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int],
+                    file_lines: dict[str, int], dups) -> None:
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM duplicate_groups WHERE repo_id=%s", (repo_id,))  # cascades to blocks
+            cur.execute("UPDATE files SET dup_lines=NULL, dup_ratio=NULL WHERE repo_id=%s", (repo_id,))
+            cur.executemany(
+                "UPDATE files SET dup_lines=%s, dup_ratio=%s WHERE id=%s",
+                [(dups.duplicated_lines.get(p, 0), min(1.0, dups.duplicated_lines.get(p, 0) / max(n, 1)), file_ids[p])
+                 for p, n in file_lines.items() if p in file_ids])
+            for idx, g in enumerate(dups.groups):
+                cur.execute("INSERT INTO duplicate_groups (repo_id, idx, lines, tokens, total_locations) "
+                            "VALUES (%s,%s,%s,%s,%s)", (repo_id, idx, g.lines, g.tokens, g.total_locations))
+                cur.executemany(
+                    "INSERT INTO duplicate_blocks (repo_id, group_idx, file_id, start_line, end_line) "
+                    "VALUES (%s,%s,%s,%s,%s)",
+                    [(repo_id, idx, file_ids[loc.path], loc.start_line, loc.end_line) for loc in g.locations])
+
+
+def save_hotspots(conn: psycopg.Connection, repo_id: int, job_id: int, file_ids: dict[str, int],
+                  scored, config) -> None:
+    """scored = [(HotspotInputs, HotspotScore | None, [Reason])]. Score columns stay NULL while the
+    formula is unimplemented; has_test/test_file are saved either way."""
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("UPDATE files SET hotspot_score=NULL, hotspot_reasons='[]', hotspot_detail=NULL, "
+                        "has_test=NULL, test_file=NULL WHERE repo_id=%s", (repo_id,))
+            cur.executemany(
+                """UPDATE files SET has_test=%s, test_file=%s, hotspot_score=%s, hotspot_reasons=%s,
+                          hotspot_detail=%s WHERE id=%s""",
+                [(i.has_test, i.test_file, s.score if s else None, Jsonb([r.to_dict() for r in reasons]),
+                  Jsonb({"contributions": s.contributions, "normalized": s.normalized}) if s else None,
+                  file_ids[i.path]) for i, s, reasons in scored])
+            cur.execute("UPDATE analysis_jobs SET hotspot_config=%s WHERE id=%s", (Jsonb(config.to_dict()), job_id))
