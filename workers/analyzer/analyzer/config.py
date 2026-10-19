@@ -66,6 +66,13 @@ RAG_MAX_CHUNKS = int(os.environ.get("RAG_MAX_CHUNKS", "6"))
 RAG_HISTORY_TURNS = int(os.environ.get("RAG_HISTORY_TURNS", "3"))
 RAG_REWRITE = os.environ.get("RAG_REWRITE", "auto")                           # auto | off | always
 RAG_RERANK = os.environ.get("RAG_RERANK", "off")                              # off | cross-encoder
+# Generated documentation (Day 7)
+DOCS_ENABLED = os.environ.get("DOCS_ENABLED", "1") == "1"
+DOCS_MAX_CALLS = int(os.environ.get("DOCS_MAX_CALLS", "20"))              # LLM calls per job; the rest is extractive
+DOCS_MAX_SYMBOLS_PER_FILE = int(os.environ.get("DOCS_MAX_SYMBOLS_PER_FILE", "4"))
+DOCS_MIN_SYMBOL_COMPLEXITY = int(os.environ.get("DOCS_MIN_SYMBOL_COMPLEXITY", "8"))
+DOCS_CODE_CHARS = int(os.environ.get("DOCS_CODE_CHARS", "4000"))          # code shown to the model per call
+DOCS_PROMPT_VERSION = "docs-v1"                                          # bump when prompts change: invalidates the cache
 MAX_ATTEMPTS = int(os.environ.get("MAX_ATTEMPTS", "3"))
 CLAIM_IDLE_MS = int(os.environ.get("CLAIM_IDLE_MS", "60000"))
 WORK_DIR = os.environ.get("WORK_DIR", "/tmp/codeatlas-clones")

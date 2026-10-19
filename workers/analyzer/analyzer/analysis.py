@@ -21,6 +21,7 @@ from pathlib import Path
 
 from . import config, db, gitstats
 from .chunking import is_indexable
+from .docs.facts import extract_facts
 from .duplication import find_duplicates
 from .embeddings import Embedder
 from .graph.edges import edges_from_resolutions
@@ -260,6 +261,9 @@ def analyze_checkout(conn, repo_id: int, job_id: int, root: Path, sha: str, *, p
         hs_ctx = RepoContext.build(hs_inputs, history_available=git.commits_seen > 0, window_days=git.window_days)
         scored = score_all(hs_inputs, hs_ctx, hs_config, score_file)
         db.save_hotspots(conn, repo_id, job_id, file_ids, scored, hs_config)
+
+    with timer("facts"):
+        db.save_repo_facts(conn, repo_id, extract_facts(root, records, by_path))
 
     # ---- chunks + vectors: only changed files on an incremental run (unchanged text hits the embedding cache) ----
     progress("chunking", 90)

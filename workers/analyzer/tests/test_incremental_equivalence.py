@@ -146,6 +146,7 @@ def snapshot(rid):
     snap["duplicates"] = sorted(sorted(v) for v in groups.values())
     snap["tokens"] = sorted((p, n, hashlib.md5(bytes(h)).hexdigest(), hashlib.md5(bytes(ln)).hexdigest()) for p, n, h, ln in
                             q("SELECT f.path, t.n, t.hashes, t.lines FROM file_tokens t JOIN files f ON f.id = t.file_id WHERE f.repo_id = %s"))
+    snap["facts"] = [conn.execute("SELECT facts::text FROM repo_facts WHERE repo_id = %s", (rid,)).fetchone()]
     snap["contents"] = sorted((p, hashlib.md5(c.encode()).hexdigest()) for p, c in
                               q("SELECT f.path, c.content FROM file_contents c JOIN files f ON f.id = c.file_id WHERE f.repo_id = %s"))
     return snap
