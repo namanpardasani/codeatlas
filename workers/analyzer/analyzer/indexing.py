@@ -77,14 +77,17 @@ def embed_pending(conn, embedder: Embedder, repo_id: int, strategies: tuple[str,
 
 def index_repo(conn, embedder: Embedder | None, repo_id: int, file_ids: dict[str, int], files: Iterable[SourceFile],
                on_progress: Callable[[float], None] | None = None, strategies: Iterable[str] | None = None,
-               budget_s: float | None = None, embed_strategies: Iterable[str] | None = None) -> IndexStats:
+               budget_s: float | None = None, embed_strategies: Iterable[str] | None = None,
+               refresh_paths: set[str] | None = None) -> IndexStats:
+    """refresh_paths=None replaces every chunk of the repo; otherwise only those files' chunks are rebuilt."""
     t0 = time.monotonic()
     emb = tuple(embed_strategies or config.EMBED_STRATEGIES)
     chunks, truncated = build_chunks(files, strategies)
     stats = IndexStats(chunks_total=len(chunks), truncated=truncated, model=embedder.name if embedder else None)
     for c in chunks:
         stats.by_strategy[c.strategy] = stats.by_strategy.get(c.strategy, 0) + 1
-    db.save_chunks(conn, repo_id, file_ids, chunks)
+    db.save_chunks(conn, repo_id, file_ids, chunks,
+                   only_file_ids=None if refresh_paths is None else {file_ids[p] for p in refresh_paths if p in file_ids})
 
     if embedder is None:
         stats.partial = any(c.strategy in emb for c in chunks)

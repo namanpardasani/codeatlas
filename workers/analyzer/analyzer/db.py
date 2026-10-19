@@ -54,11 +54,22 @@ def set_repo_status(conn, repo_id: int, status: str, commit_sha: str | None = No
     )
 
 
+def apply_renames(cur, repo_id: int, renames: list[tuple[str, str]]) -> None:
+    """Move rows to their new path, keeping their ids. Two phases through unique placeholders so that swaps and
+    chains (a->b, b->c) cannot violate UNIQUE (repo_id, path) half-way."""
+    for i, (old, _) in enumerate(renames):
+        cur.execute("UPDATE files SET path = %s WHERE repo_id = %s AND path = %s", (f"__rename__{i}__", repo_id, old))
+    for i, (_, new) in enumerate(renames):
+        cur.execute("UPDATE files SET path = %s WHERE repo_id = %s AND path = %s", (new, repo_id, f"__rename__{i}__"))
+
+
 def save_files(conn: psycopg.Connection, repo_id: int, commit_sha: str,
-               records: list[FileRecord]) -> dict[str, int]:
-    """Idempotent: upsert on (repo_id, path), then drop files that no longer exist."""
+               records: list[FileRecord], renames: list[tuple[str, str]] | None = None) -> dict[str, int]:
+    """Idempotent: (renames), upsert on (repo_id, path), then drop files that no longer exist."""
     with conn.transaction():
         with conn.cursor() as cur:
+            if renames:
+                apply_renames(cur, repo_id, renames)
             cur.executemany(
                 """INSERT INTO files (repo_id, path, language, size, lines, content_hash, commit_sha, is_test)
                    VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
@@ -78,13 +89,18 @@ def save_files(conn: psycopg.Connection, repo_id: int, commit_sha: str,
 
 
 def save_parse_results(conn: psycopg.Connection, repo_id: int,
-                       results: dict[int, ParseResult]) -> None:
-    """Replace a repo's parse output atomically. Idempotent: re-running yields identical rows,
-    never duplicates (delete-then-insert in one transaction + UNIQUE (file_id, idx))."""
+                       results: dict[int, ParseResult], replace_all: bool = True) -> None:
+    """Replace parse output atomically: the whole repo's (replace_all) or only the given files' (incremental).
+    Idempotent: re-running yields identical rows, never duplicates (delete-then-insert + UNIQUE (file_id, idx))."""
     with conn.transaction():
         with conn.cursor() as cur:
-            cur.execute("DELETE FROM symbols WHERE repo_id = %s", (repo_id,))
-            cur.execute("DELETE FROM imports_raw WHERE repo_id = %s", (repo_id,))
+            if replace_all:
+                cur.execute("DELETE FROM symbols WHERE repo_id = %s", (repo_id,))
+                cur.execute("DELETE FROM imports_raw WHERE repo_id = %s", (repo_id,))
+            else:
+                ids = list(results)
+                cur.execute("DELETE FROM symbols WHERE repo_id = %s AND file_id = ANY(%s)", (repo_id, ids))
+                cur.execute("DELETE FROM imports_raw WHERE repo_id = %s AND file_id = ANY(%s)", (repo_id, ids))
             cur.executemany(
                 """UPDATE files SET parse_status=%s, parse_error=%s, exports=%s,
                           code_lines=%s, comment_lines=%s, comment_ratio=%s, total_complexity=%s,
@@ -228,8 +244,10 @@ def save_hotspots(conn: psycopg.Connection, repo_id: int, job_id: int, file_ids:
             cur.execute("UPDATE analysis_jobs SET hotspot_config=%s WHERE id=%s", (Jsonb(config.to_dict()), job_id))
 
 
-def save_chunks(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int], chunks) -> None:
-    """Replace a repo's chunks (keyword-searchable immediately; vectors are attached afterwards)."""
+def save_chunks(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int], chunks,
+                only_file_ids: set[int] | None = None) -> None:
+    """Replace a repo's chunks, or only those of `only_file_ids` (incremental). Keyword-searchable immediately;
+    vectors are attached afterwards."""
     import hashlib
     counters: dict[tuple[str, str], int] = {}
     rows = []
@@ -242,7 +260,10 @@ def save_chunks(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int]
                      expand_identifiers(c.embed_text)))
     with conn.transaction():
         with conn.cursor() as cur:
-            cur.execute("DELETE FROM chunks WHERE repo_id = %s", (repo_id,))
+            if only_file_ids is None:
+                cur.execute("DELETE FROM chunks WHERE repo_id = %s", (repo_id,))
+            else:
+                cur.execute("DELETE FROM chunks WHERE repo_id = %s AND file_id = ANY(%s)", (repo_id, list(only_file_ids)))
             cur.executemany(
                 """INSERT INTO chunks (repo_id, file_id, strategy, idx, path, language, kind, symbol, parent_name,
                                        start_line, end_line, header, content, content_hash, embed_hash, tsv)
@@ -297,11 +318,105 @@ def save_index_stats(conn: psycopg.Connection, job_id: int, stats) -> None:
                  (stats.chunks_total, stats.embedded, stats.cached, stats.model, stats.partial, job_id))
 
 
-def save_file_contents(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int], sources) -> None:
-    """Keep the text of indexable files so the UI can open a citation at its lines (the clone is deleted)."""
+def save_file_contents(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int], sources,
+                       replace_all: bool = True, refresh_paths: set[str] | None = None) -> None:
+    """Keep the text of indexable files so the UI can open a citation at its lines (the clone is deleted).
+    Incremental: only `refresh_paths` are rewritten (and removed when they stopped being indexable)."""
     rows = [(file_ids[f.path], f.text) for f in sources if f.path in file_ids]
     with conn.transaction():
         with conn.cursor() as cur:
-            cur.execute("DELETE FROM file_contents WHERE file_id IN (SELECT id FROM files WHERE repo_id = %s)", (repo_id,))
+            if replace_all:
+                cur.execute("DELETE FROM file_contents WHERE file_id IN (SELECT id FROM files WHERE repo_id = %s)", (repo_id,))
+            elif refresh_paths:
+                cur.execute("DELETE FROM file_contents WHERE file_id = ANY(%s)",
+                            ([file_ids[p] for p in refresh_paths if p in file_ids],))
             cur.executemany("INSERT INTO file_contents (file_id, content) VALUES (%s, %s) ON CONFLICT (file_id) DO UPDATE "
                             "SET content = EXCLUDED.content", rows)
+
+
+# ---- incremental re-analysis: what the previous run left behind -------------------------------------------
+def load_file_state(conn: psycopg.Connection, repo_id: int) -> dict[str, tuple[int, str]]:
+    """path -> (file id, content hash) as of the previous analysis."""
+    return {path: (fid, h) for fid, path, h in conn.execute(
+        "SELECT id, path, content_hash FROM files WHERE repo_id = %s", (repo_id,)).fetchall()}
+
+
+def load_repo_state(conn: psycopg.Connection, repo_id: int):
+    """(status, pipeline_version, last_commit_sha) of the repo."""
+    return conn.execute("SELECT status, pipeline_version, last_commit_sha FROM repos WHERE id = %s", (repo_id,)).fetchone()
+
+
+def set_pipeline_version(conn: psycopg.Connection, repo_id: int, version: int) -> None:
+    conn.execute("UPDATE repos SET pipeline_version = %s WHERE id = %s", (version, repo_id))
+
+
+def save_tokens(conn: psycopg.Connection, results: dict[int, ParseResult]) -> None:
+    """Persist each parsed file's normalised token stream (packed uint32), so unchanged files need no re-parse."""
+    import array
+    rows = []
+    for fid, r in results.items():
+        if r.token_hashes:
+            rows.append((fid, len(r.token_hashes), array.array("I", r.token_hashes).tobytes(),
+                         array.array("I", r.token_lines).tobytes()))
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM file_tokens WHERE file_id = ANY(%s)", (list(results),))
+            cur.executemany("INSERT INTO file_tokens (file_id, n, hashes, lines) VALUES (%s,%s,%s,%s)", rows)
+
+
+def load_tokens(conn: psycopg.Connection, repo_id: int, exclude_file_ids: set[int]) -> dict[str, tuple[list[int], list[int]]]:
+    import array
+    out = {}
+    for path, n, hashes, lines in conn.execute(
+            """SELECT f.path, t.n, t.hashes, t.lines FROM file_tokens t JOIN files f ON f.id = t.file_id
+               WHERE f.repo_id = %s AND NOT (f.id = ANY(%s))""", (repo_id, list(exclude_file_ids))):
+        h, ln = array.array("I"), array.array("I")
+        h.frombytes(bytes(hashes))
+        ln.frombytes(bytes(lines))
+        out[path] = (h.tolist(), ln.tolist())
+    return out
+
+
+def load_import_items(conn: psycopg.Connection, repo_id: int, exclude_file_ids: set[int]):
+    """Raw imports of files that were NOT re-parsed, as resolver input."""
+    from .resolve.types import ImportItem
+    return [ImportItem(path, idx, spec, kind, list(names), level) for path, idx, spec, kind, names, level in conn.execute(
+        """SELECT f.path, i.idx, i.specifier, i.kind, i.names, i.level FROM imports_raw i JOIN files f ON f.id = i.file_id
+           WHERE i.repo_id = %s AND NOT (i.file_id = ANY(%s)) ORDER BY f.path, i.idx""", (repo_id, list(exclude_file_ids)))]
+
+
+def load_parse_summaries(conn: psycopg.Connection, repo_id: int, file_ids: list[int]) -> dict[str, ParseResult]:
+    """Rebuild ParseResults (symbols + line metrics; no tokens/imports) for files that were NOT re-parsed, so the
+    hotspot and duplication stages see every file."""
+    from .parsing.types import FileMetrics, Symbol
+    out: dict[str, ParseResult] = {}
+    by_id: dict[int, ParseResult] = {}
+    for fid, path, status, error, exports, lines, code, comment, ratio in conn.execute(
+            """SELECT id, path, parse_status, parse_error, exports, lines, code_lines, comment_lines, comment_ratio
+               FROM files WHERE repo_id = %s AND id = ANY(%s) AND parse_status IS NOT NULL""", (repo_id, file_ids)):
+        metrics = None if code is None else FileMetrics(lines=lines, blank_lines=max(0, lines - code - (comment or 0)),
+                                                        comment_lines=comment or 0, code_lines=code, comment_ratio=ratio or 0.0)
+        res = ParseResult(status=status, error=error, exports=list(exports or []), metrics=metrics)
+        by_id[fid] = res
+        out[path] = res
+    for (fid, name, kind, start, end, params, parent, exported, default, doc, signature, cx, nest, pcount) in conn.execute(
+            """SELECT file_id, name, kind, start_line, end_line, params, parent_name, is_exported, is_default_export,
+                      has_doc, signature, complexity, max_nesting, param_count
+               FROM symbols WHERE repo_id = %s AND file_id = ANY(%s) ORDER BY file_id, idx""", (repo_id, file_ids)):
+        by_id[fid].symbols.append(Symbol(name, kind, start, end, list(params or []), parent, exported, default, doc,
+                                         signature, cx, nest or 0, pcount or 0))
+    return out
+
+
+def save_job_stats(conn: psycopg.Connection, job_id: int, *, mode: str, diff: dict, files_total: int, files_reused: int,
+                   timings: dict, duration_ms: int) -> None:
+    conn.execute(
+        """UPDATE analysis_jobs SET mode=%s, files_total=%s, files_added=%s, files_modified=%s, files_deleted=%s,
+                  files_renamed=%s, files_reused=%s, stage_timings=%s, duration_ms=%s WHERE id=%s""",
+        (mode, files_total, diff.get("added", 0), diff.get("modified", 0), diff.get("deleted", 0), diff.get("renamed", 0),
+         files_reused, Jsonb(timings), duration_ms, job_id))
+
+
+def get_requested_mode(conn: psycopg.Connection, job_id: int) -> str:
+    row = conn.execute("SELECT requested_mode FROM analysis_jobs WHERE id = %s", (job_id,)).fetchone()
+    return row[0] if row else "auto"
