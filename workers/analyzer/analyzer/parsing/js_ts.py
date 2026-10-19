@@ -4,6 +4,7 @@ import tree_sitter_javascript as tsjs
 import tree_sitter_typescript as tst
 
 from .base import MAX_DEPTH, LanguagePlugin, signature, text
+from .complexity import JS_RULES, measure
 from .types import ParseResult, RawImport, Symbol
 
 FUNCTION_VALUES = {"arrow_function", "function_expression", "function", "generator_function"}
@@ -55,6 +56,8 @@ def _has_jsdoc(node: ts.Node) -> bool:
 
 
 class JsTsPlugin(LanguagePlugin):
+    IMPORT_TYPES = frozenset({"import_statement"})
+
     def __init__(self, name: str, extensions: tuple[str, ...], language_capsule):
         self.name = name
         self.extensions = extensions
@@ -76,6 +79,9 @@ class JsTsPlugin(LanguagePlugin):
             is_exported=exported, is_default_export=default,
             has_doc=_has_jsdoc(doc_node or node), signature=signature(node),
         )
+        sym.param_count = len(sym.params)
+        if kind in ("function", "method"):
+            sym.complexity, sym.max_nesting = measure(node, JS_RULES)
         result.symbols.append(sym)
         if exported:
             result.exports.append("default" if default else name)
