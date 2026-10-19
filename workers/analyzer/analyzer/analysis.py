@@ -186,8 +186,11 @@ def analyze_checkout(conn, repo_id: int, job_id: int, root: Path, sha: str, *, p
             diff.renamed = renames
             diff.deleted.sort()
             diff.added.sort()
-        progress("diffing", 40)
+        changed = diff.changed_count
+        progress(f"incremental: {changed} changed, {len(diff.unchanged)} reused, {len(diff.deleted)} removed", 40)
         log.info("incremental: %s", diff.summary())
+    else:
+        progress(f"full analysis: {len(records)} files ({reason})", 40)
 
     progress("saving", 45)
     with timer("saving"):
