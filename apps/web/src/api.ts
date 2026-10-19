@@ -238,3 +238,78 @@ export const searchRepo = (
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
+
+// ---- Chat ------------------------------------------------------------------------------------------
+export interface ChatCitation {
+  label: string;
+  chunk_id: number;
+  path: string;
+  start_line: number;
+  end_line: number;
+  symbol: string | null;
+  kind: string | null;
+}
+export interface ChatChunkInfo {
+  label: string;
+  path: string;
+  start_line: number;
+  end_line: number;
+  symbol: string | null;
+  similarity: number | null;
+}
+export type ChatEvent =
+  | { type: "session"; session_id: string }
+  | { type: "status"; stage: string }
+  | { type: "retrieval"; query: string; rewritten: boolean; evidence: { strong: boolean; best_similarity: number | null; reason: string }; chunks: ChatChunkInfo[]; warnings: string[] }
+  | { type: "delta"; text: string }
+  | {
+      type: "final";
+      status: "answered" | "partial" | "not_found";
+      answer: string;
+      citations: ChatCitation[];
+      removed: string[];
+      issues: string[];
+      closest?: ChatChunkInfo[];
+      model: string | null;
+      llm_called: boolean;
+    }
+  | { type: "error"; kind: string; message: string; retry_after: number | null };
+
+/** POST + parse the SSE response (EventSource cannot POST). Resolves when the stream ends. */
+export async function streamChat(
+  repoId: string,
+  body: { question: string; session_id?: string },
+  onEvent: (e: ChatEvent) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  const res = await fetch(`/api/repos/${repoId}/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!res.ok || !res.body) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error ?? `Chat failed (${res.status})`);
+  }
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  for (;;) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let sep: number;
+    while ((sep = buffer.indexOf("\n\n")) >= 0) {
+      const block = buffer.slice(0, sep);
+      buffer = buffer.slice(sep + 2);
+      const data = /^data: (.*)$/m.exec(block);
+      if (data) onEvent(JSON.parse(data[1]!) as ChatEvent);
+    }
+  }
+}
+
+export const getRepoFile = (repoId: string, path: string) =>
+  request<{ id: string; path: string; language: string | null; content: string }>(
+    `/repos/${repoId}/file?path=${encodeURIComponent(path)}`,
+  );

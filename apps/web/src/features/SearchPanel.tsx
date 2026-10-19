@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { searchRepo, type Chunking, type SearchMode, type SearchResponse } from "../api";
 import { Badge, Button, CodeBlock, Panel } from "../components/ui";
+import type { ViewerTarget } from "./CodeViewer";
 
 const LANGUAGES = ["", "typescript", "javascript", "python", "markdown"];
 const select = "rounded-ui border border-border bg-surface px-gap py-gap";
 
-export function SearchPanel({ repoId }: { repoId: string }) {
+export function SearchPanel({ repoId, onOpen }: { repoId: string; onOpen?: (t: ViewerTarget) => void }) {
   const [query, setQuery] = useState("");
   const [mode, setMode] = useState<SearchMode>("hybrid");
   const [chunking, setChunking] = useState<Chunking>("ast");
@@ -81,7 +82,10 @@ export function SearchPanel({ repoId }: { repoId: string }) {
           {result.hits.map((h) => (
             <article key={h.chunk_id} className="flex flex-col gap-gap">
               <div className="flex flex-wrap items-center gap-gap">
-                <span className="font-mono font-semibold">{h.path}:{h.start_line}–{h.end_line}</span>
+                <button className="font-mono font-semibold text-info"
+                        onClick={() => onOpen?.({ path: h.path, start: h.start_line, end: h.end_line })}>
+                  {h.path}:{h.start_line}–{h.end_line}
+                </button>
                 <Badge>{h.kind}</Badge>
                 {h.symbol && <Badge tone="info">{h.symbol}</Badge>}
                 <span className="text-small text-muted">

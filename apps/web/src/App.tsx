@@ -10,6 +10,8 @@ import { FileDetailPanel } from "./features/FileDetailPanel";
 import { GraphPanel } from "./features/GraphPanel";
 import { HotspotsPanel } from "./features/HotspotsPanel";
 import { SearchPanel } from "./features/SearchPanel";
+import { ChatPanel } from "./features/ChatPanel";
+import { CodeViewer, type ViewerTarget } from "./features/CodeViewer";
 import { FileMetricsPanel } from "./features/FileMetricsPanel";
 
 export default function App() {
@@ -20,6 +22,7 @@ export default function App() {
   const [files, setFiles] = useState<FileRow[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const [detail, setDetail] = useState<FileDetail | null>(null);
+  const [viewer, setViewer] = useState<ViewerTarget | null>(null);
   const stop = useRef<(() => void) | null>(null);
 
   useEffect(() => () => stop.current?.(), []);
@@ -31,6 +34,7 @@ export default function App() {
     setRepoId(null);
     setSelected(null);
     setDetail(null);
+    setViewer(null);
     setBusy(true);
     try {
       const { repoId, jobId } = await submitRepo(url);
@@ -66,7 +70,9 @@ export default function App() {
       </header>
       <SubmitPanel busy={busy} error={error} onSubmit={submit} />
       {job && <JobProgress job={job} />}
-      {repoId && <SearchPanel repoId={repoId} />}
+      {repoId && <ChatPanel repoId={repoId} onOpen={setViewer} />}
+      {repoId && viewer && <CodeViewer repoId={repoId} target={viewer} onClose={() => setViewer(null)} />}
+      {repoId && <SearchPanel repoId={repoId} onOpen={setViewer} />}
       {repoId && <HotspotsPanel repoId={repoId} selectedId={selected} onSelect={selectId} />}
       {selected && <FileMetricsPanel fileId={selected} />}
       {repoId && <GraphPanel repoId={repoId} />}
