@@ -9,8 +9,10 @@ from . import gitstats
 from .duplication import find_duplicates
 from .graph.edges import edges_from_resolutions
 from .graph.metrics import analyze
+from .chunking import is_indexable
 from .hotspots import HotspotConfig, RepoContext, map_tests, score_all, score_file
 from .hotspots.inputs import build_inputs
+from .indexing import SourceFile, index_repo
 from .parsing import supported
 from .parsing.runner import SandboxedParser
 from .parsing.types import ParseResult
@@ -41,7 +43,7 @@ def parse_files(conn, r, job_id: int, root: Path, file_ids: dict[str, int],
                 continue
             results[fid] = parser.parse(f.path, source)
             if n % step == 0:
-                db.update_progress(conn, r, job_id, "parsing", 50 + int(34 * n / len(targets)))
+                db.update_progress(conn, r, job_id, "parsing", 50 + int(28 * n / len(targets)))
     return results
 
 
@@ -66,7 +68,26 @@ def resolve_all(root: Path, file_ids: dict[str, int], results: dict[int, ParseRe
     return resolve_imports(set(file_ids), items, read_text)
 
 
-def run_job(conn, r, job_id: int) -> None:
+def load_sources(root: Path, records, by_path: dict) -> list[SourceFile]:
+    """Text + symbols of every indexable file (docs/config/code), read safely from the clone."""
+    root = root.resolve()
+    out: list[SourceFile] = []
+    for rec in records:
+        if not is_indexable(rec.path, rec.language, rec.size):
+            continue
+        full = (root / rec.path).resolve()
+        if not full.is_relative_to(root):
+            continue
+        try:
+            text = full.read_bytes().decode("utf-8", errors="replace")
+        except OSError:
+            continue
+        res = by_path.get(rec.path)
+        out.append(SourceFile(rec.path, rec.language, rec.size, text, res.symbols if res else []))
+    return out
+
+
+def run_job(conn, r, job_id: int, embedders=None) -> None:
     """Run one analysis job. Idempotent: safe to run again after a crash."""
     job = db.get_job(conn, job_id)
     if job is None:
@@ -102,28 +123,28 @@ def run_job(conn, r, job_id: int) -> None:
         results = parse_files(conn, r, job_id, dest, file_ids, records)
         db.save_parse_results(conn, repo_id, results)
 
-        db.update_progress(conn, r, job_id, "resolving", 86, commit_sha=sha)
+        db.update_progress(conn, r, job_id, "resolving", 80, commit_sha=sha)
         resolutions = resolve_all(dest, file_ids, results)
         db.save_resolutions(conn, repo_id, file_ids, resolutions)
         counts = summarize(resolutions)
 
-        db.update_progress(conn, r, job_id, "graph", 89, commit_sha=sha)
+        db.update_progress(conn, r, job_id, "graph", 82, commit_sha=sha)
         code_files = {f.path for f in records if supported(f.path)}
         edges = edges_from_resolutions(resolutions, code_files)
         analysis = analyze(sorted(code_files), edges)
         db.save_graph(conn, repo_id, file_ids, analysis, edges)
 
-        db.update_progress(conn, r, job_id, "git history", 92, commit_sha=sha)
+        db.update_progress(conn, r, job_id, "git history", 84, commit_sha=sha)
         git = gitstats.collect(dest, tracked=set(file_ids))
         db.save_git_stats(conn, repo_id, job_id, file_ids, git)
 
-        db.update_progress(conn, r, job_id, "duplication", 95, commit_sha=sha)
+        db.update_progress(conn, r, job_id, "duplication", 86, commit_sha=sha)
         path_of = {fid: p for p, fid in file_ids.items()}
         by_path = {path_of[fid]: res for fid, res in results.items()}
         dups = find_duplicates({p: (x.token_hashes, x.token_lines) for p, x in by_path.items()})
         db.save_duplicates(conn, repo_id, file_ids, {p: (x.metrics.lines if x.metrics else 0) for p, x in by_path.items()}, dups)
 
-        db.update_progress(conn, r, job_id, "hotspots", 97, commit_sha=sha)
+        db.update_progress(conn, r, job_id, "hotspots", 88, commit_sha=sha)
         tests = map_tests([f.path for f in records if f.path in by_path and not f.is_test],
                           [f.path for f in records if f.is_test])
         hs_inputs = build_inputs(records, by_path, analysis, git, dups, tests)
@@ -134,13 +155,24 @@ def run_job(conn, r, job_id: int) -> None:
         if scored and scored[0][1] is None:
             log.info("job %s: hotspot formula not implemented yet; scores left empty", job_id)
 
+        db.update_progress(conn, r, job_id, "chunking", 90, commit_sha=sha)
+        sources = load_sources(dest, records, by_path)
+        embedder = embedders.get() if embedders else None
+        index = index_repo(conn, embedder, repo_id, file_ids, sources,
+                           on_progress=lambda f: db.update_progress(conn, r, job_id, "embedding", 91 + int(8 * f),
+                                                                    commit_sha=sha))
+        db.save_index_stats(conn, job_id, index)
+        if index.partial:
+            log.warning("job %s: index partial (model=%s, truncated=%s)", job_id, index.model, index.truncated)
+
         db.set_repo_status(conn, repo_id, "ready", sha)
         db.update_progress(conn, r, job_id, "done", 100, "done", commit_sha=sha)
         bad = sum(1 for x in results.values() if x.status in ("failed", "partial"))
-        log.info("job %s done: %d files (%d parsed, %d with problems); imports %s; graph %d nodes, %d cycles; history %d commits%s; %d duplicate groups @ %s",
+        log.info("job %s done: %d files (%d parsed, %d with problems); imports %s; graph %d nodes, %d cycles; history %d commits%s; %d duplicate groups; %d chunks (%d embedded, %d cached) @ %s",
                  job_id, len(records), len(results), bad, counts,
                  len(analysis.graph.nodes), len(analysis.cycles), git.commits_seen,
-                 " (truncated)" if git.truncated else "", len(dups.groups), sha[:8])
+                 " (truncated)" if git.truncated else "", len(dups.groups),
+                 index.chunks_total, index.embedded, index.cached, sha[:8])
     except (CloneError, InventoryError) as e:
         # Permanent, user-facing failure: don't retry.
         log.warning("job %s failed: %s", job_id, e)

@@ -163,6 +163,34 @@ export interface FileMetrics {
   cochange: { path: string; count: number; coupling: number }[];
 }
 
+export type SearchMode = "vector" | "keyword" | "hybrid";
+export type Chunking = "ast" | "fixed";
+export interface SearchHit {
+  chunk_id: number;
+  path: string;
+  language: string | null;
+  kind: string;
+  symbol: string | null;
+  parent: string | null;
+  start_line: number;
+  end_line: number;
+  header: string;
+  content: string;
+  score: number;
+  vector_rank: number | null;
+  vector_similarity: number | null;
+  keyword_rank: number | null;
+  keyword_score: number | null;
+}
+export interface SearchResponse {
+  hits: SearchHit[];
+  terms: string[];
+  mode: SearchMode;
+  chunking: Chunking;
+  warnings: string[];
+  timings_ms: Record<string, number>;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, init);
   const body = await res.json();
@@ -200,3 +228,13 @@ export const getFileGraph = (fileId: string) => request<FileGraphDetail>(`/files
 export const getHotspots = (repoId: string, sort: string, dir: "asc" | "desc") =>
   request<HotspotsResponse>(`/repos/${repoId}/hotspots?sort=${encodeURIComponent(sort)}&dir=${dir}&limit=100`);
 export const getFileMetrics = (fileId: string) => request<FileMetrics>(`/files/${fileId}/metrics`);
+
+export const searchRepo = (
+  repoId: string,
+  body: { query: string; mode: SearchMode; chunking: Chunking; language?: string; path_prefix?: string; limit?: number },
+) =>
+  request<SearchResponse>(`/repos/${repoId}/search`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });

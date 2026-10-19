@@ -9,6 +9,16 @@ import { parseGithubUrl } from "./github.js";
 
 const submitSchema = z.object({ url: z.string().min(1).max(200) });
 
+const searchSchema = z.object({
+  query: z.string().trim().min(1).max(500),
+  mode: z.enum(["vector", "keyword", "hybrid"]).default("hybrid"),
+  chunking: z.enum(["ast", "fixed"]).default("ast"),
+  limit: z.number().int().min(1).max(50).default(10),
+  language: z.string().max(40).optional(),
+  path_prefix: z.string().max(200).optional(),
+  kind: z.string().max(30).optional(),
+});
+
 export function createApp() {
   const app = express();
   app.disable("x-powered-by");
@@ -251,6 +261,40 @@ export function createApp() {
           ),
     ]);
     res.json({ file: f, imports: imports.rows, imported_by: importedBy.rows, cycle: cycle.rows });
+  });
+
+  // ---- Search (Day 5): validated here, executed by the Python service that owns the embedding model ----
+  const searchLimiter = rateLimit({ windowMs: 60_000, limit: 60, standardHeaders: true, legacyHeaders: false });
+
+  app.post("/repos/:id/search", searchLimiter, async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const body = searchSchema.safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid search request", details: body.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`) });
+      return;
+    }
+    const exists = await pool.query("SELECT 1 FROM repos WHERE id = $1", [id]);
+    if (exists.rowCount === 0) {
+      res.status(404).json({ error: "Repo not found" });
+      return;
+    }
+    try {
+      const upstream = await fetch(`${config.searchUrl}/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repo_id: id, ...body.data }),
+        signal: AbortSignal.timeout(20_000),
+      });
+      const payload = await upstream.json();
+      res.status(upstream.status >= 500 ? 502 : upstream.status).json(payload);
+    } catch (err) {
+      console.error("search service error", err);
+      res.status(503).json({ error: "Search service unavailable" });
+    }
   });
 
   // ---- Hotspots, co-change and per-file metrics (Day 4) ----------------------------------
