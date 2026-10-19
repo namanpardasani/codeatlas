@@ -80,6 +80,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "fastembed" },
+    { name = "httpx" },
     { name = "networkx" },
     { name = "pathspec" },
     { name = "psycopg", extra = ["binary"] },
@@ -99,6 +100,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "fastembed", specifier = ">=0.9.0" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "networkx", specifier = ">=3.7" },
     { name = "pathspec", specifier = ">=0.12" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2" },
