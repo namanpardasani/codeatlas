@@ -13,6 +13,7 @@ export function Markdown({ children, onNavigate }: { children: string; onNavigat
           p: (p) => <p className="whitespace-pre-wrap" {...p} />,
           ul: (p) => <ul className="list-disc pl-section" {...p} />,
           ol: (p) => <ol className="list-decimal pl-section" {...p} />,
+          img: ({ alt }) => <span className="text-muted">{alt}</span>,   // images are never loaded from generated content
           hr: () => <hr className="my-gutter border-border" />,
           blockquote: (p) => <blockquote className="border-l-2 border-border pl-gutter text-muted" {...p} />,
           em: (p) => <em className="text-muted" {...p} />,
