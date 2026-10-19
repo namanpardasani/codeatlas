@@ -18,6 +18,7 @@ class HotspotInputs:
     function_count: int = 0
     # change history (None/0 when the clone had no usable history)
     churn: int = 0                 # commits touching the file inside the window
+    commits_total: int = 0         # commits touching it in ALL fetched history (useful when the window is quiet)
     authors: int = 0
     days_since_modified: int | None = None
     # structure
@@ -33,7 +34,7 @@ class HotspotInputs:
 
 
 NUMERIC_FIELDS = ("lines", "code_lines", "comment_ratio", "total_complexity", "max_complexity", "max_nesting",
-                  "longest_function", "function_count", "churn", "authors", "days_since_modified",
+                  "longest_function", "function_count", "churn", "commits_total", "authors", "days_since_modified",
                   "fan_in", "fan_out", "pagerank", "dup_ratio")
 
 
