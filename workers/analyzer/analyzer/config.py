@@ -31,6 +31,26 @@ HISTORY_WINDOW_DAYS = int(os.environ.get("HISTORY_WINDOW_DAYS", "90"))
 GIT_LOG_TIMEOUT_S = int(os.environ.get("GIT_LOG_TIMEOUT_S", "60"))
 COCHANGE_MAX_FILES_PER_COMMIT = int(os.environ.get("COCHANGE_MAX_FILES_PER_COMMIT", "30"))
 COCHANGE_TOP_PAIRS = int(os.environ.get("COCHANGE_TOP_PAIRS", "200"))
+# Chunking / embeddings / search (Day 5)
+CHUNK_MAX_CHARS = int(os.environ.get("CHUNK_MAX_CHARS", "1800"))   # ~450 tokens: fits a 512-token model with header
+CHUNK_MIN_CHARS = int(os.environ.get("CHUNK_MIN_CHARS", "300"))    # smaller neighbours get merged
+CHUNK_TINY_CHARS = int(os.environ.get("CHUNK_TINY_CHARS", "150"))       # a chunk this small merges with any neighbour
+CHUNK_OVERLAP_LINES = int(os.environ.get("CHUNK_OVERLAP_LINES", "3"))
+FIXED_CHUNK_CHARS = int(os.environ.get("FIXED_CHUNK_CHARS", "1800"))
+FIXED_OVERLAP_CHARS = int(os.environ.get("FIXED_OVERLAP_CHARS", "200"))
+MAX_DOC_FILE_BYTES = int(os.environ.get("MAX_DOC_FILE_BYTES", str(200 * 1024)))
+MAX_CHUNKS = int(os.environ.get("MAX_CHUNKS", "30000"))
+CHUNK_STRATEGIES = tuple(os.environ.get("CHUNK_STRATEGIES", "ast,fixed").split(","))    # chunked + keyword-indexed
+# Embedding is the expensive part (~1,800 tokens/s on a laptop CPU), so by default only these get vectors;
+# the fixed-size baseline is embedded on demand (python -m analyzer.embed_pending) for the Day 9 comparison.
+EMBED_STRATEGIES = tuple(os.environ.get("EMBED_STRATEGIES", "ast").split(","))
+EMBED_MODEL = os.environ.get("EMBED_MODEL", "BAAI/bge-small-en-v1.5")
+EMBED_DIM = int(os.environ.get("EMBED_DIM", "384"))
+EMBED_BATCH = int(os.environ.get("EMBED_BATCH", "32"))
+EMBED_THREADS = int(os.environ.get("EMBED_THREADS", "4"))
+EMBED_BUDGET_S = int(os.environ.get("EMBED_BUDGET_S", "900"))      # stop embedding after this; keyword search still works
+EMBED_CACHE_DIR = os.environ.get("EMBED_CACHE_DIR", os.path.expanduser("~/.cache/codeatlas/models"))
+SEARCH_PORT = int(os.environ.get("SEARCH_PORT", "8001"))
 MAX_ATTEMPTS = int(os.environ.get("MAX_ATTEMPTS", "3"))
 CLAIM_IDLE_MS = int(os.environ.get("CLAIM_IDLE_MS", "60000"))
 WORK_DIR = os.environ.get("WORK_DIR", "/tmp/codeatlas-clones")

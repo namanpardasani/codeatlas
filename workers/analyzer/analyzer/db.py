@@ -7,6 +7,7 @@ from psycopg.types.json import Jsonb
 from . import config
 from .inventory import FileRecord
 from .parsing.aggregate import file_aggregates
+from .textutil import expand_identifiers
 from .parsing.types import ParseResult
 
 
@@ -225,3 +226,66 @@ def save_hotspots(conn: psycopg.Connection, repo_id: int, job_id: int, file_ids:
                   Jsonb({"contributions": s.contributions, "normalized": s.normalized}) if s else None,
                   file_ids[i.path]) for i, s, reasons in scored])
             cur.execute("UPDATE analysis_jobs SET hotspot_config=%s WHERE id=%s", (Jsonb(config.to_dict()), job_id))
+
+
+def save_chunks(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int], chunks) -> None:
+    """Replace a repo's chunks (keyword-searchable immediately; vectors are attached afterwards)."""
+    import hashlib
+    counters: dict[tuple[str, str], int] = {}
+    rows = []
+    for c in chunks:
+        key = (c.path, c.strategy)
+        idx = counters[key] = counters.get(key, -1) + 1
+        rows.append((repo_id, file_ids[c.path], c.strategy, idx, c.path, c.language, c.kind, c.symbol, c.parent,
+                     c.start_line, c.end_line, c.header, c.content,
+                     hashlib.sha256(c.content.encode("utf8", errors="replace")).hexdigest(), c.embed_hash,
+                     expand_identifiers(c.embed_text)))
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM chunks WHERE repo_id = %s", (repo_id,))
+            cur.executemany(
+                """INSERT INTO chunks (repo_id, file_id, strategy, idx, path, language, kind, symbol, parent_name,
+                                       start_line, end_line, header, content, content_hash, embed_hash, tsv)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s, to_tsvector('simple', %s))""", rows)
+
+
+def apply_cached_embeddings(conn: psycopg.Connection, repo_id: int, model: str, strategies: tuple[str, ...]) -> int:
+    """Give every un-embedded chunk whose text was embedded before its vector, in one statement."""
+    return conn.execute(
+        """UPDATE chunks c SET embedding = e.embedding, embed_model = e.model
+           FROM embedding_cache e
+           WHERE c.repo_id = %s AND c.embedding IS NULL AND c.strategy = ANY(%s)
+             AND e.embed_hash = c.embed_hash AND e.model = %s""",
+        (repo_id, list(strategies), model)).rowcount
+
+
+def pending_embeddings(conn: psycopg.Connection, repo_id: int, limit: int,
+                       strategies: tuple[str, ...]) -> list[tuple[str, str]]:
+    """Distinct texts still without a vector: [(embed_hash, header+content)]."""
+    return [(h, f"{head}\n{body}") for h, head, body in conn.execute(
+        """SELECT DISTINCT ON (embed_hash) embed_hash, header, content FROM chunks
+           WHERE repo_id = %s AND embedding IS NULL AND strategy = ANY(%s) ORDER BY embed_hash LIMIT %s""",
+        (repo_id, list(strategies), limit))]
+
+
+def count_pending(conn: psycopg.Connection, repo_id: int, strategies: tuple[str, ...]) -> int:
+    return conn.execute("SELECT count(DISTINCT embed_hash) FROM chunks "
+                        "WHERE repo_id=%s AND embedding IS NULL AND strategy = ANY(%s)",
+                        (repo_id, list(strategies))).fetchone()[0]
+
+
+def store_embeddings(conn: psycopg.Connection, repo_id: int, model: str, items: list[tuple[str, str]]) -> None:
+    """items = [(embed_hash, pgvector literal)]: write to the cache and to every chunk with that text."""
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.executemany("INSERT INTO embedding_cache (embed_hash, model, embedding) VALUES (%s,%s,%s::vector) "
+                            "ON CONFLICT DO NOTHING", [(h, model, v) for h, v in items])
+            cur.executemany("UPDATE chunks SET embedding=%s::vector, embed_model=%s "
+                            "WHERE repo_id=%s AND embed_hash=%s AND embedding IS NULL",
+                            [(v, model, repo_id, h) for h, v in items])
+
+
+def save_index_stats(conn: psycopg.Connection, job_id: int, stats) -> None:
+    conn.execute("""UPDATE analysis_jobs SET chunks_total=%s, chunks_embedded=%s, chunks_cached=%s,
+                    embed_model=%s, index_partial=%s WHERE id=%s""",
+                 (stats.chunks_total, stats.embedded, stats.cached, stats.model, stats.partial, job_id))
