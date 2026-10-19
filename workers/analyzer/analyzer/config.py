@@ -58,9 +58,11 @@ LLM_DAILY_REQUESTS = int(os.environ.get("LLM_DAILY_REQUESTS", "40"))          # 
 LLM_DAILY_TOKENS = int(os.environ.get("LLM_DAILY_TOKENS", "150000"))          # per client per UTC day
 LLM_GLOBAL_DAILY_TOKENS = int(os.environ.get("LLM_GLOBAL_DAILY_TOKENS", "1000000"))   # whole service
 RAG_MIN_SIMILARITY = float(os.environ.get("RAG_MIN_SIMILARITY", "0.70"))     # calibrated on psf/requests (see NOTES)
-RAG_CONTEXT_TOKENS = int(os.environ.get("RAG_CONTEXT_TOKENS", "4500"))        # budget for retrieved code in the prompt
+RAG_CONTEXT_TOKENS = int(os.environ.get("RAG_CONTEXT_TOKENS", "3000"))        # budget for retrieved code in the prompt (local CPU models read ~65 tokens/s: 4.5k tokens = 70 s)
+RAG_MIN_SUPPORT = float(os.environ.get("RAG_MIN_SUPPORT", "0.40"))           # min share of the words a sentence says ABOUT the code (not its identifiers) found in the code it cites
+RAG_MIN_SUPPORT_SHORT = float(os.environ.get("RAG_MIN_SUPPORT_SHORT", "0.25"))  # lenient bar when a sentence has < 3 such words (all words counted)
 RAG_CANDIDATES = int(os.environ.get("RAG_CANDIDATES", "12"))
-RAG_MAX_CHUNKS = int(os.environ.get("RAG_MAX_CHUNKS", "8"))
+RAG_MAX_CHUNKS = int(os.environ.get("RAG_MAX_CHUNKS", "6"))
 RAG_HISTORY_TURNS = int(os.environ.get("RAG_HISTORY_TURNS", "3"))
 RAG_REWRITE = os.environ.get("RAG_REWRITE", "auto")                           # auto | off | always
 RAG_RERANK = os.environ.get("RAG_RERANK", "off")                              # off | cross-encoder
