@@ -7,6 +7,7 @@ import { pool } from "./db.js";
 import { redis, createSubscriber } from "./redis.js";
 import { config, eventsChannel } from "./config.js";
 import { parseGithubUrl } from "./github.js";
+import { buildTree, key as docKey, renderExport, renderFile, renderFolder, renderRepo, type DocsData } from "./docs.js";
 
 const submitSchema = z.object({ url: z.string().min(1).max(200) });
 
@@ -340,6 +341,125 @@ export function createApp() {
           ),
     ]);
     res.json({ file: f, imports: imports.rows, imported_by: importedBy.rows, cycle: cycle.rows });
+  });
+
+  // ---- Generated documentation (Day 7) ------------------------------------------------------------------------
+  async function loadDocs(repoId: number): Promise<DocsData | null> {
+    const repo = await pool.query(
+      "SELECT full_name, docs_status, docs_commit_sha, docs_model, docs_generated_at FROM repos WHERE id = $1", [repoId]);
+    if (repo.rowCount === 0) return null;
+    const [summ, facts, files, syms, deps, cyc] = await Promise.all([
+      pool.query("SELECT target_type, target_ref, summary, source, model FROM doc_summaries WHERE repo_id = $1", [repoId]),
+      pool.query("SELECT facts FROM repo_facts WHERE repo_id = $1", [repoId]),
+      pool.query(
+        `SELECT path, language, lines, fan_in, fan_out, pagerank, hotspot_score, hotspot_reasons, max_complexity, total_complexity,
+                churn, cycle_idx, has_test FROM files WHERE repo_id = $1 AND module IS NOT NULL ORDER BY path`, [repoId]),
+      pool.query(
+        `SELECT f.path, s.name, s.kind, s.parent_name, s.start_line, s.end_line, s.complexity FROM symbols s JOIN files f ON f.id = s.file_id
+         WHERE s.repo_id = $1 AND f.module IS NOT NULL AND s.kind IN ('class', 'function', 'method') ORDER BY f.path, s.idx`, [repoId]),
+      pool.query(
+        `SELECT a.path AS src, b.path AS dst FROM dependencies d JOIN files a ON a.id = d.from_file_id JOIN files b ON b.id = d.to_file_id
+         WHERE d.repo_id = $1 ORDER BY 1, 2`, [repoId]),
+      pool.query("SELECT array_agg(path ORDER BY path) AS paths FROM files WHERE repo_id = $1 AND cycle_idx IS NOT NULL GROUP BY cycle_idx", [repoId]),
+    ]);
+    const imports = new Map<string, string[]>();
+    const importedBy = new Map<string, string[]>();
+    for (const e of deps.rows) {
+      imports.set(e.src, [...(imports.get(e.src) ?? []), e.dst]);
+      importedBy.set(e.dst, [...(importedBy.get(e.dst) ?? []), e.src]);
+    }
+    const r0 = repo.rows[0];
+    return {
+      // pg returns timestamptz as a Date; the renderers want an ISO string
+      repo: { ...r0, docs_generated_at: r0.docs_generated_at ? new Date(r0.docs_generated_at).toISOString() : null },
+      facts: facts.rows[0]?.facts ?? {},
+      summaries: new Map(summ.rows.map((r) => [docKey(r.target_type, r.target_ref), { summary: r.summary, source: r.source, model: r.model }])),
+      files: files.rows,
+      symbols: syms.rows,
+      imports,
+      importedBy,
+      cycles: cyc.rows.map((r) => r.paths),
+    };
+  }
+
+  app.get("/repos/:id/docs/status", async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const r = await pool.query(
+      `SELECT r.docs_status, r.docs_commit_sha, r.docs_model, r.docs_generated_at,
+              (SELECT count(*)::int FROM doc_summaries d WHERE d.repo_id = r.id) AS targets,
+              (SELECT count(*)::int FROM doc_summaries d WHERE d.repo_id = r.id AND d.source = 'llm') AS llm,
+              (SELECT count(*)::int FROM doc_summaries d WHERE d.repo_id = r.id AND d.source = 'extractive') AS extractive
+       FROM repos r WHERE r.id = $1`, [id]);
+    if (r.rowCount === 0) {
+      res.status(404).json({ error: "Repo not found" });
+      return;
+    }
+    res.json(r.rows[0]);
+  });
+
+  app.get("/repos/:id/docs/tree", async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const d = await loadDocs(id);
+    if (!d) {
+      res.status(404).json({ error: "Repo not found" });
+      return;
+    }
+    res.json({ name: d.repo.full_name, summary: d.summaries.get(docKey("repo", ""))?.summary ?? "", tree: buildTree(d) });
+  });
+
+  const docLink = (type: string, path: string) => `doc:${type}:${encodeURIComponent(path)}`;
+
+  app.get("/repos/:id/docs/page", async (req, res) => {
+    const id = idParam(req.params.id);
+    const type = req.query.type;
+    const path = typeof req.query.path === "string" ? req.query.path : "";
+    if (!id || (type !== "repo" && type !== "folder" && type !== "file") || path.length > 500) {
+      res.status(400).json({ error: "repo id, type (repo|folder|file) and path are required" });
+      return;
+    }
+    const d = await loadDocs(id);
+    if (!d) {
+      res.status(404).json({ error: "Repo not found" });
+      return;
+    }
+    if (d.summaries.size === 0) {
+      res.status(404).json({ error: "Documentation has not been generated for this repo yet" });
+      return;
+    }
+    const exists = type === "repo" || (type === "file" ? d.files.some((f) => f.path === path) : d.files.some((f) => f.path.startsWith(path + "/")));
+    if (!exists) {
+      res.status(404).json({ error: "No such file or folder in the documentation" });
+      return;
+    }
+    const markdown = type === "repo" ? renderRepo(d, docLink) : type === "folder" ? renderFolder(d, path, docLink) : renderFile(d, path, docLink);
+    const s = d.summaries.get(docKey(type, type === "repo" ? "" : path));
+    res.json({ type, path, markdown, source: s?.source ?? null, model: s?.model ?? null, commit: d.repo.docs_commit_sha, generated_at: d.repo.docs_generated_at });
+  });
+
+  app.get("/repos/:id/docs/export.md", async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const d = await loadDocs(id);
+    if (!d || d.summaries.size === 0) {
+      res.status(404).json({ error: "Documentation has not been generated for this repo yet" });
+      return;
+    }
+    res.set({
+      "Content-Type": "text/markdown; charset=utf-8",
+      "Content-Disposition": `attachment; filename="${d.repo.full_name.replace(/[^A-Za-z0-9._-]+/g, "-")}-docs.md"`,
+    });
+    res.send(renderExport(d));
   });
 
   // ---- Search (Day 5): validated here, executed by the Python service that owns the embedding model ----

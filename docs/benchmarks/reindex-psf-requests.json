@@ -1,0 +1,140 @@
+{
+  "url": "https://github.com/psf/requests",
+  "embedder": "BAAI/bge-small-en-v1.5",
+  "runs": [
+    {
+      "run": "1 full (first run)",
+      "mode": "full",
+      "seconds": 1.72,
+      "files": 124,
+      "changed": 124,
+      "reused": 0,
+      "vectors_computed": 0,
+      "chunks_total_in_run": 1213,
+      "timings_ms": {
+        "inventory": 15,
+        "saving": 13,
+        "parsing": 700,
+        "resolving": 26,
+        "graph": 20,
+        "git": 36,
+        "duplication": 134,
+        "hotspots": 11,
+        "chunking": 26,
+        "embedding": 728
+      }
+    },
+    {
+      "run": "2 full, COLD vector cache",
+      "mode": "full",
+      "seconds": 238.46,
+      "files": 124,
+      "changed": 124,
+      "reused": 0,
+      "vectors_computed": 783,
+      "chunks_total_in_run": 1213,
+      "timings_ms": {
+        "inventory": 7,
+        "saving": 11,
+        "parsing": 619,
+        "resolving": 25,
+        "graph": 16,
+        "git": 28,
+        "duplication": 112,
+        "hotspots": 11,
+        "chunking": 29,
+        "embedding": 237596
+      }
+    },
+    {
+      "run": "3 full, WARM vector cache",
+      "mode": "full",
+      "seconds": 4.59,
+      "files": 124,
+      "changed": 124,
+      "reused": 0,
+      "vectors_computed": 0,
+      "chunks_total_in_run": 1213,
+      "timings_ms": {
+        "inventory": 34,
+        "saving": 36,
+        "parsing": 2170,
+        "resolving": 77,
+        "graph": 41,
+        "git": 104,
+        "duplication": 334,
+        "hotspots": 19,
+        "chunking": 61,
+        "embedding": 1699
+      }
+    },
+    {
+      "run": "4 incremental, nothing changed",
+      "mode": "incremental",
+      "seconds": 0.46,
+      "files": 124,
+      "changed": 0,
+      "reused": 124,
+      "vectors_computed": 0,
+      "chunks_total_in_run": 0,
+      "timings_ms": {
+        "inventory": 19,
+        "diff": 0,
+        "saving": 17,
+        "parsing": 5,
+        "resolving": 39,
+        "graph": 29,
+        "git": 56,
+        "duplication": 231,
+        "hotspots": 15,
+        "chunking": 1,
+        "embedding": 13
+      }
+    },
+    {
+      "run": "5 incremental, 5 files edited",
+      "mode": "incremental",
+      "seconds": 1.67,
+      "files": 124,
+      "changed": 5,
+      "reused": 119,
+      "vectors_computed": 5,
+      "chunks_total_in_run": 80,
+      "timings_ms": {
+        "inventory": 36,
+        "diff": 0,
+        "saving": 34,
+        "parsing": 517,
+        "resolving": 35,
+        "graph": 30,
+        "git": 75,
+        "duplication": 206,
+        "hotspots": 12,
+        "chunking": 6,
+        "embedding": 698
+      }
+    },
+    {
+      "run": "6 full, same edited tree (warm)",
+      "mode": "full",
+      "seconds": 3.06,
+      "files": 124,
+      "changed": 124,
+      "reused": 0,
+      "vectors_computed": 0,
+      "chunks_total_in_run": 1213,
+      "timings_ms": {
+        "inventory": 49,
+        "saving": 33,
+        "parsing": 1225,
+        "resolving": 34,
+        "graph": 26,
+        "git": 50,
+        "duplication": 181,
+        "hotspots": 13,
+        "chunking": 35,
+        "embedding": 1404
+      }
+    }
+  ]
+}
