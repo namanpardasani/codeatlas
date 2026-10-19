@@ -420,3 +420,17 @@ def save_job_stats(conn: psycopg.Connection, job_id: int, *, mode: str, diff: di
 def get_requested_mode(conn: psycopg.Connection, job_id: int) -> str:
     row = conn.execute("SELECT requested_mode FROM analysis_jobs WHERE id = %s", (job_id,)).fetchone()
     return row[0] if row else "auto"
+
+
+def save_repo_facts(conn: psycopg.Connection, repo_id: int, facts: dict) -> None:
+    conn.execute("""INSERT INTO repo_facts (repo_id, facts, updated_at) VALUES (%s, %s, now())
+                    ON CONFLICT (repo_id) DO UPDATE SET facts = EXCLUDED.facts, updated_at = now()""", (repo_id, Jsonb(facts)))
+
+
+def set_docs_status(conn: psycopg.Connection, repo_id: int, status: str) -> None:
+    conn.execute("UPDATE repos SET docs_status = %s WHERE id = %s", (status, repo_id))
+
+
+def save_docs_stats(conn: psycopg.Connection, job_id: int, stats) -> None:
+    conn.execute("UPDATE analysis_jobs SET docs_llm_calls=%s, docs_cached=%s, docs_extractive=%s WHERE id=%s",
+                 (stats.llm_calls, stats.cached + stats.reused, stats.extractive, job_id))

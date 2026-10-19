@@ -5,9 +5,34 @@ from pathlib import Path
 from . import config, db
 from .analysis import analyze_checkout
 from .clone import CloneError, LimitError, clone
+from .docs.generate import generate_docs
+from .llm import LLMError, get_llm
 from .inventory import InventoryError
 
 log = logging.getLogger("analyzer.pipeline")
+
+
+def run_docs(conn, repo_id: int, job_id: int, sha: str) -> None:
+    """Documentation runs AFTER the analysis is marked done: search/chat/graph are usable meanwhile, and a slow or
+    unavailable LLM can only delay the docs, never fail the job."""
+    if not config.DOCS_ENABLED:
+        return
+    try:
+        db.set_docs_status(conn, repo_id, "running")
+        try:
+            llm = get_llm()
+        except LLMError as e:
+            log.info("docs: no usable LLM (%s); extractive summaries only", e.message)
+            llm = None
+        stats = generate_docs(conn, llm, repo_id, sha)
+        db.save_docs_stats(conn, job_id, stats)
+        log.info("docs for repo %s: %d targets, %d LLM calls (budget %d%s), %d reused, %d cached, %d extractive%s",
+                 repo_id, stats.targets, stats.llm_calls, stats.budget, ", exhausted" if stats.budget_exhausted else "",
+                 stats.reused, stats.cached, stats.extractive,
+                 f"; LLM stopped: {stats.llm_disabled_reason}" if stats.llm_disabled_reason else "")
+    except Exception:  # noqa: BLE001  docs must never fail an analysis that already succeeded
+        log.exception("docs generation failed for repo %s", repo_id)
+        db.set_docs_status(conn, repo_id, "failed")
 
 
 def run_job(conn, r, job_id: int, embedders=None) -> None:
@@ -59,6 +84,7 @@ def run_job(conn, r, job_id: int, embedders=None) -> None:
                  result.cycles, result.index.chunks_total if result.index else 0,
                  result.index.embedded if result.index else 0, result.index.cached if result.index else 0,
                  result.duration_ms / 1000, sha[:8])
+        run_docs(conn, repo_id, job_id, sha)
     except (CloneError, InventoryError) as e:
         # Permanent, user-facing failure: don't retry.
         log.warning("job %s failed: %s", job_id, e)
