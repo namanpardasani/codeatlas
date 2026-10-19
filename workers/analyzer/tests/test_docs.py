@@ -150,7 +150,7 @@ def test_a_new_prompt_version_or_model_never_reuses_old_summaries(h, monkeypatch
     llm2 = ScriptedLLM()
     llm2.model = "scripted-2"
     assert docs(h, llm2, max_calls=100).llm_calls > 0                                      # another model: regenerate
-    monkeypatch.setattr(config, "DOCS_PROMPT_VERSION", "docs-v2")
+    monkeypatch.setattr(config, "DOCS_PROMPT_VERSION", "docs-v-next")   # anything but the current version
     llm3 = ScriptedLLM()
     llm3.model = "scripted-2"
     assert docs(h, llm3, max_calls=100).llm_calls > 0                                      # another prompt version: regenerate
