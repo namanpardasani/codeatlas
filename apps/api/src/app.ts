@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import { pool } from "./db.js";
 import { redis, createSubscriber } from "./redis.js";
@@ -8,6 +9,11 @@ import { config, eventsChannel } from "./config.js";
 import { parseGithubUrl } from "./github.js";
 
 const submitSchema = z.object({ url: z.string().min(1).max(200) });
+
+const chatSchema = z.object({
+  question: z.string().trim().min(1).max(1000),
+  session_id: z.string().uuid().optional(),
+});
 
 const searchSchema = z.object({
   query: z.string().trim().min(1).max(500),
@@ -295,6 +301,162 @@ export function createApp() {
       console.error("search service error", err);
       res.status(503).json({ error: "Search service unavailable" });
     }
+  });
+
+  // ---- Chat (Day 6): sessions + history live here; retrieval, LLM and citation checks run in the Python service ----
+  const chatLimiter = rateLimit({ windowMs: 60_000, limit: 20, standardHeaders: true, legacyHeaders: false });
+  const clientKey = (ip: string | undefined) =>
+    createHash("sha256").update(`${config.clientSalt}:${ip ?? "unknown"}`).digest("hex").slice(0, 24);
+
+  app.post("/repos/:id/chat", chatLimiter, async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const body = chatSchema.safeParse(req.body ?? {});
+    if (!body.success) {
+      res.status(400).json({ error: "Invalid chat request", details: body.error.issues.map((i) => `${i.path.join(".")}: ${i.message}`) });
+      return;
+    }
+    const { question, session_id } = body.data;
+    const client = clientKey(req.ip);
+    const repo = await pool.query("SELECT id FROM repos WHERE id = $1", [id]);
+    if (repo.rowCount === 0) {
+      res.status(404).json({ error: "Repo not found" });
+      return;
+    }
+
+    let sessionId: number;
+    let publicId: string;
+    if (session_id) {
+      const s = await pool.query("SELECT id, public_id FROM chat_sessions WHERE public_id = $1 AND repo_id = $2", [session_id, id]);
+      if (s.rowCount === 0) {
+        res.status(404).json({ error: "Chat session not found" });
+        return;
+      }
+      sessionId = Number(s.rows[0].id);
+      publicId = s.rows[0].public_id;
+    } else {
+      const s = await pool.query(
+        "INSERT INTO chat_sessions (repo_id, client_key, title) VALUES ($1, $2, $3) RETURNING id, public_id",
+        [id, client, question.slice(0, 80)],
+      );
+      sessionId = Number(s.rows[0].id);
+      publicId = s.rows[0].public_id;
+    }
+
+    // earlier turns for follow-ups: (question, verified answer) pairs, oldest first
+    const prior = await pool.query(
+      "SELECT role, content FROM chat_messages WHERE session_id = $1 AND status IS DISTINCT FROM 'error' ORDER BY id DESC LIMIT 6",
+      [sessionId],
+    );
+    const history: { q: string; a: string }[] = [];
+    const chronological = prior.rows.reverse();
+    for (let i = 0; i < chronological.length - 1; i++) {
+      if (chronological[i].role === "user" && chronological[i + 1].role === "assistant") {
+        history.push({ q: chronological[i].content, a: chronological[i + 1].content });
+      }
+    }
+    await pool.query("INSERT INTO chat_messages (session_id, role, content) VALUES ($1, 'user', $2)", [sessionId, question]);
+
+    res.set({ "Content-Type": "text/event-stream", "Cache-Control": "no-cache", Connection: "keep-alive", "X-Accel-Buffering": "no" });
+    res.flushHeaders();
+    const send = (type: string, data: unknown) => res.write(`event: ${type}\ndata: ${JSON.stringify(data)}\n\n`);
+    send("session", { session_id: publicId });
+
+    const abort = new AbortController();
+    res.on("close", () => abort.abort());   // browser went away: stop the upstream (and the LLM call)
+    let final: Record<string, unknown> | null = null;
+    let errored: { message: string; kind: string } | null = null;
+    let retrieval: Record<string, unknown> | null = null;
+    try {
+      const upstream = await fetch(`${config.searchUrl}/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ repo_id: id, question, history, client_key: client }),
+        signal: AbortSignal.any([abort.signal, AbortSignal.timeout(180_000)]),
+      });
+      if (!upstream.ok || !upstream.body) throw new Error(`upstream ${upstream.status}`);
+      const decoder = new TextDecoder();
+      let buffer = "";
+      for await (const chunk of upstream.body as unknown as AsyncIterable<Uint8Array>) {
+        buffer += decoder.decode(chunk, { stream: true });
+        let nl: number;
+        while ((nl = buffer.indexOf("\n")) >= 0) {
+          const line = buffer.slice(0, nl).trim();
+          buffer = buffer.slice(nl + 1);
+          if (!line) continue;
+          const ev = JSON.parse(line) as { type: string } & Record<string, unknown>;
+          if (ev.type === "final") final = ev;
+          if (ev.type === "retrieval") retrieval = ev;
+          if (ev.type === "error") errored = { message: String(ev.message), kind: String(ev.kind) };
+          send(ev.type, ev);
+        }
+      }
+    } catch (err) {
+      if (!abort.signal.aborted) {
+        console.error("chat upstream error", err);
+        errored = { message: "The answer service is unavailable.", kind: "unavailable" };
+        send("error", { type: "error", ...errored, retry_after: null });
+      }
+    }
+    try {
+      if (final) {
+        await pool.query(
+          `INSERT INTO chat_messages (session_id, role, content, status, citations, retrieval, model, usage)
+           VALUES ($1, 'assistant', $2, $3, $4, $5, $6, $7)`,
+          [sessionId, String(final.answer), final.status, JSON.stringify(final.citations ?? []),
+           JSON.stringify({ evidence: (retrieval as { evidence?: unknown } | null)?.evidence ?? null, retrieved: final.retrieved ?? final.closest ?? [],
+                            query: (retrieval as { query?: unknown } | null)?.query ?? null, claims: final.claims ?? [], issues: final.issues ?? [] }),
+           final.model ?? null, JSON.stringify(final.usage ?? null)],
+        );
+      } else if (errored) {
+        await pool.query("INSERT INTO chat_messages (session_id, role, content, status) VALUES ($1, 'assistant', $2, 'error')", [sessionId, errored.message]);
+      }
+      await pool.query("UPDATE chat_sessions SET updated_at = now() WHERE id = $1", [sessionId]);
+    } catch (err) {
+      console.error("could not store chat message", err);
+    }
+    res.end();
+  });
+
+  app.get("/chat/sessions/:publicId", async (req, res) => {
+    const parsed = z.string().uuid().safeParse(req.params.publicId);
+    if (!parsed.success) {
+      res.status(400).json({ error: "Invalid session id" });
+      return;
+    }
+    const s = await pool.query("SELECT id, repo_id, title, created_at FROM chat_sessions WHERE public_id = $1", [parsed.data]);
+    if (s.rowCount === 0) {
+      res.status(404).json({ error: "Chat session not found" });
+      return;
+    }
+    const m = await pool.query(
+      "SELECT id, role, content, status, citations, model, created_at FROM chat_messages WHERE session_id = $1 ORDER BY id",
+      [s.rows[0].id],
+    );
+    res.json({ session: { id: parsed.data, repo_id: s.rows[0].repo_id, title: s.rows[0].title }, messages: m.rows });
+  });
+
+  // Text of an indexed file, for the code viewer (citations open it at their lines).
+  app.get("/repos/:id/file", async (req, res) => {
+    const id = idParam(req.params.id);
+    const path = typeof req.query.path === "string" ? req.query.path : "";
+    if (!id || !path || path.length > 500) {
+      res.status(400).json({ error: "repo id and path are required" });
+      return;
+    }
+    const r = await pool.query(
+      `SELECT f.id, f.path, f.language, c.content FROM files f JOIN file_contents c ON c.file_id = f.id
+       WHERE f.repo_id = $1 AND f.path = $2`,
+      [id, path],
+    );
+    if (r.rowCount === 0) {
+      res.status(404).json({ error: "File not found or not indexed" });
+      return;
+    }
+    res.json({ id: r.rows[0].id, path: r.rows[0].path, language: r.rows[0].language, content: r.rows[0].content });
   });
 
   // ---- Hotspots, co-change and per-file metrics (Day 4) ----------------------------------
