@@ -253,6 +253,129 @@ export function createApp() {
     res.json({ file: f, imports: imports.rows, imported_by: importedBy.rows, cycle: cycle.rows });
   });
 
+  // ---- Hotspots, co-change and per-file metrics (Day 4) ----------------------------------
+  const HOTSPOT_SORTS: Record<string, string> = {
+    score: "f.hotspot_score", complexity: "f.max_complexity", total_complexity: "f.total_complexity",
+    churn: "f.churn", commits_total: "f.commits_total", authors: "f.authors", fan_in: "f.fan_in",
+    duplication: "f.dup_ratio", lines: "f.lines", path: "f.path", last_modified: "f.last_modified",
+  };
+
+  app.get("/repos/:id/hotspots", async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const n = Number(req.query.limit ?? 50);
+    const limit = Number.isInteger(n) && n > 0 ? Math.min(n, 500) : 50;
+    const dir = req.query.dir === "asc" ? "ASC" : "DESC";
+
+    const meta = await pool.query(
+      `SELECT count(*)::int AS total, count(f.hotspot_score)::int AS scored
+       FROM files f WHERE f.repo_id = $1 AND f.module IS NOT NULL AND NOT f.is_test`,
+      [id],
+    );
+    const scored = meta.rows[0].scored > 0;
+    // No formula yet -> "score" cannot sort anything: fall back to raw complexity.
+    let sort = typeof req.query.sort === "string" && req.query.sort in HOTSPOT_SORTS ? req.query.sort : "score";
+    if (sort === "score" && !scored) sort = "complexity";
+
+    const [rows, job] = await Promise.all([
+      pool.query(
+        `SELECT f.id, f.path, f.language, f.lines, f.code_lines, f.comment_ratio, f.hotspot_score, f.hotspot_reasons,
+                f.max_complexity, f.total_complexity, f.max_nesting, f.longest_function, f.function_count,
+                f.churn, f.commits_total, f.authors, f.last_modified, f.fan_in, f.cycle_idx, f.has_test, f.test_file,
+                f.dup_ratio,
+                (SELECT c.size FROM dependency_cycles c WHERE c.repo_id = f.repo_id AND c.cycle_idx = f.cycle_idx) AS cycle_size
+         FROM files f WHERE f.repo_id = $1 AND f.module IS NOT NULL AND NOT f.is_test
+         ORDER BY ${HOTSPOT_SORTS[sort]} ${dir} NULLS LAST, f.path LIMIT $2`,
+        [id, limit],
+      ),
+      pool.query(
+        `SELECT history_commits, history_window_days, history_truncated FROM analysis_jobs
+         WHERE repo_id = $1 AND status = 'done' ORDER BY id DESC LIMIT 1`,
+        [id],
+      ),
+    ]);
+    const j = job.rows[0];
+    res.json({
+      scored,
+      sort,
+      dir: dir.toLowerCase(),
+      total: meta.rows[0].total,
+      history: {
+        available: (j?.history_commits ?? 0) > 0,
+        commits: j?.history_commits ?? 0,
+        window_days: j?.history_window_days ?? null,
+        truncated: j?.history_truncated ?? false,
+      },
+      items: rows.rows,
+    });
+  });
+
+  app.get("/repos/:id/cochange", async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid repo id" });
+      return;
+    }
+    const n = Number(req.query.limit ?? 20);
+    const limit = Number.isInteger(n) && n > 0 ? Math.min(n, 200) : 20;
+    const r = await pool.query(
+      `SELECT a.path AS file_a, b.path AS file_b, x.count, x.coupling
+       FROM file_cochange x JOIN files a ON a.id = x.file_a_id JOIN files b ON b.id = x.file_b_id
+       WHERE x.repo_id = $1 ORDER BY x.count DESC, x.coupling DESC, a.path LIMIT $2`,
+      [id, limit],
+    );
+    res.json(r.rows);
+  });
+
+  app.get("/files/:id/metrics", async (req, res) => {
+    const id = idParam(req.params.id);
+    if (!id) {
+      res.status(400).json({ error: "Invalid file id" });
+      return;
+    }
+    const file = await pool.query(
+      `SELECT id, repo_id, path, language, lines, code_lines, comment_lines, comment_ratio, total_complexity,
+              max_complexity, max_nesting, function_count, longest_function, churn, commits_total, authors,
+              last_modified, dup_lines, dup_ratio, has_test, test_file, hotspot_score, hotspot_reasons,
+              hotspot_detail, cycle_idx, fan_in, fan_out, pagerank
+       FROM files WHERE id = $1`,
+      [id],
+    );
+    const f = file.rows[0];
+    if (!f) {
+      res.status(404).json({ error: "File not found" });
+      return;
+    }
+    const [functions, duplicates, cochange] = await Promise.all([
+      pool.query(
+        `SELECT name, kind, parent_name, start_line, end_line, (end_line - start_line + 1) AS length,
+                complexity, max_nesting, param_count
+         FROM symbols WHERE file_id = $1 AND complexity IS NOT NULL ORDER BY complexity DESC, start_line`,
+        [id],
+      ),
+      pool.query(
+        `SELECT b.group_idx AS group_id, b.start_line, b.end_line, g.lines, g.total_locations,
+                (SELECT json_agg(json_build_object('path', f2.path, 'start_line', b2.start_line, 'end_line', b2.end_line)
+                                 ORDER BY f2.path, b2.start_line)
+                 FROM duplicate_blocks b2 JOIN files f2 ON f2.id = b2.file_id
+                 WHERE b2.repo_id = b.repo_id AND b2.group_idx = b.group_idx AND NOT (b2.file_id = b.file_id AND b2.start_line = b.start_line)) AS others
+         FROM duplicate_blocks b JOIN duplicate_groups g ON g.repo_id = b.repo_id AND g.idx = b.group_idx
+         WHERE b.file_id = $1 ORDER BY b.start_line`,
+        [id],
+      ),
+      pool.query(
+        `SELECT p.path, x.count, x.coupling FROM file_cochange x
+         JOIN files p ON p.id = CASE WHEN x.file_a_id = $1 THEN x.file_b_id ELSE x.file_a_id END
+         WHERE x.file_a_id = $1 OR x.file_b_id = $1 ORDER BY x.count DESC, x.coupling DESC, p.path LIMIT 10`,
+        [id],
+      ),
+    ]);
+    res.json({ file: f, functions: functions.rows, duplicates: duplicates.rows, cochange: cochange.rows });
+  });
+
   // Server-Sent Events: current state first, then live updates published by the worker.
   app.get("/jobs/:id/events", async (req, res) => {
     const id = Number(req.params.id);
