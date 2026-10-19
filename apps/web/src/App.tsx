@@ -11,6 +11,7 @@ import { GraphPanel } from "./features/GraphPanel";
 import { HotspotsPanel } from "./features/HotspotsPanel";
 import { SearchPanel } from "./features/SearchPanel";
 import { ChatPanel } from "./features/ChatPanel";
+import { ReanalyzePanel } from "./features/ReanalyzePanel";
 import { CodeViewer, type ViewerTarget } from "./features/CodeViewer";
 import { FileMetricsPanel } from "./features/FileMetricsPanel";
 
@@ -23,6 +24,7 @@ export default function App() {
   const [selected, setSelected] = useState<string | null>(null);
   const [detail, setDetail] = useState<FileDetail | null>(null);
   const [viewer, setViewer] = useState<ViewerTarget | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   const stop = useRef<(() => void) | null>(null);
 
   useEffect(() => () => stop.current?.(), []);
@@ -38,19 +40,25 @@ export default function App() {
     setBusy(true);
     try {
       const { repoId, jobId } = await submitRepo(url);
-      stop.current?.();
-      stop.current = watchJob(jobId, (e) => {
-        setJob(e);
-        if (e.status === "done") {
-          setRepoId(repoId);
-          getFiles(repoId).then(setFiles).catch((err) => setError(String(err.message)));
-        }
-      });
+      follow(repoId, jobId);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setBusy(false);
     }
+  }
+
+  /** Watch a job; when it finishes, reload everything that depends on the analysis. */
+  function follow(repo: string, jobId: string) {
+    setRepoId(repo);
+    stop.current?.();
+    stop.current = watchJob(jobId, (e) => {
+      setJob(e);
+      if (e.status === "done") {
+        getFiles(repo).then(setFiles).catch((err) => setError(String(err.message)));
+        setRefreshKey((k) => k + 1);
+      }
+    });
   }
 
   async function selectId(id: string) {
@@ -70,12 +78,20 @@ export default function App() {
       </header>
       <SubmitPanel busy={busy} error={error} onSubmit={submit} />
       {job && <JobProgress job={job} />}
+      {repoId && (
+        <ReanalyzePanel
+          repoId={repoId}
+          busy={job !== null && job.status !== "done" && job.status !== "failed"}
+          refreshKey={refreshKey}
+          onStart={(jobId) => { setJob(null); follow(repoId, jobId); }}
+        />
+      )}
       {repoId && <ChatPanel repoId={repoId} onOpen={setViewer} />}
       {repoId && viewer && <CodeViewer repoId={repoId} target={viewer} onClose={() => setViewer(null)} />}
       {repoId && <SearchPanel repoId={repoId} onOpen={setViewer} />}
-      {repoId && <HotspotsPanel repoId={repoId} selectedId={selected} onSelect={selectId} />}
+      {repoId && <HotspotsPanel key={refreshKey} repoId={repoId} selectedId={selected} onSelect={selectId} />}
       {selected && <FileMetricsPanel fileId={selected} />}
-      {repoId && <GraphPanel repoId={repoId} />}
+      {repoId && <GraphPanel key={refreshKey} repoId={repoId} />}
       {files.length > 0 && <FilesPanel files={files} selectedId={selected} onSelect={(f) => selectId(f.id)} />}
       {detail && <FileDetailPanel detail={detail} />}
     </main>
