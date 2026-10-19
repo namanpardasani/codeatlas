@@ -314,3 +314,33 @@ export const getRepoFile = (repoId: string, path: string) =>
   request<{ id: string; path: string; language: string | null; content: string }>(
     `/repos/${repoId}/file?path=${encodeURIComponent(path)}`,
   );
+
+// ---- Re-analysis -------------------------------------------------------------------------------------
+export interface AnalysisRun {
+  id: string;
+  status: string;
+  mode: "full" | "incremental" | null;
+  requested_mode: "auto" | "full";
+  commit_sha: string | null;
+  files_total: number | null;
+  files_added: number | null;
+  files_modified: number | null;
+  files_deleted: number | null;
+  files_renamed: number | null;
+  files_reused: number | null;
+  duration_ms: number | null;
+  stage_timings: Record<string, number> | null;
+  chunks_total: number | null;
+  chunks_embedded: number | null;
+  chunks_cached: number | null;
+  created_at: string;
+  finished_at: string | null;
+}
+
+export const reanalyze = (repoId: string, mode: "auto" | "full") =>
+  request<{ repoId: string; jobId: string; alreadyRunning: boolean }>(`/repos/${repoId}/reanalyze`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ mode }),
+  });
+export const getAnalyses = (repoId: string) => request<AnalysisRun[]>(`/repos/${repoId}/analyses`);
