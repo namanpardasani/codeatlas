@@ -9,6 +9,7 @@ import { FilesPanel } from "./features/FilesPanel";
 import { FileDetailPanel } from "./features/FileDetailPanel";
 import { GraphPanel } from "./features/GraphPanel";
 import { HotspotsPanel } from "./features/HotspotsPanel";
+import { SearchPanel } from "./features/SearchPanel";
 import { FileMetricsPanel } from "./features/FileMetricsPanel";
 
 export default function App() {
@@ -65,6 +66,7 @@ export default function App() {
       </header>
       <SubmitPanel busy={busy} error={error} onSubmit={submit} />
       {job && <JobProgress job={job} />}
+      {repoId && <SearchPanel repoId={repoId} />}
       {repoId && <HotspotsPanel repoId={repoId} selectedId={selected} onSelect={selectId} />}
       {selected && <FileMetricsPanel fileId={selected} />}
       {repoId && <GraphPanel repoId={repoId} />}

@@ -8,3 +8,4 @@ export type { Column, SortState } from "./Table";
 export { Stat } from "./Stat";
 export { ProgressBar } from "./ProgressBar";
 export { token } from "./tokens";
+export { CodeBlock } from "./CodeBlock";
