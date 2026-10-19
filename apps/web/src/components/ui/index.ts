@@ -4,6 +4,7 @@ export { Panel } from "./Panel";
 export { Badge } from "./Badge";
 export type { Tone } from "./Badge";
 export { Table } from "./Table";
-export type { Column } from "./Table";
+export type { Column, SortState } from "./Table";
+export { Stat } from "./Stat";
 export { ProgressBar } from "./ProgressBar";
 export { token } from "./tokens";

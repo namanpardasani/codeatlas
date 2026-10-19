@@ -93,6 +93,76 @@ export interface FileGraphDetail {
   cycle: { id: string; path: string }[];
 }
 
+export interface HotspotReason {
+  factor: string;
+  points: number;
+  severity: "high" | "medium" | "low";
+  text: string;
+}
+export interface HotspotItem {
+  id: string;
+  path: string;
+  language: string | null;
+  lines: number;
+  code_lines: number | null;
+  comment_ratio: number | null;
+  hotspot_score: number | null;
+  hotspot_reasons: HotspotReason[];
+  max_complexity: number | null;
+  total_complexity: number | null;
+  max_nesting: number | null;
+  longest_function: number | null;
+  function_count: number | null;
+  churn: number | null;
+  commits_total: number | null;
+  authors: number | null;
+  last_modified: string | null;
+  fan_in: number | null;
+  cycle_idx: number | null;
+  cycle_size: number | null;
+  has_test: boolean | null;
+  test_file: string | null;
+  dup_ratio: number | null;
+}
+export interface HotspotsResponse {
+  scored: boolean;
+  sort: string;
+  dir: "asc" | "desc";
+  total: number;
+  history: { available: boolean; commits: number; window_days: number | null; truncated: boolean };
+  items: HotspotItem[];
+}
+export interface FunctionMetric {
+  name: string;
+  kind: string;
+  parent_name: string | null;
+  start_line: number;
+  end_line: number;
+  length: number;
+  complexity: number;
+  max_nesting: number;
+  param_count: number;
+}
+export interface FileMetrics {
+  file: HotspotItem & {
+    comment_lines: number | null;
+    dup_lines: number | null;
+    fan_out: number | null;
+    pagerank: number | null;
+    hotspot_detail: { contributions: Record<string, number>; normalized: Record<string, number> } | null;
+  };
+  functions: FunctionMetric[];
+  duplicates: {
+    group_id: number;
+    start_line: number;
+    end_line: number;
+    lines: number;
+    total_locations: number;
+    others: { path: string; start_line: number; end_line: number }[] | null;
+  }[];
+  cochange: { path: string; count: number; coupling: number }[];
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`/api${path}`, init);
   const body = await res.json();
@@ -126,3 +196,7 @@ export const getFileGraphOverview = (repoId: string, limit = 300) =>
 export const getFolderGraph = (repoId: string) =>
   request<GraphResponse<FolderGraphNode>>(`/repos/${repoId}/graph?mode=folders`);
 export const getFileGraph = (fileId: string) => request<FileGraphDetail>(`/files/${fileId}/graph`);
+
+export const getHotspots = (repoId: string, sort: string, dir: "asc" | "desc") =>
+  request<HotspotsResponse>(`/repos/${repoId}/hotspots?sort=${encodeURIComponent(sort)}&dir=${dir}&limit=100`);
+export const getFileMetrics = (fileId: string) => request<FileMetrics>(`/files/${fileId}/metrics`);
