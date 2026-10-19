@@ -230,8 +230,9 @@ def test_real_model_finds_the_right_function_by_meaning(repo):
         assert "retry_with_backoff" in names(r, 3)
         r = search(conn, REAL, rid, "is the entered secret correct for this account", mode="vector")
         assert "verify_password" in names(r, 3)
-    finally:
-        conn.execute("DELETE FROM embedding_cache WHERE model = %s", (REAL.name,))
+    finally:  # remove only the cache rows THIS fixture created; never the whole model's cache (real repos use it)
+        conn.execute("DELETE FROM embedding_cache WHERE model = %s AND embed_hash IN "
+                     "(SELECT embed_hash FROM chunks WHERE repo_id = %s)", (REAL.name, rid))
 
 
 @needs_db
