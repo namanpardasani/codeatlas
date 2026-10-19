@@ -261,10 +261,16 @@ def apply_cached_embeddings(conn: psycopg.Connection, repo_id: int, model: str, 
 
 def pending_embeddings(conn: psycopg.Connection, repo_id: int, limit: int,
                        strategies: tuple[str, ...]) -> list[tuple[str, str]]:
-    """Distinct texts still without a vector: [(embed_hash, header+content)]."""
+    """Distinct texts still without a vector: [(embed_hash, header+content)]. Source and docs come before
+    test files, so if the time budget cuts embedding short the most valuable chunks already have vectors."""
     return [(h, f"{head}\n{body}") for h, head, body in conn.execute(
-        """SELECT DISTINCT ON (embed_hash) embed_hash, header, content FROM chunks
-           WHERE repo_id = %s AND embedding IS NULL AND strategy = ANY(%s) ORDER BY embed_hash LIMIT %s""",
+        r"""SELECT embed_hash, header, content FROM (
+              SELECT DISTINCT ON (embed_hash) embed_hash, header, content,
+                     (path ~* '(^|/)(tests?|__tests__|specs?)/' OR path ~* '(^|/)test_[^/]*$'
+                      OR path ~* '[._](test|spec)\.[a-z]+$') AS is_test
+              FROM chunks WHERE repo_id = %s AND embedding IS NULL AND strategy = ANY(%s)
+              ORDER BY embed_hash, is_test) t
+            ORDER BY is_test, embed_hash LIMIT %s""",
         (repo_id, list(strategies), limit))]
 
 

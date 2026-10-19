@@ -297,3 +297,17 @@ def test_real_model_finds_the_right_function_by_meaning(repo):
         assert "verify_password" in names(r, 3)
     finally:
         conn.execute("DELETE FROM embedding_cache WHERE model = %s", (REAL.name,))
+
+
+@needs_db
+def test_source_is_embedded_before_test_files(repo):
+    rid, ids = repo
+    extra = dict(FILES)
+    extra["tests/test_retry.py"] = "def test_retry():\n    assert retry_with_backoff(lambda: 1) == 1\n"
+    for p, t in extra.items():
+        if p not in ids:
+            ids.update(db.save_files(conn, rid, "sha", [__import__("analyzer.inventory", fromlist=["FileRecord"]).FileRecord(
+                q, LANG[q.rsplit(".", 1)[-1]], len(x), x.count("\n"), "h", q.startswith("tests/")) for q, x in extra.items()]))
+    index_repo(conn, None, rid, ids, source_files(extra))       # chunks saved, nothing embedded
+    pending = db.pending_embeddings(conn, rid, 1000, ("ast",))
+    assert "tests/test_retry.py" in pending[-1][1] and all("tests/" not in t for _, t in pending[:-1])
