@@ -18,8 +18,12 @@ def _describe(factor: str, i: HotspotInputs, ctx: RepoContext) -> str:
                 f"({_top(pct)}), {i.total_complexity} in total across {i.function_count} functions, "
                 f"nesting up to {i.max_nesting}")
     if factor == "churn":
-        pct = ctx.percentile("churn", i.churn)
         who = f", {i.authors} authors" if i.authors > 1 else ""
+        if ctx.maximum("churn") == 0:  # quiet window everywhere: the score used all fetched history
+            pct = ctx.percentile("commits_total", i.commits_total)
+            return (f"changes often: {i.commits_total} commits in the fetched history ({_top(pct)}){who}; "
+                    f"nothing in the repo changed in the last {ctx.window_days} days")
+        pct = ctx.percentile("churn", i.churn)
         return f"changes often: {i.churn} commits in the last {ctx.window_days} days ({_top(pct)}){who}"
     if factor == "cycle":
         return f"part of a circular dependency group of {i.cycle_size} files"

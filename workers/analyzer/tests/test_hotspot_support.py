@@ -99,9 +99,10 @@ def test_each_factor_has_a_sentence():
         assert len(r) == 1 and r[0].factor == f and r[0].severity == "high" and len(r[0].text) > 10
 
 
-def test_score_all_survives_the_unimplemented_stub():
-    from analyzer.hotspots import score_file
+def test_score_all_survives_a_scorer_that_is_not_implemented():
+    def unfinished(*_):
+        raise NotImplementedError
     hot, ctx, cfg, _ = _scored()
-    assert score_all([hot], ctx, cfg, score_file) == [(hot, None, [])]   # stub raises -> scores are None
+    assert score_all([hot], ctx, cfg, unfinished) == [(hot, None, [])]   # raises -> scores are None, no crash
     done = score_all([hot], ctx, cfg, reference_score)
     assert done[0][1] is not None and done[0][2]
