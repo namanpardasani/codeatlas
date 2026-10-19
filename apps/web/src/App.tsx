@@ -8,6 +8,8 @@ import { JobProgress } from "./features/JobProgress";
 import { FilesPanel } from "./features/FilesPanel";
 import { FileDetailPanel } from "./features/FileDetailPanel";
 import { GraphPanel } from "./features/GraphPanel";
+import { HotspotsPanel } from "./features/HotspotsPanel";
+import { FileMetricsPanel } from "./features/FileMetricsPanel";
 
 export default function App() {
   const [busy, setBusy] = useState(false);
@@ -46,10 +48,10 @@ export default function App() {
     }
   }
 
-  async function select(f: FileRow) {
-    setSelected(f.id);
+  async function selectId(id: string) {
+    setSelected(id);
     try {
-      setDetail(await getFileDetail(f.id));
+      setDetail(await getFileDetail(id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not load file");
     }
@@ -63,8 +65,10 @@ export default function App() {
       </header>
       <SubmitPanel busy={busy} error={error} onSubmit={submit} />
       {job && <JobProgress job={job} />}
+      {repoId && <HotspotsPanel repoId={repoId} selectedId={selected} onSelect={selectId} />}
+      {selected && <FileMetricsPanel fileId={selected} />}
       {repoId && <GraphPanel repoId={repoId} />}
-      {files.length > 0 && <FilesPanel files={files} selectedId={selected} onSelect={select} />}
+      {files.length > 0 && <FilesPanel files={files} selectedId={selected} onSelect={(f) => selectId(f.id)} />}
       {detail && <FileDetailPanel detail={detail} />}
     </main>
   );
