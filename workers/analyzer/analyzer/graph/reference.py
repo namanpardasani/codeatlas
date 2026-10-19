@@ -36,7 +36,8 @@ def reference_cycles(graph: DependencyGraph) -> list[list[str]]:
 
 
 def reference_pagerank(graph: DependencyGraph, alpha: float = 0.85) -> dict[str, float]:
-    return nx.pagerank(_to_nx(graph), alpha=alpha)
+    # tight tolerance: networkx's default (1e-6) stops earlier than our implementation
+    return nx.pagerank(_to_nx(graph), alpha=alpha, tol=1e-12, max_iter=1000)
 
 
 def reference_betweenness(graph: DependencyGraph) -> dict[str, float]:
