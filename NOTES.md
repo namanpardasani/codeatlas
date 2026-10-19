@@ -13,9 +13,15 @@
 - UI: all styling in `apps/web/src/index.css` (`@theme` tokens) and `components/ui/*`; feature panels use only semantic classes.
 
 - Resolution layer (`analyzer/resolve/`): `js.py` (TS/JS), `python.py`, `jsonc.py` (tsconfig parsing); `resolve_imports()` returns per-import `Resolution(status internal|external|unresolved, targets, package, reason)`. Stored on `imports_raw` (migration 003). Pipeline stage "resolving" (92%).
-- Graph layer (`analyzer/graph/`): `types.py` (Edge, DependencyGraph), `builder.py` + `cycles.py` are the implementations (Tarjan SCC, iterative), `reference.py` is a networkx reference used only to cross-check in tests.
+- Graph layer (`analyzer/graph/`): `types.py` (Edge, DependencyGraph), `builder.py` (build_graph), `cycles.py` (iterative Tarjan SCC), `metrics.py` (fan-in/out, hand-written PageRank, folder modules, cross-module edges), `edges.py` (resolutions -> edges), `reference.py` (networkx, tests only).
+- Graph storage (migration 004): `dependencies` (indexed by (repo, from) and (repo, to)), `dependency_cycles`, `module_edges`, and per-file `module/fan_in/fan_out/pagerank/cycle_idx` on `files` (module IS NOT NULL = graph node). Pipeline stage "graph" (96%). API: `GET /repos/:id/graph?mode=files|folders&limit=`, `GET /files/:id/graph`. UI: React Flow + dagre layout in `features/GraphPanel.tsx`.
 
 ## Decisions and tradeoffs
+- Graph nodes = code files only (supported languages). Edges to assets (css/json/images) are dropped; external/unresolved imports never become edges.
+- Centrality = PageRank, not betweenness. Edge A->B means "A imports B", so rank flows to files imported by many important files (types, utils, base classes). Betweenness finds bridge files but costs O(N*E) (too slow for thousands of files without sampling) and is harder to explain. PageRank is O(iterations*(N+E)). Dangling files (import nothing) spread their rank evenly (standard fix). Hand-written; cross-checked against networkx on 10 random graphs (needs scipy, dev-only).
+- Folder modules: depth chosen automatically (look one level deeper when a single folder holds >=80% of files and splits into several sub-folders; max 3).
+- Big graphs: API caps file nodes (default 300, max 1000) keeping cycle members first, then most central, and says `truncated`; `mode=folders` collapses to one node per folder with aggregated edge counts, so any repo stays drawable.
+- Migrations: `python -m analyzer.migrate` (psycopg) works without psql/docker; `scripts/migrate.sh` still works via docker compose.
 - Never guess: an import that looks internal but matches no file is `unresolved` with a reason (shown in the UI), not silently dropped or mapped to a "closest" file. Unresolved rate is itself a quality metric for the eval.
 - External packages (npm, Node builtins, Python stdlib/third-party) are a separate list (`resolution='external'`, `package`), NOT graph nodes: they are not our code, would swamp the graph (react imported by 300 files), and cannot form cycles with our files.
 - Python `from pkg import name`: edge to `pkg/__init__.py` AND to `pkg/name.py` if `name` is a submodule (otherwise the real dependency on the submodule would be missed).
@@ -40,6 +46,9 @@
 - Ports 5433/6380 chosen because FlagForge containers already use 5432/6379.
 
 ## What happens if X fails
+- Graph too large to draw: the API caps nodes and flags `truncated`; folder mode is always small. A repo over MAX_FILES (5,000) fails earlier with a clear error.
+- Dynamic/aliased imports a static resolver cannot follow (e.g. requests' `requests.packages.urllib3`): stay `unresolved` with a reason; the edge is absent, nothing guessed.
+- Graph save is one transaction: a crash mid-save leaves the previous graph intact; re-running replaces it (tested 3x).
 - Import cannot be resolved (typo, generated file, path alias we don't understand, file ignored/too large): recorded as `unresolved` + reason; the edge is simply absent from the graph; job continues.
 - tsconfig is malformed/unreadable: JSONC parse returns None; we proceed without aliases (alias imports then show as external/unresolved) instead of failing.
 - Circular `extends` in tsconfig: cycle guard + depth limit 5.
@@ -58,6 +67,13 @@
 - XREADGROUP block longer than the client socket timeout looks like a connection failure; socket_timeout (30s) > block (5s).
 
 ## Interview Q&A
+- What is an SCC and why does it find cycles? A maximal set of nodes that can all reach each other. If A->B->C->A, each reaches the others, so they are in one SCC; a file in no cycle is its own SCC of size 1. So SCCs of size >= 2 are exactly the circular-dependency groups. Tarjan finds all in one DFS: O(N+E).
+- Why iterative Tarjan? Recursion depth equals path length; a 5,000-file import chain exceeds Python's recursion limit.
+- Why report the SCC and not every simple cycle? Simple cycles can be exponentially many; the SCC is the actionable unit (these files are tangled together).
+- PageRank vs betweenness? See decisions: PageRank rewards being imported by important files (shared core); betweenness rewards sitting on many shortest paths (bridges/choke points) but is O(N*E).
+- Why exclude external packages from the graph? Not our code, would dominate fan-in (react imported everywhere), cannot form cycles with our files; kept as a separate list.
+- Huge graphs in the UI? Server-side cap + prioritisation (cycles, centrality), and a folder-level collapse with aggregated edges; the client never receives thousands of nodes.
+- Unresolved imports? Recorded with a reason, never guessed: a wrong edge silently corrupts cycles/centrality/hotspots; a recorded failure is measurable.
 - Hard cases in import resolution? Extension-less imports and directory index files; TS ESM `.js`->`.ts`; tsconfig paths/baseUrl/extends/references; monorepo workspace packages; Python src layouts, relative levels, `from pkg import submodule`, namespace packages, stdlib vs third-party.
 - Why not resolve everything by guessing? A wrong edge silently corrupts every downstream metric (cycles, centrality, hotspots). A recorded failure is measurable and fixable.
 - Why exclude external packages from the graph? Not our code; would dominate fan-in; cannot create cycles with our files; kept as a separate list for a dependency report.
@@ -77,3 +93,4 @@
 - 2026-10-16 Day 1 complete: schema + migrate.sh, Express API (POST /repos, GET /jobs/:id, SSE), Python worker (Streams, safe clone, inventory), React progress UI. Verified end to end on octocat/Hello-World. 21 API tests + 22 worker tests pass.
 - 2026-10-16 Day 2 complete: parser plugins (TS/TSX/JS symbols+imports+exports, Python symbols+exports), sandboxed parsing, migration 002, parsing stage, file list + symbol/import UI, token-based UI components. Python import extraction left as TODO stub with 3 xfail tests (user writes it). Verified on sindresorhus/p-limit (6 files, 42 symbols). Found and worked around a tree-sitter 0.26.0 segfault (pinned 0.25.2).
 - 2026-10-16 Day 3 steps 1-2: import resolution (TS/JS + Python) stored and shown in UI; verified on p-limit (4 internal, 20 external, 0 unresolved). Graph scaffold ready (types, contracts, fixtures, networkx reference, 85 skipped tests waiting for the user's build_graph + find_cycles). PAUSED: steps 3-6 (metrics, storage/API, React Flow UI) wait for the user's implementation.
+- 2026-10-19 Day 3 complete: import resolution, build_graph + iterative Tarjan + Python import extraction (committed from the user's request to apply them), metrics (fan-in/out, PageRank, modules, cross-module edges), storage + API, React Flow graph view. Verified end to end on psf/requests: 124 files, 37 code nodes, 117 internal / 193 external / 1 unresolved imports, one cycle group of 11 core files, compat.py most central. Tests: worker 164, API 26. UI typechecks and builds but has not been viewed in a browser by me.
