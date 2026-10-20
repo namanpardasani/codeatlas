@@ -9,6 +9,7 @@ import { config, eventsChannel } from "./config.js";
 import { parseGithubUrl } from "./github.js";
 import { authRouter, loadUser, originGuard, requireLogin } from "./auth.js";
 import { admit, checkRepoOnGithub, type Admission } from "./limits.js";
+import { keywordSearch } from "./keywordSearch.js";
 import { buildTree, key as docKey, renderExport, renderFile, renderFolder, renderRepo, type DocsData } from "./docs.js";
 
 const submitSchema = z.object({ url: z.string().min(1).max(200) });
@@ -524,8 +525,14 @@ export function createApp(opts: { fetchImpl?: typeof fetch } = {}) {
       const payload = await upstream.json();
       res.status(upstream.status >= 500 ? 502 : upstream.status).json(payload);
     } catch (err) {
-      console.error("search service error", err);
-      res.status(503).json({ error: "Search service unavailable" });
+      // The service is optional (e.g. the free read-only demo): degrade to Postgres keyword search instead of failing.
+      console.error("search service unavailable, using keyword fallback:", err instanceof Error ? err.message : err);
+      try {
+        res.json(await keywordSearch(id, body.data));
+      } catch (e2) {
+        console.error("keyword fallback failed", e2 instanceof Error ? e2.message : e2);
+        res.status(503).json({ error: "Search is unavailable" });
+      }
     }
   });
 

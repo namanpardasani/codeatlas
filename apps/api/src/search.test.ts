@@ -74,16 +74,26 @@ describe("search API", () => {
     expect((await post(999999999, { query: "x" })).status).toBe(404);
   });
 
-  it("turns an upstream failure into 502 and an unreachable service into 503", async ({ skip }) => {
+  it("turns an upstream failure into 502; an unreachable service degrades to keyword search over the stored chunks", async ({ skip }) => {
     if (!dbUp) skip();
     stubStatus = 500;
     expect((await post(repoId, { query: "x" })).status).toBe(502);
     stubStatus = 200;
+    const f = await pool.query("INSERT INTO files (repo_id, path, content_hash) VALUES ($1, 'src/retry.py', 'h') RETURNING id", [repoId]);
+    await pool.query(
+      `INSERT INTO chunks (repo_id, file_id, strategy, idx, path, language, kind, symbol, start_line, end_line, header, content, content_hash, embed_hash, tsv)
+       VALUES ($1,$2,'ast',0,'src/retry.py','python','function','retry_with_backoff',1,9,'h','def retry_with_backoff(): sleep twice as long','c','e',
+               to_tsvector('simple','def retry_with_backoff sleep twice as long'))`,
+      [repoId, f.rows[0].id],
+    );
     const good = config.searchUrl;
     config.searchUrl = "http://127.0.0.1:9";
-    const res = await post(repoId, { query: "x" });
+    const res = await post(repoId, { query: "how does the retry backoff sleep? x'); DROP TABLE chunks; --" });
     config.searchUrl = good;
-    expect(res.status).toBe(503);
-    expect(res.body.error).toMatch(/unavailable/i);
+    expect(res.status).toBe(200);
+    expect(res.body.mode).toBe("keyword");
+    expect(res.body.warnings[0]).toMatch(/not available/);
+    expect(res.body.hits[0]).toMatchObject({ path: "src/retry.py", symbol: "retry_with_backoff", start_line: 1 });
+    expect((await pool.query("SELECT count(*)::int AS n FROM chunks WHERE repo_id = $1", [repoId])).rows[0].n).toBe(1);   // nothing was dropped
   });
 });

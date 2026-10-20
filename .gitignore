@@ -45,3 +45,5 @@ models/
 .idea/
 .DS_Store
 *.log
+
+demo-data/

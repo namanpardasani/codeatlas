@@ -1,0 +1,12 @@
+**/node_modules
+**/.venv
+**/dist
+**/__pycache__
+**/.pytest_cache
+.git
+.env
+.env.*
+eval/results
+docs
+*.md
+!workers/analyzer/README.md
