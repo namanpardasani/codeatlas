@@ -4,6 +4,7 @@ Switchable per request (Day 9 compares them):
     mode     = vector | keyword | hybrid
     chunking = ast | fixed          (which chunk set to search; `fixed` is the fixed-size baseline)
 """
+import re
 import time
 from dataclasses import asdict, dataclass, field
 
@@ -85,9 +86,19 @@ def _filters(language, path_prefix, kind, exclude_tests=False) -> tuple[str, dic
     return sql, params
 
 
+DOC_PATH_RE = re.compile(r"(\.(md|mdx|rst|txt|adoc)$|\.d\.ts$|(^|/)(docs?|documentation)/|(^|/)(changelog|history|news|license)[^/]*$|(^|/)(examples?|samples?|demos?|benchmarks?|scripts)/|(^|/)benchmark[^/]*$)", re.I)
+
+
+def is_doc_path(path: str) -> bool:
+    """Documentation, type declarations, examples and benchmarks: they describe or exercise the library, they are not
+    its implementation."""
+    return bool(DOC_PATH_RE.search(path))
+
+
 def search(conn, embedder: Embedder | None, repo_id: int, query: str, *, mode: str = "hybrid",
            chunking: str = "ast", limit: int = 10, language: str | None = None, path_prefix: str | None = None,
-           kind: str | None = None, candidates: int = 50, exclude_tests: bool = False) -> SearchResult:
+           kind: str | None = None, candidates: int = 50, exclude_tests: bool = False,
+           doc_weight: float = 1.0) -> SearchResult:
     if mode not in MODES:
         raise ValueError(f"mode must be one of {MODES}")
     if chunking not in CHUNKINGS:
@@ -140,6 +151,12 @@ def search(conn, embedder: Embedder | None, repo_id: int, query: str, *, mode: s
 
     if mode == "hybrid":
         ordered = rrf_fuse({"vector": [i for i, _ in vec], "keyword": [i for i, _ in kw]})
+        if doc_weight < 1.0 and ordered:
+            # "source first": documentation and .d.ts chunks describe the code with the same words the question uses,
+            # so they outrank the implementation that answers "how does it work". Scale their fused score down.
+            paths = dict(conn.execute("SELECT id, path FROM chunks WHERE id = ANY(%s)", ([i for i, _ in ordered],)).fetchall())
+            ordered = [(i, s * (doc_weight if is_doc_path(paths[i]) else 1.0)) for i, s in ordered]
+            ordered = [x for _, x in sorted(enumerate(ordered), key=lambda t: (-t[1][1], t[0]))]
     elif mode == "vector":
         ordered = [(i, s) for i, s in vec]
     else:

@@ -114,3 +114,9 @@ def load_graph_truth(path: str | Path) -> tuple[list[GraphTruth], str, list[str]
             edges.append((a, b))
         out.append(GraphTruth(str(r["repo"]).lower(), files, edges))
     return out, digest, problems
+
+
+def select(ds: Dataset, only_tag: str | None = None, exclude_tag: str | None = None) -> Dataset:
+    """A view of the dataset by tag (e.g. develop on --exclude-tag heldout, score --only-tag heldout once)."""
+    qs = [q for q in ds.questions if (only_tag is None or only_tag in q.tags) and (exclude_tag is None or exclude_tag not in q.tags)]
+    return Dataset(qs, ds.sha256, ds.path)

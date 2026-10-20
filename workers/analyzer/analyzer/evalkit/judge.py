@@ -10,7 +10,7 @@ from ..llm.types import Delta, Message, Usage, estimate_tokens
 from .answers import evidence_text
 from .schema import Dataset
 
-RUBRIC_VERSION = "rubric-v1"
+RUBRIC_VERSION = "rubric-v2"
 
 RUBRIC_MD = """# Grading rubric (used by the LLM judge AND by the human spot-check)
 
@@ -53,8 +53,8 @@ EXCERPTS the answerer was given:
 ANSWER TO GRADE:
 {answer}
 
-Respond with exactly this JSON and nothing else:
-{{"correctness": 0, "groundedness": 0, "citation_validity": 0, "unsupported_claims": ["short quote of each claim not in the excerpts"], "reason": "one sentence"}}"""
+First think about each dimension briefly, then finish with exactly one JSON object whose three scores are YOUR grades (each the digit 0, 1 or 2; do not copy placeholders):
+{{"correctness": <0|1|2>, "groundedness": <0|1|2>, "citation_validity": <0|1|2>, "unsupported_claims": [<short quotes of claims not in the excerpts, or empty>], "reason": "<one sentence>"}}"""
 
 DIMS = ("correctness", "groundedness", "citation_validity")
 
@@ -93,7 +93,7 @@ def cache_key(model: str, q, answer: str, evidence: str) -> str:
 
 def _ask(llm, prompt: str) -> tuple[str, int, int]:
     text, tin, tout = "", 0, 0
-    for ev in llm.stream([Message("user", prompt)], max_tokens=300, temperature=0.0):
+    for ev in llm.stream([Message("user", prompt)], max_tokens=450, temperature=0.0):
         if isinstance(ev, Delta):
             text += ev.text
         elif isinstance(ev, Usage):

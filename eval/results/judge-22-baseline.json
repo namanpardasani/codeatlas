@@ -1,0 +1,732 @@
+{
+ "config": {
+  "answers_run": 19,
+  "judge": "qwen2.5-coder-1.5b",
+  "rubric": "rubric-v1"
+ },
+ "dataset_hash": "c21d34b17debc47fa496441f6eca7025f5d6aac5ef2c6a611c92ac323e16f1a3",
+ "git_sha": "7600365",
+ "id": 22,
+ "items": [
+  {
+   "cached": true,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-001",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": true,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-002",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "citation_validity": 2,
+   "correctness": 0,
+   "groundedness": 2,
+   "id": "req-003",
+   "reason": "refused an answerable question",
+   "repo": "psf/requests",
+   "rule": "refusal",
+   "unsupported_claims": []
+  },
+  {
+   "cached": true,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-004",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": true,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-005",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": true,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-006",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": true,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-007",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": true,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-008",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": true,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-009",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": true,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-010",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-011",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "tokens": [
+    2203,
+    58
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-012",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "tokens": [
+    2586,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-013",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "tokens": [
+    2617,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-014",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "tokens": [
+    2330,
+    58
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-015",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "tokens": [
+    2060,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-016",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "tokens": [
+    2022,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-017",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "tokens": [
+    2556,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-018",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "tokens": [
+    2028,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-019",
+   "reason": "one sentence",
+   "repo": "psf/requests",
+   "tokens": [
+    1664,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "citation_validity": 2,
+   "correctness": 2,
+   "groundedness": 2,
+   "id": "req-020",
+   "reason": "refused an unanswerable question",
+   "repo": "psf/requests",
+   "rule": "refusal",
+   "unsupported_claims": []
+  },
+  {
+   "citation_validity": 2,
+   "correctness": 2,
+   "groundedness": 2,
+   "id": "req-021",
+   "reason": "refused an unanswerable question",
+   "repo": "psf/requests",
+   "rule": "refusal",
+   "unsupported_claims": []
+  },
+  {
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "req-022",
+   "reason": "answered a question the repo cannot answer",
+   "repo": "psf/requests",
+   "rule": "answered-unanswerable",
+   "unsupported_claims": [
+    "To send many requests concurrently with asyncio using the built-in async session, you can use the `Session` class from the `requests` library. Here's an example of how to do it:\n\n```python\nimport asyn"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "pl-001",
+   "reason": "one sentence",
+   "repo": "sindresorhus/p-limit",
+   "tokens": [
+    1617,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "pl-002",
+   "reason": "one sentence",
+   "repo": "sindresorhus/p-limit",
+   "tokens": [
+    1688,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "pl-003",
+   "reason": "one sentence",
+   "repo": "sindresorhus/p-limit",
+   "tokens": [
+    1543,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "pl-004",
+   "reason": "one sentence",
+   "repo": "sindresorhus/p-limit",
+   "tokens": [
+    2088,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "pl-005",
+   "reason": "one sentence",
+   "repo": "sindresorhus/p-limit",
+   "tokens": [
+    2559,
+    58
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "pl-006",
+   "reason": "one sentence",
+   "repo": "sindresorhus/p-limit",
+   "tokens": [
+    2028,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "citation_validity": 2,
+   "correctness": 0,
+   "groundedness": 2,
+   "id": "pl-007",
+   "reason": "refused an answerable question",
+   "repo": "sindresorhus/p-limit",
+   "rule": "refusal",
+   "unsupported_claims": []
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "pl-008",
+   "reason": "one sentence",
+   "repo": "sindresorhus/p-limit",
+   "tokens": [
+    1679,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "citation_validity": 2,
+   "correctness": 2,
+   "groundedness": 2,
+   "id": "pl-009",
+   "reason": "refused an unanswerable question",
+   "repo": "sindresorhus/p-limit",
+   "rule": "refusal",
+   "unsupported_claims": []
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "id-001",
+   "reason": "one sentence",
+   "repo": "pallets/itsdangerous",
+   "tokens": [
+    2379,
+    58
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 1,
+   "correctness": 1,
+   "groundedness": 1,
+   "id": "id-002",
+   "reason": "the answer is correct and grounded in the excerpts",
+   "repo": "pallets/itsdangerous",
+   "tokens": [
+    2538,
+    54
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "id-003",
+   "reason": "one sentence",
+   "repo": "pallets/itsdangerous",
+   "tokens": [
+    2083,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "id-004",
+   "reason": "one sentence",
+   "repo": "pallets/itsdangerous",
+   "tokens": [
+    2036,
+    58
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "id-005",
+   "reason": "one sentence",
+   "repo": "pallets/itsdangerous",
+   "tokens": [
+    2363,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 1,
+   "correctness": 1,
+   "groundedness": 1,
+   "id": "id-006",
+   "reason": "the answer is correct and grounded in the excerpts",
+   "repo": "pallets/itsdangerous",
+   "tokens": [
+    2299,
+    54
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "id-007",
+   "reason": "one sentence",
+   "repo": "pallets/itsdangerous",
+   "tokens": [
+    1725,
+    58
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "id-008",
+   "reason": "one sentence",
+   "repo": "pallets/itsdangerous",
+   "tokens": [
+    1479,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "id-009",
+   "reason": "one sentence",
+   "repo": "pallets/itsdangerous",
+   "tokens": [
+    2531,
+    58
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "id-010",
+   "reason": "answered a question the repo cannot answer",
+   "repo": "pallets/itsdangerous",
+   "rule": "answered-unanswerable",
+   "unsupported_claims": [
+    "This can be seen in the `dumps` method of the `Serializer` class, which uses AES-128 in CBC mode [C4:7-47]. The `dumps` method is called with the `serializer_kwargs` argument set to `{'mode': 'CBC'}`."
+   ]
+  },
+  {
+   "citation_validity": 2,
+   "correctness": 2,
+   "groundedness": 2,
+   "id": "id-011",
+   "reason": "refused an unanswerable question",
+   "repo": "pallets/itsdangerous",
+   "rule": "refusal",
+   "unsupported_claims": []
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "ch-001",
+   "reason": "one sentence",
+   "repo": "chalk/chalk",
+   "tokens": [
+    2584,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "ch-002",
+   "reason": "one sentence",
+   "repo": "chalk/chalk",
+   "tokens": [
+    2511,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "citation_validity": 2,
+   "correctness": 0,
+   "groundedness": 2,
+   "id": "ch-003",
+   "reason": "refused an answerable question",
+   "repo": "chalk/chalk",
+   "rule": "refusal",
+   "unsupported_claims": []
+  },
+  {
+   "cached": false,
+   "citation_validity": 1,
+   "correctness": 1,
+   "groundedness": 1,
+   "id": "ch-004",
+   "reason": "all claims supported and visible in the excerpts",
+   "repo": "chalk/chalk",
+   "tokens": [
+    2740,
+    43
+   ],
+   "unsupported_claims": []
+  },
+  {
+   "citation_validity": 2,
+   "correctness": 0,
+   "groundedness": 2,
+   "id": "ch-005",
+   "reason": "refused an answerable question",
+   "repo": "chalk/chalk",
+   "rule": "refusal",
+   "unsupported_claims": []
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "ch-006",
+   "reason": "one sentence",
+   "repo": "chalk/chalk",
+   "tokens": [
+    2520,
+    58
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "cached": false,
+   "citation_validity": 0,
+   "correctness": 0,
+   "groundedness": 0,
+   "id": "ch-007",
+   "reason": "one sentence",
+   "repo": "chalk/chalk",
+   "tokens": [
+    2319,
+    47
+   ],
+   "unsupported_claims": [
+    "short quote of each claim not in the excerpts"
+   ]
+  },
+  {
+   "citation_validity": 2,
+   "correctness": 2,
+   "groundedness": 2,
+   "id": "ch-008",
+   "reason": "refused an unanswerable question",
+   "repo": "chalk/chalk",
+   "rule": "refusal",
+   "unsupported_claims": []
+  }
+ ],
+ "kind": "judge",
+ "label": "baseline",
+ "summary": {
+  "citation_validity_full_marks": 0.18,
+  "correctness_full_marks": 0.1,
+  "groundedness_full_marks": 0.18,
+  "hallucination_rate_any": 1.0,
+  "hallucination_rate_serious": 0.926829268292683,
+  "judge_calls_cached": 9,
+  "judge_model": "qwen2.5-coder-1.5b",
+  "mean_citation_validity": 0.42,
+  "mean_correctness": 0.26,
+  "mean_groundedness": 0.42,
+  "n": 50,
+  "n_answers_judged": 41,
+  "parse_failed": 0,
+  "rubric": "rubric-v1",
+  "same_model_as_answerer": true,
+  "scored": 50
+ }
+}

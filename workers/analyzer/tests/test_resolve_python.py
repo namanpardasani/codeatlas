@@ -28,9 +28,10 @@ def test_relative_levels():
     r = make("a/__init__.py", "a/x.py", "a/sub/__init__.py", "a/sub/y.py", "a/sub/z.py")
     assert r.resolve(item("a/sub/y.py", "z", "from", ["f"], level=1)).targets == ["a/sub/z.py"]
     assert r.resolve(item("a/sub/y.py", "x", "from", ["f"], level=2)).targets == ["a/x.py"]
-    # `from . import z` -> package __init__ AND submodule z
-    assert r.resolve(item("a/sub/y.py", "", "from", ["z"], level=1)).targets == ["a/sub/__init__.py", "a/sub/z.py"]
-    assert r.resolve(item("a/sub/y.py", "", "from", ["x"], level=2)).targets == ["a/__init__.py", "a/x.py"]
+    # `from . import z` where z is a submodule -> only a/sub/z.py (day 9: the package __init__ is an implicit side
+    # effect, not a dependency; counting it made children "import" the parent that re-exports them)
+    assert r.resolve(item("a/sub/y.py", "", "from", ["z"], level=1)).targets == ["a/sub/z.py"]
+    assert r.resolve(item("a/sub/y.py", "", "from", ["x"], level=2)).targets == ["a/x.py"]
 
 
 def test_relative_failures_are_unresolved():
@@ -70,3 +71,18 @@ def test_package_beats_module_of_same_name_and_star_import():
     r = make("m/__init__.py", "m.py", "main.py")
     assert r.resolve(item("main.py", "m")).targets == ["m/__init__.py"]
     assert r.resolve(item("main.py", "m", "from", ["*"])).targets == ["m/__init__.py"]
+
+
+def test_from_package_import_submodules_does_not_depend_on_the_package_init():
+    r = make("pkg/__init__.py", "pkg/a.py", "pkg/b.py", "pkg/sub/__init__.py", "pkg/sub/c.py", "pkg/sub/d.py")
+    # every name is a submodule -> only those files
+    assert r.resolve(item("pkg/b.py", "", "from", ["a"], level=1)).targets == ["pkg/a.py"]
+    assert r.resolve(item("pkg/sub/c.py", "", "from", ["c", "d"], level=1)).targets == ["pkg/sub/c.py", "pkg/sub/d.py"]
+    assert r.resolve(item("x.py", "pkg", "from", ["a", "b"], level=0)).targets == ["pkg/a.py", "pkg/b.py"]
+    # a name defined in __init__ itself (not a submodule) keeps the edge to __init__
+    assert r.resolve(item("pkg/b.py", "", "from", ["a", "VERSION"], level=1)).targets == ["pkg/__init__.py", "pkg/a.py"]
+    assert r.resolve(item("pkg/b.py", "", "from", ["VERSION"], level=1)).targets == ["pkg/__init__.py"]
+    assert r.resolve(item("pkg/b.py", "", "from", ["*"], level=1)).targets == ["pkg/__init__.py"]
+    # a plain `from .a import f` is unaffected: it depends on a.py, and `import pkg` on __init__
+    assert r.resolve(item("pkg/b.py", "a", "from", ["f"], level=1)).targets == ["pkg/a.py"]
+    assert r.resolve(item("x.py", "pkg", "import", [], level=0)).targets == ["pkg/__init__.py"]

@@ -3,7 +3,7 @@ file/symbol lands in the ranking."""
 from dataclasses import dataclass
 
 from .. import config
-from ..rag.pipeline import wants_tests
+from ..rag.pipeline import doc_weight_for, wants_tests
 from ..rag.rerank import rerank as rerank_hits
 from ..search import search
 from . import metrics
@@ -71,7 +71,8 @@ def run_variant(conn, embedder, scorer, ds: Dataset, ids: dict[str, int], v: Var
         targets, _ = resolve_targets(conn, rid, q)
         excl = not wants_tests(q.question)            # same rule as the chat pipeline
         res = search(conn, embedder if v.mode != "keyword" else None, rid, q.question, mode=v.mode, chunking=v.chunking,
-                     limit=RERANK_CANDIDATES if v.rerank else K, exclude_tests=excl)
+                     limit=RERANK_CANDIDATES if v.rerank else K, exclude_tests=excl,
+                     doc_weight=doc_weight_for(q.question))
         hits = res.hits
         if v.rerank and hits:
             hits = rerank_hits(hits, q.question, scorer)
@@ -100,5 +101,5 @@ def run_retrieval(conn, embedder, scorer, ds: Dataset, ids: dict[str, int], vari
 
 def run_config(variants: list[Variant], embedder_name: str, reranker_name: str | None) -> dict:
     return {"variants": [v.name for v in variants], "k": K, "rerank_candidates": RERANK_CANDIDATES,
-            "embedder": embedder_name, "reranker": reranker_name, "rrf_k": 60,
+            "doc_weight": config.RAG_DOC_WEIGHT, "embedder": embedder_name, "reranker": reranker_name, "rrf_k": 60,
             "ast_max_chars": getattr(config, "CHUNK_MAX_CHARS", None)}

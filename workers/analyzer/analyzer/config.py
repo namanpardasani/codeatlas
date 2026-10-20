@@ -61,6 +61,7 @@ RAG_MIN_SIMILARITY = float(os.environ.get("RAG_MIN_SIMILARITY", "0.70"))     # c
 RAG_CONTEXT_TOKENS = int(os.environ.get("RAG_CONTEXT_TOKENS", "3000"))        # budget for retrieved code in the prompt (local CPU models read ~65 tokens/s: 4.5k tokens = 70 s)
 RAG_MIN_SUPPORT = float(os.environ.get("RAG_MIN_SUPPORT", "0.40"))           # min share of the words a sentence says ABOUT the code (not its identifiers) found in the code it cites
 RAG_MIN_SUPPORT_SHORT = float(os.environ.get("RAG_MIN_SUPPORT_SHORT", "0.25"))  # lenient bar when a sentence has < 3 such words (all words counted)
+RAG_DOC_WEIGHT = float(os.environ.get("RAG_DOC_WEIGHT", "0.7"))               # <1 demotes docs/.d.ts chunks for implementation questions (1.0 = off; 0.7 chosen on the Day 9 dev split)
 RAG_CANDIDATES = int(os.environ.get("RAG_CANDIDATES", "12"))
 RAG_MAX_CHUNKS = int(os.environ.get("RAG_MAX_CHUNKS", "6"))
 RAG_HISTORY_TURNS = int(os.environ.get("RAG_HISTORY_TURNS", "3"))

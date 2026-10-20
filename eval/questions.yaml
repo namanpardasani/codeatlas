@@ -1,0 +1,464 @@
+# CodeAtlas evaluation questions.
+#
+# AUTHORSHIP (read before trusting any number computed from this file): these 50 questions and their ground truth were
+# written by Claude (the AI that also built CodeAtlas), NOT by a human maintainer of these repos. Method: the source of
+# each repo was read first and every `answer_notes` / `files` / `symbols` entry was checked against that source; the
+# questions were written BEFORE any retrieval or answer run, and no question was changed after seeing results.
+# Limits: the author knows how CodeAtlas works, so style bias is possible (see docs/EVAL.md). Questions tagged
+# `heldout` are not used to guide fixes; they are scored once at the end.
+# Pre-run correction (before any result existed): ch-004 and ch-007 originally pointed at source/vendor/, which the
+# analyser deliberately skips (vendored code); they were replaced with questions about indexed files.
+version: 1
+questions:
+  # ---------------------------------------------------------------- psf/requests (22)
+  - id: req-001
+    repo: psf/requests
+    question: "How does the library follow redirects, and what stops an endless redirect loop?"
+    answer_notes: >
+      SessionRedirectMixin.resolve_redirects loops over redirect responses: it gets the target from the Location header,
+      rebuilds the request (method, headers, cookies, proxies, auth) and sends it again with allow_redirects=False.
+      Before each hop it checks len(resp.history) >= max_redirects and raises TooManyRedirects.
+    files: [src/requests/sessions.py]
+    symbols: [SessionRedirectMixin.resolve_redirects]
+    tags: [control-flow]
+  - id: req-002
+    repo: psf/requests
+    question: "When does a redirect cause the Authorization header to be dropped?"
+    answer_notes: >
+      should_strip_auth returns True when the hostname changes. It allows http to https upgrades on the default ports,
+      and when scheme and port are unchanged (default ports count as equal) it keeps the header; otherwise a changed
+      port or scheme strips it. rebuild_auth uses it to delete the Authorization header.
+    files: [src/requests/sessions.py]
+    symbols: [SessionRedirectMixin.should_strip_auth]
+    tags: [security, heldout]
+  - id: req-003
+    repo: psf/requests
+    question: "After a 302 or 303 response, which HTTP method is used for the next request?"
+    answer_notes: >
+      rebuild_method switches to GET for 303 See Other and 302 Found unless the method was HEAD, and for 301 Moved
+      Permanently when the method was POST. 307 and 308 keep the method.
+    files: [src/requests/sessions.py]
+    symbols: [SessionRedirectMixin.rebuild_method]
+    tags: [control-flow]
+  - id: req-004
+    repo: psf/requests
+    question: "What steps does Session.send go through to turn a prepared request into a final response?"
+    answer_notes: >
+      It sets stream/verify/cert/proxies defaults, finds the adapter for the URL, calls adapter.send and records
+      elapsed time, dispatches the response hook, stores cookies from the response and its history, follows redirects
+      through resolve_redirects when allow_redirects is true (attaching the history), and reads r.content unless stream.
+    files: [src/requests/sessions.py]
+    symbols: [Session.send]
+    tags: [control-flow]
+  - id: req-005
+    repo: psf/requests
+    question: "How are per-request settings combined with session-level settings such as headers or params?"
+    answer_notes: >
+      merge_setting returns the request value if the session has none and vice versa; when both are mappings it merges
+      them with the request values winning, then deletes keys whose merged value is None.
+    files: [src/requests/sessions.py]
+    symbols: [merge_setting]
+    tags: [config]
+  - id: req-006
+    repo: psf/requests
+    question: "Which environment variables influence proxies and the CA bundle, and where are they read?"
+    answer_notes: >
+      Session.merge_environment_settings, only if trust_env: proxies from get_environ_proxies (respecting no_proxy) are
+      added without overriding explicit ones, and when verify is True/None it uses REQUESTS_CA_BUNDLE or CURL_CA_BUNDLE.
+      The results are then merged with the session's own proxies, stream, verify and cert.
+    files: [src/requests/sessions.py]
+    symbols: [Session.merge_environment_settings]
+    tags: [config, heldout]
+  - id: req-007
+    repo: psf/requests
+    question: "How does passing json= produce the request body and Content-Type header?"
+    answer_notes: >
+      In PreparedRequest.prepare_body, when data is empty and json is not None the content type is application/json and
+      the body is complexjson.dumps(json, allow_nan=False) encoded to UTF-8 bytes; a ValueError becomes InvalidJSONError.
+    files: [src/requests/models.py]
+    symbols: [PreparedRequest.prepare_body]
+    tags: [encoding]
+  - id: req-008
+    repo: psf/requests
+    question: "How does the library decide between a Content-Length header and chunked transfer encoding for a streamed body?"
+    answer_notes: >
+      prepare_body detects iterables/streams, computes length with super_len (which inspects len, fileno, tell/seek);
+      with a length it sets Content-Length, otherwise Transfer-Encoding: chunked. Streaming a body together with files
+      raises NotImplementedError.
+    files: [src/requests/models.py, src/requests/utils.py]
+    symbols: [PreparedRequest.prepare_body, super_len]
+    tags: [encoding, multi-file]
+  - id: req-009
+    repo: psf/requests
+    question: "How does Response.json decide which character encoding to decode with when none is declared?"
+    answer_notes: >
+      If self.encoding is unset and the content is longer than 3 bytes it calls guess_json_utf, which checks BOMs and
+      counts NUL bytes in the first four bytes to pick utf-8/16/32 variants; if that fails or the codec is wrong it
+      falls back to self.text. Decode errors are re-raised as requests' JSONDecodeError.
+    files: [src/requests/models.py, src/requests/utils.py]
+    symbols: [Response.json, guess_json_utf]
+    tags: [encoding, multi-file, heldout]
+  - id: req-010
+    repo: psf/requests
+    question: "What exactly does raise_for_status do and what does the error message look like?"
+    answer_notes: >
+      It decodes the reason (utf-8, falling back to iso-8859-1), and for status 400-499 builds "<code> Client Error:
+      <reason> for url: <url>", for 500-599 "<code> Server Error: ...", then raises HTTPError carrying the response.
+      Other statuses do nothing.
+    files: [src/requests/models.py]
+    symbols: [Response.raise_for_status]
+    tags: [errors]
+  - id: req-011
+    repo: psf/requests
+    question: "How is Response.text decoded when the server did not specify a charset?"
+    answer_notes: >
+      It uses self.encoding from the headers; if None it uses apparent_encoding (charset detection). Content is decoded
+      with errors="replace"; an unknown encoding (LookupError) or TypeError falls back to str(content, errors="replace").
+      Empty content returns an empty string.
+    files: [src/requests/models.py]
+    symbols: [Response.text]
+    tags: [encoding]
+  - id: req-012
+    repo: psf/requests
+    question: "How are low-level urllib3 failures translated into the library's own exceptions when sending?"
+    answer_notes: >
+      HTTPAdapter.send wraps conn.urlopen: ProtocolError/OSError become ConnectionError; MaxRetryError becomes
+      ConnectTimeout, RetryError, ProxyError, SSLError or ConnectionError depending on its reason; ClosedPoolError is a
+      ConnectionError; ReadTimeoutError becomes ReadTimeout; invalid header errors become InvalidHeader.
+    files: [src/requests/adapters.py]
+    symbols: [HTTPAdapter.send]
+    tags: [errors, heldout]
+  - id: req-013
+    repo: psf/requests
+    question: "How is the timeout argument interpreted when it is a tuple versus a single number?"
+    answer_notes: >
+      In HTTPAdapter.send a tuple is unpacked as (connect, read) into a urllib3 Timeout; an invalid tuple raises
+      ValueError with a message about passing a (connect, read) tuple; an existing Timeout object is used as is; a single
+      value is used for both connect and read.
+    files: [src/requests/adapters.py]
+    symbols: [HTTPAdapter.send]
+    tags: [config]
+  - id: req-014
+    repo: psf/requests
+    question: "What does the adapter check before using TLS, and what happens if the CA bundle path is wrong?"
+    answer_notes: >
+      cert_verify: for https URLs with verify truthy it uses the verify path (or DEFAULT_CA_BUNDLE_PATH when verify is
+      True), raises OSError if the bundle path does not exist, sets cert_reqs CERT_REQUIRED and ca_certs or ca_cert_dir;
+      otherwise CERT_NONE. A client cert (single file or (cert, key) pair) must exist or OSError is raised.
+    files: [src/requests/adapters.py]
+    symbols: [HTTPAdapter.cert_verify]
+    tags: [security]
+  - id: req-015
+    repo: psf/requests
+    question: "Where does the library look for netrc credentials and how are they returned?"
+    answer_notes: >
+      get_netrc_auth uses the NETRC environment variable if set, otherwise ~/.netrc then ~/_netrc, parses with the netrc
+      module for the URL's hostname and returns a (login, password) tuple; parse errors are ignored unless raise_errors.
+    files: [src/requests/utils.py]
+    symbols: [get_netrc_auth]
+    tags: [auth, heldout]
+  - id: req-016
+    repo: psf/requests
+    question: "In what order are proxy settings matched against a request URL?"
+    answer_notes: >
+      select_proxy tries the keys scheme://hostname, scheme, all://hostname, then all, returning the first present in the
+      proxies mapping; with no hostname it uses the scheme or "all".
+    files: [src/requests/utils.py]
+    symbols: [select_proxy]
+    tags: [config]
+  - id: req-017
+    repo: psf/requests
+    question: "How does HTTP digest authentication get triggered and how many times will it retry?"
+    answer_notes: >
+      HTTPDigestAuth.handle_401 runs as a response hook: if a 4xx response has a WWW-Authenticate header containing
+      "digest" and fewer than 2 attempts were made, it parses the challenge, builds an Authorization header with
+      build_digest_header, re-sends a copy of the request and appends the 401 response to history. Otherwise it returns
+      the response unchanged.
+    files: [src/requests/auth.py]
+    symbols: [HTTPDigestAuth.handle_401]
+    tags: [auth]
+  - id: req-018
+    repo: psf/requests
+    question: "How can response.headers['content-type'] work regardless of how the server capitalised the header name?"
+    answer_notes: >
+      CaseInsensitiveDict keeps an OrderedDict mapping the lower-cased key to (original key, value), so lookups lower-case
+      the key while iteration returns the original casing.
+    files: [src/requests/structures.py]
+    symbols: [CaseInsensitiveDict]
+    tags: [data-structure]
+  - id: req-019
+    repo: psf/requests
+    question: "How do you remove a cookie through the cookie jar's set method?"
+    answer_notes: >
+      RequestsCookieJar.set called with value None removes the cookie by name (optionally narrowed by domain and path)
+      through remove_cookie_by_name; with a Morsel it converts it using morsel_to_cookie; otherwise create_cookie builds
+      one and set_cookie stores it.
+    files: [src/requests/cookies.py]
+    symbols: [RequestsCookieJar.set]
+    tags: [cookies]
+  - id: req-020
+    repo: psf/requests
+    question: "How does the library negotiate HTTP/2 with the server?"
+    answer_notes: "It does not. There is no HTTP/2 support or negotiation code in this repository."
+    answerable: false
+    tags: [unanswerable]
+  - id: req-021
+    repo: psf/requests
+    question: "Where is the WebSocket connection handled?"
+    answer_notes: "Nowhere. The repository has no WebSocket support."
+    answerable: false
+    tags: [unanswerable, heldout]
+  - id: req-022
+    repo: psf/requests
+    question: "How do I send many requests concurrently with asyncio using the built-in async session?"
+    answer_notes: "There is no async API or asyncio code in this repository; it is synchronous only."
+    answerable: false
+    tags: [unanswerable]
+
+  # ---------------------------------------------------------------- sindresorhus/p-limit (9)
+  - id: pl-001
+    repo: sindresorhus/p-limit
+    question: "How does the limiter make sure no more than the allowed number of functions run at once?"
+    answer_notes: >
+      It keeps activeCount and a queue. enqueue adds the task and calls resumeNext immediately if activeCount is below
+      concurrency; resumeNext increments activeCount and runs the next queued item only while activeCount < concurrency.
+    files: [index.js]
+    symbols: [resumeNext, enqueue]
+    tags: [core]
+  - id: pl-002
+    repo: sindresorhus/p-limit
+    question: "What happens when a limited function finishes or throws?"
+    answer_notes: >
+      run resolves the caller's promise with the result immediately, awaits the result inside try/catch so a rejection
+      does not become an unhandled rejection (the caller still receives it), then calls next(), which decrements
+      activeCount and calls resumeNext to start the following queued task.
+    files: [index.js]
+    symbols: [run, next]
+    tags: [core, heldout]
+  - id: pl-003
+    repo: sindresorhus/p-limit
+    question: "How do I discard the tasks that are still waiting in the queue, and can they be rejected?"
+    answer_notes: >
+      clearQueue empties the queue; if the limiter was created with rejectOnClear: true, every queued item is rejected
+      with the AbortSignal.abort() reason instead of being silently dropped.
+    files: [index.js]
+    tags: [api]
+  - id: pl-004
+    repo: sindresorhus/p-limit
+    question: "Can the concurrency limit be changed after the limiter is created, and what happens to waiting tasks?"
+    answer_notes: >
+      Yes, through the concurrency setter: it validates the new value, stores it and, in a microtask, starts queued
+      tasks with resumeNext while activeCount is below the new limit.
+    files: [index.js]
+    tags: [api]
+  - id: pl-005
+    repo: sindresorhus/p-limit
+    question: "How does limit.map work and what does it do if iterating the input throws?"
+    answer_notes: >
+      map schedules generator(function_, value, index) for every item of the iterable via Array.from and returns
+      Promise.all of the promises. If the iterable throws, already scheduled promises get a no-op catch to avoid
+      unhandled rejections and the error is rethrown.
+    files: [index.js]
+    tags: [api, heldout]
+  - id: pl-006
+    repo: sindresorhus/p-limit
+    question: "What does limitFunction give me compared with pLimit?"
+    answer_notes: >
+      limitFunction(function_, options) creates a limiter and returns a wrapper that runs each call through it; the
+      wrapper also exposes clearQueue.
+    files: [index.js]
+    symbols: [limitFunction]
+    tags: [api]
+  - id: pl-007
+    repo: sindresorhus/p-limit
+    question: "What values of concurrency are rejected and with which error?"
+    answer_notes: >
+      validateConcurrency accepts positive integers and Infinity; anything else throws a TypeError "Expected `concurrency`
+      to be a number from 1 and up". A non-boolean rejectOnClear also throws a TypeError.
+    files: [index.js]
+    symbols: [validateConcurrency]
+    tags: [validation]
+  - id: pl-008
+    repo: sindresorhus/p-limit
+    question: "Which package provides the queue data structure and how is it used?"
+    answer_notes: >
+      The yocto-queue package (imported as Queue in index.js and listed as a dependency in package.json); the limiter
+      uses enqueue, dequeue, clear and size.
+    files: [index.js, package.json]
+    tags: [dependencies]
+  - id: pl-009
+    repo: sindresorhus/p-limit
+    question: "How does p-limit persist queued tasks to disk so they survive a process restart?"
+    answer_notes: "It does not; the queue is in memory only and there is no persistence code."
+    answerable: false
+    tags: [unanswerable]
+
+  # ---------------------------------------------------------------- pallets/itsdangerous (11)
+  - id: id-001
+    repo: pallets/itsdangerous
+    question: "How does Signer.unsign separate the value from the signature and what does it raise on failure?"
+    answer_notes: >
+      It converts the input to bytes, raises BadSignature if the separator is missing, splits on the LAST separator with
+      rsplit(sep, 1), returns the value if verify_signature passes, otherwise raises BadSignature "Signature ... does not
+      match" with the payload attached.
+    files: [src/itsdangerous/signer.py]
+    symbols: [Signer.unsign]
+    tags: [core]
+  - id: id-002
+    repo: pallets/itsdangerous
+    question: "Which key derivation methods are supported and what does each do?"
+    answer_notes: >
+      derive_key supports "concat" (digest of salt + secret), "django-concat" (digest of salt + b"signer" + secret),
+      "hmac" (HMAC of the salt keyed with the secret) and "none" (the secret itself); anything else raises TypeError.
+    files: [src/itsdangerous/signer.py]
+    symbols: [Signer.derive_key]
+    tags: [crypto]
+  - id: id-003
+    repo: pallets/itsdangerous
+    question: "How does the timestamp signer embed the signing time and enforce an expiry?"
+    answer_notes: >
+      TimestampSigner.sign appends the separator and a base64 of the integer timestamp to the value and then signs value
+      plus timestamp. unsign verifies the signature, splits off the timestamp, and when max_age is given raises
+      SignatureExpired if the age exceeds max_age or is negative.
+    files: [src/itsdangerous/timed.py]
+    symbols: [TimestampSigner.sign, TimestampSigner.unsign]
+    tags: [core, heldout]
+  - id: id-004
+    repo: pallets/itsdangerous
+    question: "Why do URL-safe tokens sometimes start with a dot?"
+    answer_notes: >
+      URLSafeSerializerMixin.dump_payload zlib-compresses the JSON when that makes it shorter and then prepends "." to
+      the base64 output to mark it as compressed; load_payload strips the dot and decompresses.
+    files: [src/itsdangerous/url_safe.py]
+    symbols: [URLSafeSerializerMixin.dump_payload, URLSafeSerializerMixin.load_payload]
+    tags: [encoding]
+  - id: id-005
+    repo: pallets/itsdangerous
+    question: "How can secret keys be rotated without invalidating existing signatures?"
+    answer_notes: >
+      The signer accepts a list of secret keys ordered oldest to newest (_make_keys_list). The newest (last) key signs;
+      verify_signature tries the keys in reverse order (newest first) so signatures made with older keys still verify.
+    files: [src/itsdangerous/signer.py]
+    symbols: [Signer.verify_signature, _make_keys_list]
+    tags: [crypto, heldout]
+  - id: id-006
+    repo: pallets/itsdangerous
+    question: "What are fallback signers and how does loads use them?"
+    answer_notes: >
+      Serializer.iter_unsigners yields the configured signer first, then a signer built for each fallback (a dict of
+      kwargs, a (class, kwargs) tuple or a class) for every secret key. Serializer.loads tries each unsigner and returns
+      the first that unsigns, raising the last BadSignature if none do.
+    files: [src/itsdangerous/serializer.py]
+    symbols: [Serializer.iter_unsigners, Serializer.loads]
+    tags: [core]
+  - id: id-007
+    repo: pallets/itsdangerous
+    question: "What is the exception hierarchy for bad or expired data?"
+    answer_notes: >
+      BadData is the base; BadSignature extends it; BadTimeSignature extends BadSignature; SignatureExpired extends
+      BadTimeSignature; BadHeader extends BadSignature; BadPayload extends BadData (not BadSignature).
+    files: [src/itsdangerous/exc.py]
+    tags: [errors]
+  - id: id-008
+    repo: pallets/itsdangerous
+    question: "How is base64 encoding made URL-safe and how is missing padding handled?"
+    answer_notes: >
+      base64_encode uses urlsafe_b64encode and strips the "=" padding; base64_decode restores padding by appending
+      "=" * (-len % 4) before urlsafe_b64decode, turning TypeError/ValueError into BadData.
+    files: [src/itsdangerous/encoding.py]
+    symbols: [base64_encode, base64_decode]
+    tags: [encoding]
+  - id: id-009
+    repo: pallets/itsdangerous
+    question: "How does loads on a timed serializer treat an expired signature while fallback signers exist?"
+    answer_notes: >
+      TimedSerializer.loads tries each unsigner with max_age and return_timestamp; if a signer unsigns the value but the
+      signature is expired it re-raises SignatureExpired immediately and does not try the next signer; other
+      BadSignature errors move on to the next signer.
+    files: [src/itsdangerous/timed.py]
+    symbols: [TimedSerializer.loads]
+    tags: [core]
+  - id: id-010
+    repo: pallets/itsdangerous
+    question: "Which AES mode does the library use to encrypt the payload?"
+    answer_notes: "None. The library only signs data; the payload is readable and nothing is encrypted."
+    answerable: false
+    tags: [unanswerable]
+  - id: id-011
+    repo: pallets/itsdangerous
+    question: "Where are user passwords hashed with bcrypt before signing?"
+    answer_notes: "Nowhere. There is no password hashing or bcrypt code in this repository."
+    answerable: false
+    tags: [unanswerable, heldout]
+
+  # ---------------------------------------------------------------- chalk/chalk (8)
+  - id: ch-001
+    repo: chalk/chalk
+    question: "When I chain styles like chalk.red.bold, how are the escape codes combined?"
+    answer_notes: >
+      createStyler builds a styler with open/close codes; with a parent, openAll is parent.openAll + open and closeAll is
+      close + parent.closeAll, so closing codes unwind in reverse order of opening.
+    files: [source/index.js]
+    symbols: [createStyler]
+    tags: [core]
+  - id: ch-002
+    repo: chalk/chalk
+    question: "How does Chalk keep colouring working when the text already contains a closing escape code?"
+    answer_notes: >
+      applyStyle checks whether the string contains an ESC character; if so, for each styler in the chain it uses
+      stringReplaceAll to replace occurrences of the close code with the open code, so text after a nested close remains
+      styled.
+    files: [source/index.js, source/utilities.js]
+    symbols: [applyStyle, stringReplaceAll]
+    tags: [core, multi-file]
+  - id: ch-003
+    repo: chalk/chalk
+    question: "Why are styles closed and reopened around line breaks?"
+    answer_notes: >
+      applyStyle calls stringEncaseCRLFWithFirstIndex when the text has a newline: it inserts the close codes before and
+      the open codes after each \n (keeping \r\n), fixing colour bleeding onto the next line (macOS issue).
+    files: [source/index.js, source/utilities.js]
+    symbols: [stringEncaseCRLFWithFirstIndex, applyStyle]
+    tags: [core, multi-file, heldout]
+  - id: ch-004
+    repo: chalk/chalk
+    question: "How does a new Chalk instance decide its default colour level, and how can that be overridden?"
+    answer_notes: >
+      applyOptions validates options.level with assertValidLevel when given and uses it; otherwise it uses the level
+      detected for stdout (stdoutColor.level, or 0 when no colour support was detected). The value is stored under the
+      LEVEL symbol before the prototype with the level accessor is installed.
+    files: [source/index.js]
+    symbols: [applyOptions]
+    tags: [config]
+  - id: ch-005
+    repo: chalk/chalk
+    question: "What values can the colour level take and what happens with an invalid one?"
+    answer_notes: >
+      assertValidLevel requires a safe integer from 0 to 3, otherwise it throws an Error "The `level` should be an integer
+      from 0 to 3"; the level setter calls it.
+    files: [source/index.js]
+    symbols: [assertValidLevel]
+    tags: [validation]
+  - id: ch-006
+    repo: chalk/chalk
+    question: "How are rgb and hex colours rendered on terminals that only support 16 or 256 colours?"
+    answer_notes: >
+      createModelConverters returns four converters indexed by level: for rgb and hex it converts to the nearest ANSI 16
+      colour at levels 1 (and 0), to ansi256 at level 2, and emits the true 24-bit code at level 3.
+    files: [source/index.js]
+    symbols: [createModelConverters]
+    tags: [colour, heldout]
+  - id: ch-007
+    repo: chalk/chalk
+    question: "How do I get a Chalk instance whose colour level follows stderr instead of stdout?"
+    answer_notes: >
+      The module exports chalkStderr, created with createChalk using the level detected for stderr (stderrColor.level,
+      or 0 if none), alongside the default chalk instance which uses stdout's level.
+    files: [source/index.js]
+    tags: [config]
+  - id: ch-008
+    repo: chalk/chalk
+    question: "How does Chalk cache coloured output on disk to speed up repeated runs?"
+    answer_notes: "It does not; there is no caching or disk access in this library."
+    answerable: false
+    tags: [unanswerable]
