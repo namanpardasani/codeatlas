@@ -5,10 +5,13 @@ export function SubmitPanel({
   busy,
   error,
   onSubmit,
+  disabledReason,
 }: {
   busy: boolean;
   error: string | null;
   onSubmit: (url: string) => void;
+  /** set when analysis is unavailable (demo mode, login required) */
+  disabledReason?: string | null;
 }) {
   const [url, setUrl] = useState("");
   return (
@@ -26,8 +29,10 @@ export function SubmitPanel({
           placeholder="https://github.com/owner/repo"
           className="flex-1 rounded-ui border border-border bg-surface px-gap py-gap"
         />
-        <Button disabled={busy || !url.trim()}>{busy ? "Starting…" : "Analyse"}</Button>
+        <Button disabled={busy || !url.trim() || Boolean(disabledReason)}>{busy ? "Starting…" : "Analyse"}</Button>
       </form>
+      <p className="mt-gap text-muted">Public GitHub repositories only. Private repositories are not supported.</p>
+      {disabledReason && <p className="mt-gap text-muted">{disabledReason}</p>}
       {error && <p className="mt-gap text-danger">{error}</p>}
     </Panel>
   );

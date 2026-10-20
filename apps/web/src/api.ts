@@ -198,6 +198,17 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return body as T;
 }
 
+export interface Me {
+  user: { id: number; login: string; avatarUrl: string | null } | null;
+  loginAvailable: boolean;
+  authRequired: boolean;
+  demoMode: boolean;
+  limits: { analysesPerDay: number; maxRepoMb: number };
+  notice: string;
+}
+export const getMe = () => request<Me>("/me");
+export const logout = () => request<{ ok: boolean }>("/auth/logout", { method: "POST" });
+
 export const submitRepo = (url: string) =>
   request<{ repoId: string; jobId: string }>("/repos", {
     method: "POST",

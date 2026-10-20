@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  getFileDetail, getFiles, submitRepo, watchJob,
-  type FileDetail, type FileRow, type JobEvent,
+  getFileDetail, getFiles, getMe, submitRepo, watchJob,
+  type FileDetail, type FileRow, type JobEvent, type Me,
 } from "./api";
 import { SubmitPanel } from "./features/SubmitPanel";
+import { AuthBar } from "./features/AuthBar";
 import { JobProgress } from "./features/JobProgress";
 import { FilesPanel } from "./features/FilesPanel";
 import { FileDetailPanel } from "./features/FileDetailPanel";
@@ -26,9 +27,20 @@ export default function App() {
   const [detail, setDetail] = useState<FileDetail | null>(null);
   const [viewer, setViewer] = useState<ViewerTarget | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [me, setMe] = useState<Me | null>(null);
   const stop = useRef<(() => void) | null>(null);
 
-  useEffect(() => () => stop.current?.(), []);
+  const loadMe = () => getMe().then(setMe).catch(() => setMe(null));
+  useEffect(() => {
+    void loadMe();
+    return () => stop.current?.();
+  }, []);
+
+  const blocked = me?.demoMode
+    ? "This is a read-only demo: analysis is disabled."
+    : me?.authRequired && !me.user
+      ? "Sign in with GitHub to analyse a repository."
+      : null;
 
   async function submit(url: string) {
     setError(null);
@@ -76,8 +88,9 @@ export default function App() {
       <header>
         <h1 className="text-display font-bold">CodeAtlas</h1>
         <p className="text-muted">Paste a public GitHub repo to analyse its architecture.</p>
+        <AuthBar me={me} onChange={loadMe} />
       </header>
-      <SubmitPanel busy={busy} error={error} onSubmit={submit} />
+      <SubmitPanel busy={busy} error={error} onSubmit={submit} disabledReason={blocked} />
       {job && <JobProgress job={job} />}
       {repoId && (
         <ReanalyzePanel
