@@ -23,6 +23,11 @@ NOT_FOUND_TEXT = "I couldn't find this in the repo."
 MAX_QUESTION = 1000
 
 
+def wants_tests(*texts: str) -> bool:
+    """Does the question ask about tests? Otherwise test files are excluded from retrieval (they crowd out source)."""
+    return bool(re.search(r"\b(tests?|testing|pytest|spec|unit)\b", " ".join(texts), re.I))
+
+
 def _chunk_info(c: ContextChunk) -> dict:
     h = c.hit
     return {"label": c.label, "chunk_id": h.chunk_id, "path": h.path, "start_line": c.shown_start,
@@ -61,9 +66,9 @@ def answer(conn, embedder, llm, repo_id: int, question: str, *, history: list[tu
         # 2. retrieval (+ optional rerank)
         yield {"type": "status", "stage": "retrieving"}
         # "how does X work" is answered by source code; test files and docs would otherwise crowd it out
-        wants_tests = bool(re.search(r"\b(tests?|testing|pytest|spec|unit)\b", f"{question} {query}", re.I))
+        tests_wanted = wants_tests(question, query)
         result = search(conn, embedder, repo_id, query, mode="hybrid", chunking="ast", limit=config.RAG_CANDIDATES,
-                        exclude_tests=not wants_tests)
+                        exclude_tests=not tests_wanted)
         hits = result.hits
         if reranker and hits:
             hits = rerank_hits(hits, query, reranker)
