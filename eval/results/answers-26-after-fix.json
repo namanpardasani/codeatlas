@@ -1,0 +1,6206 @@
+{
+ "config": {
+  "filter": {
+   "exclude_tag": null,
+   "only_tag": null
+  },
+  "llm": "llamacpp",
+  "model": "qwen2.5-coder-1.5b",
+  "n_questions": 50,
+  "rerank": false
+ },
+ "dataset_hash": "c21d34b17debc47fa496441f6eca7025f5d6aac5ef2c6a611c92ac323e16f1a3",
+ "git_sha": "e2697cd",
+ "id": 26,
+ "items": [
+  {
+   "answer": "The library follows redirects by calling the `resolve_redirects` method on the `SessionRedirectMixin` class, which is responsible for handling redirects. This method iterates through the history of responses, updating the request and response objects accordingly [C1:188-213]. If a custom mixin is used to handle this logic, it may be advantageous to cache the redirect location onto the response object as a private attribute [C6:132-151].\n\nTo stop an endless redirect loop, the library checks if the number of redirects exceeds a predefined maximum (`max_redirects`). If it does, it raises a `TooManyRedirects` exception [C1:217-217]. Additionally, the library ensures that the response is not followed if its status code is not one of the permanent versions of redirect (e.g., 301, 302) [C3:877-888].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102857,
+     "end_line": 213,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "start_line": 188,
+     "symbol": "SessionRedirectMixin.resolve_redirects"
+    },
+    {
+     "chunk_id": 102855,
+     "end_line": 151,
+     "inferred": true,
+     "kind": "group",
+     "label": "C6",
+     "path": "src/requests/sessions.py",
+     "start_line": 132,
+     "symbol": "SessionRedirectMixin.send, SessionRedirectMixin.get_redirect_target"
+    },
+    {
+     "chunk_id": 102857,
+     "end_line": 217,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "start_line": 217,
+     "symbol": "SessionRedirectMixin.resolve_redirects"
+    },
+    {
+     "chunk_id": 102810,
+     "end_line": 888,
+     "inferred": true,
+     "kind": "group",
+     "label": "C3",
+     "path": "src/requests/models.py",
+     "start_line": 877,
+     "symbol": "Response.is_redirect, Response.is_permanent_redirect"
+    }
+   ],
+   "error": null,
+   "id": "req-001",
+   "issues": [
+    "uncited_claim",
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does the library follow redirects, and what stops an endless redirect loop?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102857,
+     "end_line": 228,
+     "keyword_rank": 2,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "score": 0.032258,
+     "similarity": 0.758,
+     "start_line": 186,
+     "symbol": "SessionRedirectMixin.resolve_redirects",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102860,
+     "end_line": 307,
+     "keyword_rank": 6,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/sessions.py",
+     "score": 0.031545,
+     "similarity": 0.7663,
+     "start_line": 286,
+     "symbol": "SessionRedirectMixin.resolve_redirects",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102810,
+     "end_line": 889,
+     "keyword_rank": 1,
+     "kind": "group",
+     "label": "C3",
+     "path": "src/requests/models.py",
+     "score": 0.030679,
+     "similarity": 0.721,
+     "start_line": 876,
+     "symbol": "Response.is_redirect, Response.is_permanent_redirect",
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 102879,
+     "end_line": 829,
+     "keyword_rank": 3,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/sessions.py",
+     "score": 0.029572,
+     "similarity": 0.7163,
+     "start_line": 790,
+     "symbol": "Session.send",
+     "vector_rank": 13
+    },
+    {
+     "chunk_id": 102858,
+     "end_line": 262,
+     "keyword_rank": 15,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/sessions.py",
+     "score": 0.029206,
+     "similarity": 0.7415,
+     "start_line": 226,
+     "symbol": "SessionRedirectMixin.resolve_redirects",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102855,
+     "end_line": 152,
+     "keyword_rank": 4,
+     "kind": "group",
+     "label": "C6",
+     "path": "src/requests/sessions.py",
+     "score": 0.029139,
+     "similarity": 0.7154,
+     "start_line": 132,
+     "symbol": "SessionRedirectMixin.send, SessionRedirectMixin.get_redirect_target",
+     "vector_rank": 14
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3093,
+    "output_tokens": 154
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo. (The model's answer could not be tied to any retrieved code, so it was discarded.)",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [],
+   "error": null,
+   "id": "req-002",
+   "issues": [
+    "removed: C1:325-326 is outside src/requests/sessions.py:334-368",
+    "no_valid_citation"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "When does a redirect cause the Authorization header to be dropped?",
+   "refused": true,
+   "removed_sentences": [
+    "A redirect causes the Authorization header to be dropped when it is being redirected to a new host, as indicated by the `del headers[\"Authorization\"]` line in the `rebuild_auth` method of the `SessionRedirectMixin` class [C1:325-326]."
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102862,
+     "end_line": 368,
+     "keyword_rank": 9,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "score": 0.028986,
+     "similarity": 0.7221,
+     "start_line": 334,
+     "symbol": "SessionRedirectMixin.rebuild_proxies",
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 102855,
+     "end_line": 152,
+     "keyword_rank": 12,
+     "kind": "group",
+     "label": "C2",
+     "path": "src/requests/sessions.py",
+     "score": 0.028595,
+     "similarity": 0.7233,
+     "start_line": 132,
+     "symbol": "SessionRedirectMixin.send, SessionRedirectMixin.get_redirect_target",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 102856,
+     "end_line": 184,
+     "keyword_rank": 27,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/sessions.py",
+     "score": 0.027888,
+     "similarity": 0.7878,
+     "start_line": 154,
+     "symbol": "SessionRedirectMixin.should_strip_auth",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102858,
+     "end_line": 262,
+     "keyword_rank": 28,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/sessions.py",
+     "score": 0.027237,
+     "similarity": 0.7584,
+     "start_line": 226,
+     "symbol": "SessionRedirectMixin.resolve_redirects",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102810,
+     "end_line": 889,
+     "keyword_rank": 8,
+     "kind": "group",
+     "label": "C5",
+     "path": "src/requests/models.py",
+     "score": 0.026754,
+     "similarity": 0.7018,
+     "start_line": 876,
+     "symbol": "Response.is_redirect, Response.is_permanent_redirect",
+     "vector_rank": 23
+    },
+    {
+     "chunk_id": 102861,
+     "end_line": 332,
+     "keyword_rank": 33,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/sessions.py",
+     "score": 0.026378,
+     "similarity": 0.7527,
+     "start_line": 309,
+     "symbol": "SessionRedirectMixin.rebuild_auth",
+     "vector_rank": 4
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 3043,
+    "output_tokens": 60
+   }
+  },
+  {
+   "answer": "After a 302 or 303 response, the HTTP method used for the next request is [C1:380-385].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 1,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102863,
+     "end_line": 385,
+     "inferred": false,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "start_line": 380,
+     "symbol": "SessionRedirectMixin.rebuild_method"
+    }
+   ],
+   "error": null,
+   "id": "req-003",
+   "issues": [],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "After a 302 or 303 response, which HTTP method is used for the next request?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102863,
+     "end_line": 392,
+     "keyword_rank": 4,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "score": 0.032018,
+     "similarity": 0.7644,
+     "start_line": 370,
+     "symbol": "SessionRedirectMixin.rebuild_method",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102643,
+     "end_line": 748,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/adapters.py",
+     "score": 0.030679,
+     "similarity": 0.7166,
+     "start_line": 707,
+     "symbol": "HTTPAdapter.send",
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 102803,
+     "end_line": 799,
+     "keyword_rank": 11,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/models.py",
+     "score": 0.029469,
+     "similarity": 0.7331,
+     "start_line": 765,
+     "symbol": "Response.__init__",
+     "vector_rank": 5
+    },
+    {
+     "chunk_id": 102663,
+     "end_line": 47,
+     "keyword_rank": 3,
+     "kind": "function",
+     "label": "C4",
+     "path": "src/requests/api.py",
+     "score": 0.029031,
+     "similarity": 0.7089,
+     "start_line": 24,
+     "symbol": "request",
+     "vector_rank": 16
+    },
+    {
+     "chunk_id": 102879,
+     "end_line": 829,
+     "keyword_rank": 18,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/sessions.py",
+     "score": 0.027313,
+     "similarity": 0.7169,
+     "start_line": 790,
+     "symbol": "Session.send",
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 102878,
+     "end_line": 792,
+     "keyword_rank": 7,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/sessions.py",
+     "score": 0.026553,
+     "similarity": 0.7033,
+     "start_line": 752,
+     "symbol": "Session.send",
+     "vector_rank": 26
+    }
+   ],
+   "status": "answered",
+   "usage": {
+    "input_tokens": 3665,
+    "output_tokens": 35
+   }
+  },
+  {
+   "answer": "To turn a prepared request into a final response, Session.send goes through the following steps:\n[C1:752-792] It sets defaults for hooks to ensure they always have the correct parameters to reproduce the previous request.\n[C1:763-764] It resolves proxies for the request.\n[C1:790-792] It persists cookies.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 1,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102878,
+     "end_line": 792,
+     "inferred": false,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "start_line": 752,
+     "symbol": "Session.send"
+    },
+    {
+     "chunk_id": 102878,
+     "end_line": 764,
+     "inferred": false,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "start_line": 763,
+     "symbol": "Session.send"
+    },
+    {
+     "chunk_id": 102878,
+     "end_line": 792,
+     "inferred": false,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "start_line": 790,
+     "symbol": "Session.send"
+    }
+   ],
+   "error": null,
+   "id": "req-004",
+   "issues": [
+    "removed: the cited code does not contain what it says (support 17%)",
+    "removed: the cited code does not contain what it says (support 33%)",
+    "removed: the cited code does not contain what it says (support 0%)",
+    "removed: the cited code does not contain what it says (support 25%)",
+    "removed: C1:794-795 is outside src/requests/sessions.py:752-792",
+    "removed: C1:796-798 is outside src/requests/sessions.py:752-792",
+    "removed: C1:800-801 is outside src/requests/sessions.py:752-792",
+    "removed: C1:802-803 is outside src/requests/sessions.py:752-792",
+    "removed: C1:804-805 is outside src/requests/sessions.py:752-792",
+    "removed: C1:806-807 is outside src/requests/sessions.py:752-792"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "What steps does Session.send go through to turn a prepared request into a final response?",
+   "refused": false,
+   "removed_sentences": [
+    "[C1:765-768] It checks if cookies are sent on the response and extracts them to the cookiejar.",
+    "[C1:769-770] It merges cookies with session cookies.",
+    "[C1:780-782] It sets environment's basic authentication if not explicitly set.",
+    "[C1:783-785] It rebuilds auth and proxy information.",
+    "[C1:786-789] It attempts to rewind consumed file-like object.",
+    "[C1:794-795] If redirects are allowed, it resolves redirects using the resolve_redirects generator.",
+    "[C1:796-798] It extracts cookies from the history of the request.",
+    "[C1:800-801] It resolves redirects if allowed.",
+    "[C1:802-803] It shuffles things around if there's history.",
+    "[C1:804-805] It stores the response on the Request for Response.next() if redirects aren't being followed.",
+    "[C1:806-807] If redirects aren't being followed, it raises an UnrewindableBodyError if the response is not streamable."
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102878,
+     "end_line": 792,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "score": 0.032787,
+     "similarity": 0.8404,
+     "start_line": 752,
+     "symbol": "Session.send",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102859,
+     "end_line": 288,
+     "keyword_rank": 7,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/sessions.py",
+     "score": 0.029211,
+     "similarity": 0.7673,
+     "start_line": 260,
+     "symbol": "SessionRedirectMixin.resolve_redirects",
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 102879,
+     "end_line": 829,
+     "keyword_rank": 20,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/sessions.py",
+     "score": 0.028629,
+     "similarity": 0.8064,
+     "start_line": 790,
+     "symbol": "Session.send",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102867,
+     "end_line": 555,
+     "keyword_rank": 19,
+     "kind": "group",
+     "label": "C4",
+     "path": "src/requests/sessions.py",
+     "score": 0.02781,
+     "similarity": 0.7792,
+     "start_line": 505,
+     "symbol": "Session.__enter__, Session.__exit__, Session.prepare_request",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 102641,
+     "end_line": 667,
+     "keyword_rank": 11,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/adapters.py",
+     "score": 0.027598,
+     "similarity": 0.7528,
+     "start_line": 634,
+     "symbol": "HTTPAdapter.send",
+     "vector_rank": 14
+    },
+    {
+     "chunk_id": 102868,
+     "end_line": 578,
+     "keyword_rank": 8,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/sessions.py",
+     "score": 0.027526,
+     "similarity": 0.7407,
+     "start_line": 557,
+     "symbol": "Session.request",
+     "vector_rank": 18
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3665,
+    "output_tokens": 338
+   }
+  },
+  {
+   "answer": "To combine per-request settings with session-level settings, the `merge_setting` function is used [C4:547-551]. This function takes two dictionaries, `session_setting` and `request_setting`, and merges them into a single dictionary using the `dict_class` parameter [C3:77-97]. The merged dictionary is then used to set the appropriate headers and parameters for the request [C3:77-102].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102867,
+     "end_line": 551,
+     "inferred": true,
+     "kind": "group",
+     "label": "C4",
+     "path": "src/requests/sessions.py",
+     "start_line": 547,
+     "symbol": "Session.__enter__, Session.__exit__, Session.prepare_request"
+    },
+    {
+     "chunk_id": 102853,
+     "end_line": 97,
+     "inferred": true,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/sessions.py",
+     "start_line": 77,
+     "symbol": "merge_setting"
+    },
+    {
+     "chunk_id": 102853,
+     "end_line": 102,
+     "inferred": true,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/sessions.py",
+     "start_line": 77,
+     "symbol": "merge_setting"
+    }
+   ],
+   "error": null,
+   "id": "req-005",
+   "issues": [
+    "citations_inferred",
+    "removed: the cited code does not contain what it says (support 29%)"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How are per-request settings combined with session-level settings such as headers or params?",
+   "refused": false,
+   "removed_sentences": [
+    "This ensures that per-request settings override session-level settings where necessary. [C1]"
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102868,
+     "end_line": 594,
+     "keyword_rank": 4,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "score": 0.03055,
+     "similarity": 0.7577,
+     "start_line": 557,
+     "symbol": "Session.request",
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 102870,
+     "end_line": 653,
+     "keyword_rank": 11,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/sessions.py",
+     "score": 0.030478,
+     "similarity": 0.7982,
+     "start_line": 619,
+     "symbol": "Session.request",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102853,
+     "end_line": 105,
+     "keyword_rank": 8,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/sessions.py",
+     "score": 0.029412,
+     "similarity": 0.7549,
+     "start_line": 76,
+     "symbol": "merge_setting",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 102867,
+     "end_line": 555,
+     "keyword_rank": 9,
+     "kind": "group",
+     "label": "C4",
+     "path": "src/requests/sessions.py",
+     "score": 0.028986,
+     "similarity": 0.7542,
+     "start_line": 505,
+     "symbol": "Session.__enter__, Session.__exit__, Session.prepare_request",
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 102878,
+     "end_line": 792,
+     "keyword_rank": 15,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/sessions.py",
+     "score": 0.028958,
+     "similarity": 0.7632,
+     "start_line": 752,
+     "symbol": "Session.send",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 102663,
+     "end_line": 43,
+     "keyword_rank": 3,
+     "kind": "function",
+     "label": "C6",
+     "path": "src/requests/api.py",
+     "score": 0.027109,
+     "similarity": 0.7211,
+     "start_line": 24,
+     "symbol": "request",
+     "vector_rank": 29
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3753,
+    "output_tokens": 84
+   }
+  },
+  {
+   "answer": "[The environment variable `REQUESTS_CA_BUNDLE` is read from the `os.environ` dictionary in the `get_environ_proxies` function, which is called by the `resolve_proxies` function in the `SessionRedirectMixin` class. This function then uses this value to set the CA bundle for HTTPS requests [C6:82-85]. The environment variable `no_proxy` is also read from the `os.environ` dictionary in the `resolve_proxies` function, which is called by the `rebuild_proxies` method in the `SessionRedirectMixin` class. This function then uses this value to determine whether to bypass proxies for a given URL [C2:911-936].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102923,
+     "end_line": 85,
+     "inferred": true,
+     "kind": "module",
+     "label": "C6",
+     "path": "src/requests/utils.py",
+     "start_line": 82,
+     "symbol": null
+    },
+    {
+     "chunk_id": 102957,
+     "end_line": 936,
+     "inferred": true,
+     "kind": "function",
+     "label": "C2",
+     "path": "src/requests/utils.py",
+     "start_line": 911,
+     "symbol": "resolve_proxies"
+    }
+   ],
+   "error": null,
+   "id": "req-006",
+   "issues": [
+    "uncited_claim",
+    "citations_inferred",
+    "removed: not supported by any retrieved code (support 17%)"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "Which environment variables influence proxies and the CA bundle, and where are they read?",
+   "refused": false,
+   "removed_sentences": [
+    "The CA bundle is read from the `DEFAULT_CA_BUNDLE_PATH` variable in the `certs` module, which is imported from the `certifi` library."
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102880,
+     "end_line": 868,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "score": 0.032522,
+     "similarity": 0.7572,
+     "start_line": 831,
+     "symbol": "Session.merge_environment_settings",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102957,
+     "end_line": 939,
+     "keyword_rank": 3,
+     "kind": "function",
+     "label": "C2",
+     "path": "src/requests/utils.py",
+     "score": 0.031746,
+     "similarity": 0.738,
+     "start_line": 911,
+     "symbol": "resolve_proxies",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102955,
+     "end_line": 882,
+     "keyword_rank": 16,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/utils.py",
+     "score": 0.029551,
+     "similarity": 0.7608,
+     "start_line": 873,
+     "symbol": "get_environ_proxies",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102862,
+     "end_line": 368,
+     "keyword_rank": 6,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/sessions.py",
+     "score": 0.028309,
+     "similarity": 0.7082,
+     "start_line": 334,
+     "symbol": "SessionRedirectMixin.rebuild_proxies",
+     "vector_rank": 16
+    },
+    {
+     "chunk_id": 102953,
+     "end_line": 838,
+     "keyword_rank": 15,
+     "kind": "function",
+     "label": "C5",
+     "path": "src/requests/utils.py",
+     "score": 0.026847,
+     "similarity": 0.709,
+     "start_line": 810,
+     "symbol": "should_bypass_proxies",
+     "vector_rank": 14
+    },
+    {
+     "chunk_id": 102923,
+     "end_line": 97,
+     "keyword_rank": 36,
+     "kind": "module",
+     "label": "C6",
+     "path": "src/requests/utils.py",
+     "score": 0.026042,
+     "similarity": 0.7272,
+     "start_line": 81,
+     "symbol": null,
+     "vector_rank": 4
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 2781,
+    "output_tokens": 165
+   }
+  },
+  {
+   "answer": "To produce the request body and Content-Type header when passing `json=` to the `post` method, we need to follow these steps:\n\n1. The `post` method in `src/requests/api.py:117-134` is called with the `json` parameter [C5:117-134].\n2. Inside the `post` method, the `request` function is called with the method 'post', the URL, and the `json` parameter [C5:117-134].\n3. The `request` function creates a new `Request` object with the specified method and URL [C3:113-134].\n4. The `request` function then calls the `prepare` method on the new `Request` object to prepare the request body and headers [C3:113-135].\n5. In the `prepare_body` method of `src/requests/models.py:645-652`, the content type is added to the headers if it is not already present [C4:645-652].\n6. The content type is determined based on the method of the request [C3:103-128]. For methods that can have a body (i.e., not GET or HEAD), the content type is set to 'application/json' [C1:576-601].\n7. The `prepare_content_length` method of `src/requests/models.py:654-668` is called to prepare the Content-Length header based on the request method and body [C4:646-646].\n8. If the body is not None, the length of the body is calculated using `super_len(body)` [C1:576-601].\n9. If the length exists, it is set as the Content-Length header using `self.headers[\"Content-Length\"] = builtin_str(length)` [C6:654-668].\n10. If the length does not exist and the method is not GET or HEAD, the Content-Length header is set to '0' [C6:654-668].\n\nTherefore, passing `json=` to the `post` method produces the request body and Content-Type header by adding the content type to the headers if it is not already present and setting the Content-Length header based on the request method and body.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102668,
+     "end_line": 134,
+     "inferred": true,
+     "kind": "function",
+     "label": "C5",
+     "path": "src/requests/api.py",
+     "start_line": 117,
+     "symbol": "post"
+    },
+    {
+     "chunk_id": 102499,
+     "end_line": 134,
+     "inferred": true,
+     "kind": "section",
+     "label": "C3",
+     "path": "docs/user/advanced.rst",
+     "start_line": 113,
+     "symbol": "advanced.rst"
+    },
+    {
+     "chunk_id": 102499,
+     "end_line": 135,
+     "inferred": true,
+     "kind": "section",
+     "label": "C3",
+     "path": "docs/user/advanced.rst",
+     "start_line": 113,
+     "symbol": "advanced.rst"
+    },
+    {
+     "chunk_id": 102797,
+     "end_line": 652,
+     "inferred": true,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/models.py",
+     "start_line": 645,
+     "symbol": "PreparedRequest.prepare_body"
+    },
+    {
+     "chunk_id": 102499,
+     "end_line": 128,
+     "inferred": true,
+     "kind": "section",
+     "label": "C3",
+     "path": "docs/user/advanced.rst",
+     "start_line": 103,
+     "symbol": "advanced.rst"
+    },
+    {
+     "chunk_id": 102795,
+     "end_line": 601,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "start_line": 576,
+     "symbol": "PreparedRequest.prepare_body"
+    },
+    {
+     "chunk_id": 102797,
+     "end_line": 646,
+     "inferred": true,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/models.py",
+     "start_line": 646,
+     "symbol": "PreparedRequest.prepare_body"
+    },
+    {
+     "chunk_id": 102798,
+     "end_line": 668,
+     "inferred": true,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/models.py",
+     "start_line": 654,
+     "symbol": "PreparedRequest.prepare_content_length"
+    }
+   ],
+   "error": null,
+   "id": "req-007",
+   "issues": [
+    "citations_inferred",
+    "uncited_claim"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does passing json= produce the request body and Content-Type header?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102795,
+     "end_line": 610,
+     "keyword_rank": 4,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "score": 0.031754,
+     "similarity": 0.785,
+     "start_line": 576,
+     "symbol": "PreparedRequest.prepare_body",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102663,
+     "end_line": 47,
+     "keyword_rank": 1,
+     "kind": "function",
+     "label": "C2",
+     "path": "src/requests/api.py",
+     "score": 0.031319,
+     "similarity": 0.7442,
+     "start_line": 24,
+     "symbol": "request",
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 102499,
+     "end_line": 149,
+     "keyword_rank": 6,
+     "kind": "section",
+     "label": "C3",
+     "path": "docs/user/advanced.rst",
+     "score": 0.030303,
+     "similarity": 0.7455,
+     "start_line": 102,
+     "symbol": "advanced.rst",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 102797,
+     "end_line": 652,
+     "keyword_rank": 8,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/models.py",
+     "score": 0.03009,
+     "similarity": 0.7493,
+     "start_line": 645,
+     "symbol": "PreparedRequest.prepare_body",
+     "vector_rank": 5
+    },
+    {
+     "chunk_id": 102668,
+     "end_line": 134,
+     "keyword_rank": 13,
+     "kind": "function",
+     "label": "C5",
+     "path": "src/requests/api.py",
+     "score": 0.029324,
+     "similarity": 0.7513,
+     "start_line": 117,
+     "symbol": "post",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 102798,
+     "end_line": 668,
+     "keyword_rank": 10,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/models.py",
+     "score": 0.028778,
+     "similarity": 0.7436,
+     "start_line": 654,
+     "symbol": "PreparedRequest.prepare_content_length",
+     "vector_rank": 9
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3071,
+    "output_tokens": 393
+   }
+  },
+  {
+   "answer": "To decide between a Content-Length header and chunked transfer encoding for a streamed body, the library first checks if the `Content-Length` header is explicitly provided in the response headers [C2:609-634]. If not, it then checks if the body is iterable and has a length that can be determined using `super_len` [C1:657-657]. If both conditions are met, it sets the `Content-Length` header to the length of the body [C2:609-634]. If neither condition is met, it sets the `Transfer-Encoding` header to \"chunked\" [C1:655-668]. This decision is made in the method `prepare_body` of the `PreparedRequest` class, which is called before setting the body in the method `prepare_content_length`.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102796,
+     "end_line": 634,
+     "inferred": true,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/models.py",
+     "start_line": 609,
+     "symbol": "PreparedRequest.prepare_body"
+    },
+    {
+     "chunk_id": 102798,
+     "end_line": 657,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "start_line": 657,
+     "symbol": "PreparedRequest.prepare_content_length"
+    },
+    {
+     "chunk_id": 102798,
+     "end_line": 668,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "start_line": 655,
+     "symbol": "PreparedRequest.prepare_content_length"
+    }
+   ],
+   "error": null,
+   "id": "req-008",
+   "issues": [
+    "citations_inferred",
+    "uncited_claim"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does the library decide between a Content-Length header and chunked transfer encoding for a streamed body?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102798,
+     "end_line": 668,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "score": 0.032787,
+     "similarity": 0.8323,
+     "start_line": 654,
+     "symbol": "PreparedRequest.prepare_content_length",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102796,
+     "end_line": 647,
+     "keyword_rank": 2,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/models.py",
+     "score": 0.032258,
+     "similarity": 0.7931,
+     "start_line": 608,
+     "symbol": "PreparedRequest.prepare_body",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102813,
+     "end_line": 951,
+     "keyword_rank": 15,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/models.py",
+     "score": 0.029206,
+     "similarity": 0.7888,
+     "start_line": 914,
+     "symbol": "Response.iter_content",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102942,
+     "end_line": 591,
+     "keyword_rank": 6,
+     "kind": "function",
+     "label": "C4",
+     "path": "src/requests/utils.py",
+     "score": 0.02885,
+     "similarity": 0.737,
+     "start_line": 569,
+     "symbol": "get_encoding_from_headers",
+     "vector_rank": 13
+    },
+    {
+     "chunk_id": 102797,
+     "end_line": 652,
+     "keyword_rank": 13,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/models.py",
+     "score": 0.028405,
+     "similarity": 0.7519,
+     "start_line": 645,
+     "symbol": "PreparedRequest.prepare_body",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 102795,
+     "end_line": 610,
+     "keyword_rank": 7,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/models.py",
+     "score": 0.026974,
+     "similarity": 0.728,
+     "start_line": 576,
+     "symbol": "PreparedRequest.prepare_body",
+     "vector_rank": 23
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 2831,
+    "output_tokens": 136
+   }
+  },
+  {
+   "answer": "To determine which character encoding to decode with when none is declared, Response.json first checks if the response has an encoding set in its headers [C2:1091-1123]. If it does, it uses that encoding. If not, it falls back to guessing the encoding using `charset_normalizer` or `chardet` [C6:898-900]. If neither of these libraries are available, it defaults to using UTF-8 [C6:898-902]. This decision is made based solely on HTTP headers, following RFC 2616 to the letter [C1:1060-1062].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102819,
+     "end_line": 1123,
+     "inferred": true,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/models.py",
+     "start_line": 1091,
+     "symbol": "Response.json"
+    },
+    {
+     "chunk_id": 102812,
+     "end_line": 900,
+     "inferred": true,
+     "kind": "group",
+     "label": "C6",
+     "path": "src/requests/models.py",
+     "start_line": 898,
+     "symbol": "Response.apparent_encoding, Response.iter_content"
+    },
+    {
+     "chunk_id": 102812,
+     "end_line": 902,
+     "inferred": true,
+     "kind": "group",
+     "label": "C6",
+     "path": "src/requests/models.py",
+     "start_line": 898,
+     "symbol": "Response.apparent_encoding, Response.iter_content"
+    },
+    {
+     "chunk_id": 102818,
+     "end_line": 1062,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "start_line": 1060,
+     "symbol": "Response.text"
+    }
+   ],
+   "error": null,
+   "id": "req-009",
+   "issues": [
+    "citations_inferred",
+    "uncited_claim"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does Response.json decide which character encoding to decode with when none is declared?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102818,
+     "end_line": 1089,
+     "keyword_rank": 3,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "score": 0.032002,
+     "similarity": 0.779,
+     "start_line": 1053,
+     "symbol": "Response.text",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102819,
+     "end_line": 1124,
+     "keyword_rank": 10,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/models.py",
+     "score": 0.030679,
+     "similarity": 0.8099,
+     "start_line": 1091,
+     "symbol": "Response.json",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102803,
+     "end_line": 799,
+     "keyword_rank": 6,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/models.py",
+     "score": 0.030303,
+     "similarity": 0.735,
+     "start_line": 765,
+     "symbol": "Response.__init__",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 102945,
+     "end_line": 671,
+     "keyword_rank": 12,
+     "kind": "function",
+     "label": "C4",
+     "path": "src/requests/utils.py",
+     "score": 0.027588,
+     "similarity": 0.7145,
+     "start_line": 633,
+     "symbol": "get_unicode_from_response",
+     "vector_rank": 13
+    },
+    {
+     "chunk_id": 102943,
+     "end_line": 620,
+     "keyword_rank": 11,
+     "kind": "group",
+     "label": "C5",
+     "path": "src/requests/utils.py",
+     "score": 0.026743,
+     "similarity": 0.7058,
+     "start_line": 594,
+     "symbol": "stream_decode_response_unicode, iter_slices",
+     "vector_rank": 19
+    },
+    {
+     "chunk_id": 102812,
+     "end_line": 913,
+     "keyword_rank": 14,
+     "kind": "group",
+     "label": "C6",
+     "path": "src/requests/models.py",
+     "score": 0.026671,
+     "similarity": 0.7074,
+     "start_line": 896,
+     "symbol": "Response.apparent_encoding, Response.iter_content",
+     "vector_rank": 16
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3258,
+    "output_tokens": 97
+   }
+  },
+  {
+   "answer": "[C1] The `raise_for_status` method in the `Response` class of the `requests` library raises an `HTTPError` if the HTTP status code of the response is between 400 and 600, indicating a client or server error. The error message is constructed by concatenating the status code, a descriptive string, and the URL of the request [C1:1144-1169]. For example, if the status code is 404, the error message would be \"404 Client Error: Not Found for url: http://example.com\".",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 1,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102821,
+     "end_line": 1171,
+     "inferred": false,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "start_line": 1144,
+     "symbol": "Response.raise_for_status"
+    },
+    {
+     "chunk_id": 102821,
+     "end_line": 1169,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "start_line": 1144,
+     "symbol": "Response.raise_for_status"
+    }
+   ],
+   "error": null,
+   "id": "req-010",
+   "issues": [
+    "citations_inferred",
+    "uncited_claim"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "What exactly does raise_for_status do and what does the error message look like?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102821,
+     "end_line": 1171,
+     "keyword_rank": 2,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "score": 0.032522,
+     "similarity": 0.8098,
+     "start_line": 1144,
+     "symbol": "Response.raise_for_status",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102643,
+     "end_line": 748,
+     "keyword_rank": 3,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/adapters.py",
+     "score": 0.031025,
+     "similarity": 0.7091,
+     "start_line": 707,
+     "symbol": "HTTPAdapter.send",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 102809,
+     "end_line": 874,
+     "keyword_rank": 4,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/models.py",
+     "score": 0.03055,
+     "similarity": 0.7052,
+     "start_line": 861,
+     "symbol": "Response.ok",
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 102908,
+     "end_line": 106,
+     "keyword_rank": 14,
+     "kind": "module",
+     "label": "C4",
+     "path": "src/requests/status_codes.py",
+     "score": 0.029387,
+     "similarity": 0.7589,
+     "start_line": 72,
+     "symbol": null,
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102807,
+     "end_line": 845,
+     "keyword_rank": 11,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/models.py",
+     "score": 0.028577,
+     "similarity": 0.6997,
+     "start_line": 837,
+     "symbol": "Response.__bool__",
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 102808,
+     "end_line": 859,
+     "keyword_rank": 12,
+     "kind": "group",
+     "label": "C6",
+     "path": "src/requests/models.py",
+     "score": 0.027973,
+     "similarity": 0.6953,
+     "start_line": 847,
+     "symbol": "Response.__nonzero__, Response.__iter__",
+     "vector_rank": 11
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 2802,
+    "output_tokens": 114
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [],
+   "error": null,
+   "id": "req-011",
+   "issues": [],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How is Response.text decoded when the server did not specify a charset?",
+   "refused": true,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102819,
+     "end_line": 1124,
+     "keyword_rank": 7,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/models.py",
+     "score": 0.030798,
+     "similarity": 0.7899,
+     "start_line": 1091,
+     "symbol": "Response.json",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102818,
+     "end_line": 1089,
+     "keyword_rank": 13,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/models.py",
+     "score": 0.030092,
+     "similarity": 0.8182,
+     "start_line": 1053,
+     "symbol": "Response.text",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102945,
+     "end_line": 671,
+     "keyword_rank": 17,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/utils.py",
+     "score": 0.028139,
+     "similarity": 0.7447,
+     "start_line": 633,
+     "symbol": "get_unicode_from_response",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 102803,
+     "end_line": 799,
+     "keyword_rank": 10,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/models.py",
+     "score": 0.027273,
+     "similarity": 0.722,
+     "start_line": 765,
+     "symbol": "Response.__init__",
+     "vector_rank": 17
+    },
+    {
+     "chunk_id": 102802,
+     "end_line": 763,
+     "keyword_rank": 26,
+     "kind": "class",
+     "label": "C5",
+     "path": "src/requests/models.py",
+     "score": 0.023256,
+     "similarity": 0.7045,
+     "start_line": 732,
+     "symbol": "Response",
+     "vector_rank": 26
+    },
+    {
+     "chunk_id": 102813,
+     "end_line": 951,
+     "keyword_rank": 38,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/models.py",
+     "score": 0.02255,
+     "similarity": 0.7116,
+     "start_line": 914,
+     "symbol": "Response.iter_content",
+     "vector_rank": 21
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 3580,
+    "output_tokens": 10
+   }
+  },
+  {
+   "answer": "To translate low-level urllib3 failures into the library's own exceptions when sending, requests uses the `urllib3.exceptions` module [C1:150-150].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102595,
+     "end_line": 150,
+     "inferred": true,
+     "kind": "module",
+     "label": "C1",
+     "path": "src/requests/__init__.py",
+     "start_line": 150,
+     "symbol": null
+    }
+   ],
+   "error": null,
+   "id": "req-012",
+   "issues": [
+    "citations_inferred",
+    "removed: not supported by any retrieved code (support 38%)",
+    "removed: not supported by any retrieved code (support 33%)"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How are low-level urllib3 failures translated into the library's own exceptions when sending?",
+   "refused": false,
+   "removed_sentences": [
+    "Specifically, it catches exceptions raised by urllib3 and translates them into `RequestsDependencyWarning` if the dependency is not compatible.",
+    "This ensures that users are aware of any issues with the underlying libraries and can take appropriate action to resolve them."
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102595,
+     "end_line": 156,
+     "keyword_rank": 2,
+     "kind": "module",
+     "label": "C1",
+     "path": "src/requests/__init__.py",
+     "score": 0.032258,
+     "similarity": 0.7819,
+     "start_line": 111,
+     "symbol": null,
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102703,
+     "end_line": 33,
+     "keyword_rank": 3,
+     "kind": "module",
+     "label": "C2",
+     "path": "src/requests/compat.py",
+     "score": 0.030366,
+     "similarity": 0.7573,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 102593,
+     "end_line": 96,
+     "keyword_rank": 1,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/__init__.py",
+     "score": 0.02692,
+     "similarity": 0.7241,
+     "start_line": 60,
+     "symbol": "check_compatibility",
+     "vector_rank": 35
+    },
+    {
+     "chunk_id": 102592,
+     "end_line": 57,
+     "keyword_rank": 4,
+     "kind": "module",
+     "label": "C4",
+     "path": "src/requests/__init__.py",
+     "score": 0.025726,
+     "similarity": 0.7191,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 39
+    },
+    {
+     "chunk_id": 102622,
+     "end_line": 119,
+     "keyword_rank": 27,
+     "kind": "function",
+     "label": "C5",
+     "path": "src/requests/adapters.py",
+     "score": 0.025193,
+     "similarity": 0.7521,
+     "start_line": 85,
+     "symbol": "_urllib3_request_context",
+     "vector_rank": 13
+    },
+    {
+     "chunk_id": 102624,
+     "end_line": 199,
+     "keyword_rank": 28,
+     "kind": "class",
+     "label": "C6",
+     "path": "src/requests/adapters.py",
+     "score": 0.023864,
+     "similarity": 0.7447,
+     "start_line": 158,
+     "symbol": "HTTPAdapter",
+     "vector_rank": 20
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3773,
+    "output_tokens": 75
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [],
+   "error": null,
+   "id": "req-013",
+   "issues": [
+    "weak evidence: best vector similarity 0.70 < 0.70 and no named identifier matched"
+   ],
+   "llm_called": false,
+   "model": null,
+   "question": "How is the timeout argument interpreted when it is a tuple versus a single number?",
+   "refused": true,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102642,
+     "end_line": 709,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/adapters.py",
+     "score": 0.031099,
+     "similarity": 0.672,
+     "start_line": 665,
+     "symbol": "HTTPAdapter.send",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 102761,
+     "end_line": 150,
+     "keyword_rank": 12,
+     "kind": "group",
+     "label": "C2",
+     "path": "src/requests/exceptions.py",
+     "score": 0.030018,
+     "similarity": 0.6967,
+     "start_line": 82,
+     "symbol": "Timeout, ConnectTimeout, ReadTimeout\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102664,
+     "end_line": 71,
+     "keyword_rank": 8,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/api.py",
+     "score": 0.029857,
+     "similarity": 0.6786,
+     "start_line": 45,
+     "symbol": "request",
+     "vector_rank": 6
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+   }
+  },
+  {
+   "answer": "The adapter checks if the URL starts with \"https\" and if `verify` is True [C1:307-326]. If both conditions are met, it attempts to find a suitable TLS CA bundle at the specified path [C1:317-339]. If the CA bundle path is wrong, it raises an OSError with a message indicating that the path is invalid [C1:317-339].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102629,
+     "end_line": 326,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/adapters.py",
+     "start_line": 307,
+     "symbol": "HTTPAdapter.cert_verify"
+    },
+    {
+     "chunk_id": 102629,
+     "end_line": 339,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/adapters.py",
+     "start_line": 317,
+     "symbol": "HTTPAdapter.cert_verify"
+    }
+   ],
+   "error": null,
+   "id": "req-014",
+   "issues": [
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "What does the adapter check before using TLS, and what happens if the CA bundle path is wrong?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102629,
+     "end_line": 347,
+     "keyword_rank": 2,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/adapters.py",
+     "score": 0.032002,
+     "similarity": 0.7494,
+     "start_line": 307,
+     "symbol": "HTTPAdapter.cert_verify",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102623,
+     "end_line": 155,
+     "keyword_rank": 7,
+     "kind": "class",
+     "label": "C2",
+     "path": "src/requests/adapters.py",
+     "score": 0.031054,
+     "similarity": 0.7504,
+     "start_line": 122,
+     "symbol": "BaseAdapter",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102634,
+     "end_line": 482,
+     "keyword_rank": 9,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/adapters.py",
+     "score": 0.029877,
+     "similarity": 0.7438,
+     "start_line": 455,
+     "symbol": "HTTPAdapter.get_connection_with_tls_context",
+     "vector_rank": 5
+    },
+    {
+     "chunk_id": 102630,
+     "end_line": 363,
+     "keyword_rank": 16,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/adapters.py",
+     "score": 0.029551,
+     "similarity": 0.7945,
+     "start_line": 345,
+     "symbol": "HTTPAdapter.cert_verify",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102641,
+     "end_line": 667,
+     "keyword_rank": 11,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/adapters.py",
+     "score": 0.02837,
+     "similarity": 0.7228,
+     "start_line": 634,
+     "symbol": "HTTPAdapter.send",
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 102633,
+     "end_line": 453,
+     "keyword_rank": 8,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/adapters.py",
+     "score": 0.027364,
+     "similarity": 0.6999,
+     "start_line": 431,
+     "symbol": "HTTPAdapter.build_connection_pool_key_attributes",
+     "vector_rank": 19
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3257,
+    "output_tokens": 62
+   }
+  },
+  {
+   "answer": "The library looks for netrc credentials at `~/.netrc`, `~/_netrc`, or at the path specified by the `NETRC` environment variable [C4:48-48].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102549,
+     "end_line": 48,
+     "inferred": true,
+     "kind": "section",
+     "label": "C4",
+     "path": "docs/user/authentication.rst",
+     "start_line": 48,
+     "symbol": "authentication.rst"
+    }
+   ],
+   "error": null,
+   "id": "req-015",
+   "issues": [
+    "citations_inferred",
+    "removed: C1:24-30 is outside src/requests/utils.py:231-280"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "Where does the library look for netrc credentials and how are they returned?",
+   "refused": false,
+   "removed_sentences": [
+    "If credentials for the hostname are found, the request is sent with HTTP Basic Auth. [C1:24-30]"
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102929,
+     "end_line": 280,
+     "keyword_rank": 1,
+     "kind": "function",
+     "label": "C1",
+     "path": "src/requests/utils.py",
+     "score": 0.032787,
+     "similarity": 0.7939,
+     "start_line": 231,
+     "symbol": "get_netrc_auth",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102861,
+     "end_line": 332,
+     "keyword_rank": 6,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/sessions.py",
+     "score": 0.028309,
+     "similarity": 0.6498,
+     "start_line": 309,
+     "symbol": "SessionRedirectMixin.rebuild_auth",
+     "vector_rank": 16
+    },
+    {
+     "chunk_id": 102308,
+     "end_line": 61,
+     "keyword_rank": 17,
+     "kind": "section",
+     "label": "C3",
+     "path": ".github/workflows/run-tests.yml",
+     "score": 0.022888,
+     "similarity": 0.632,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 41
+    },
+    {
+     "chunk_id": 102549,
+     "end_line": 52,
+     "keyword_rank": 2,
+     "kind": "section",
+     "label": "C4",
+     "path": "docs/user/authentication.rst",
+     "score": 0.022581,
+     "similarity": 0.7116,
+     "start_line": 1,
+     "symbol": "authentication.rst",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102564,
+     "end_line": 257,
+     "keyword_rank": 3,
+     "kind": "section",
+     "label": "C5",
+     "path": "docs/user/quickstart.rst",
+     "score": 0.022222,
+     "similarity": 0.7041,
+     "start_line": 221,
+     "symbol": "quickstart.rst",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102923,
+     "end_line": 97,
+     "keyword_rank": null,
+     "kind": "module",
+     "label": "C6",
+     "path": "src/requests/utils.py",
+     "score": 0.015625,
+     "similarity": 0.6675,
+     "start_line": 81,
+     "symbol": null,
+     "vector_rank": 4
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3971,
+    "output_tokens": 62
+   }
+  },
+  {
+   "answer": "The proxy settings are matched against a request URL in the following order:\n1. The scheme of the request URL is compared to the schemes in the proxy dictionary [C2:911-936].\n2. If a match is found, the corresponding proxy is returned [C3:810-835].\n3. If no match is found, the next scheme in the proxy dictionary is checked [C2:911-936].\n4. If no match is found after checking all schemes, the \"all\" key in the proxy dictionary is checked [C2:911-936].\n5. If no match is found after checking all keys, None is returned [C3:810-835].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102957,
+     "end_line": 936,
+     "inferred": true,
+     "kind": "function",
+     "label": "C2",
+     "path": "src/requests/utils.py",
+     "start_line": 911,
+     "symbol": "resolve_proxies"
+    },
+    {
+     "chunk_id": 102953,
+     "end_line": 835,
+     "inferred": true,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/utils.py",
+     "start_line": 810,
+     "symbol": "should_bypass_proxies"
+    }
+   ],
+   "error": null,
+   "id": "req-016",
+   "issues": [
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "In what order are proxy settings matched against a request URL?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102638,
+     "end_line": 597,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/adapters.py",
+     "score": 0.032266,
+     "similarity": 0.7881,
+     "start_line": 565,
+     "symbol": "HTTPAdapter.request_url",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102957,
+     "end_line": 939,
+     "keyword_rank": 4,
+     "kind": "function",
+     "label": "C2",
+     "path": "src/requests/utils.py",
+     "score": 0.031754,
+     "similarity": 0.7899,
+     "start_line": 911,
+     "symbol": "resolve_proxies",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102953,
+     "end_line": 838,
+     "keyword_rank": 10,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/utils.py",
+     "score": 0.030679,
+     "similarity": 0.7902,
+     "start_line": 810,
+     "symbol": "should_bypass_proxies",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102635,
+     "end_line": 510,
+     "keyword_rank": 7,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/adapters.py",
+     "score": 0.03031,
+     "similarity": 0.7789,
+     "start_line": 480,
+     "symbol": "HTTPAdapter.get_connection_with_tls_context",
+     "vector_rank": 5
+    },
+    {
+     "chunk_id": 102956,
+     "end_line": 908,
+     "keyword_rank": 8,
+     "kind": "function",
+     "label": "C5",
+     "path": "src/requests/utils.py",
+     "score": 0.029199,
+     "similarity": 0.7629,
+     "start_line": 885,
+     "symbol": "select_proxy",
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 102862,
+     "end_line": 368,
+     "keyword_rank": 9,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/sessions.py",
+     "score": 0.028577,
+     "similarity": 0.7591,
+     "start_line": 334,
+     "symbol": "SessionRedirectMixin.rebuild_proxies",
+     "vector_rank": 11
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3087,
+    "output_tokens": 105
+   }
+  },
+  {
+   "answer": "HTTP digest authentication is triggered when the server responds with a 401 status code and the \"www-authenticate\" header contains the word \"digest\" [C1:275-300]. If these conditions are met, it sets the number of retries to 1 and returns the response [C2:166-191]. The `max_retries` attribute in [C2] specifies the maximum number of retries each connection should attempt.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 1,
+    "precision": 0.0,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102689,
+     "end_line": 300,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/auth.py",
+     "start_line": 275,
+     "symbol": "HTTPDigestAuth.handle_401"
+    },
+    {
+     "chunk_id": 102624,
+     "end_line": 191,
+     "inferred": true,
+     "kind": "class",
+     "label": "C2",
+     "path": "src/requests/adapters.py",
+     "start_line": 166,
+     "symbol": "HTTPAdapter"
+    },
+    {
+     "chunk_id": 102624,
+     "end_line": 199,
+     "inferred": false,
+     "kind": "class",
+     "label": "C2",
+     "path": "src/requests/adapters.py",
+     "start_line": 158,
+     "symbol": "HTTPAdapter"
+    }
+   ],
+   "error": null,
+   "id": "req-017",
+   "issues": [
+    "citations_inferred",
+    "removed: the cited code does not contain what it says (support 33%)"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does HTTP digest authentication get triggered and how many times will it retry?",
+   "refused": false,
+   "removed_sentences": [
+    "The `HTTPDigestAuth.handle_401` method in [C1] checks if the response is not a 4xx status code and if it has not already been retried twice."
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102689,
+     "end_line": 315,
+     "keyword_rank": 17,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/auth.py",
+     "score": 0.02938,
+     "similarity": 0.779,
+     "start_line": 273,
+     "symbol": "HTTPDigestAuth.handle_401",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102624,
+     "end_line": 199,
+     "keyword_rank": 15,
+     "kind": "class",
+     "label": "C2",
+     "path": "src/requests/adapters.py",
+     "score": 0.026847,
+     "similarity": 0.6948,
+     "start_line": 158,
+     "symbol": "HTTPAdapter",
+     "vector_rank": 14
+    },
+    {
+     "chunk_id": 102869,
+     "end_line": 621,
+     "keyword_rank": 36,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/sessions.py",
+     "score": 0.025123,
+     "similarity": 0.731,
+     "start_line": 592,
+     "symbol": "Session.request",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 102761,
+     "end_line": 150,
+     "keyword_rank": 32,
+     "kind": "group",
+     "label": "C4",
+     "path": "src/requests/exceptions.py",
+     "score": 0.022106,
+     "similarity": 0.6793,
+     "start_line": 82,
+     "symbol": "Timeout, ConnectTimeout, ReadTimeout\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026",
+     "vector_rank": 29
+    },
+    {
+     "chunk_id": 102865,
+     "end_line": 479,
+     "keyword_rank": 35,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/sessions.py",
+     "score": 0.021637,
+     "similarity": 0.6791,
+     "start_line": 442,
+     "symbol": "Session.__init__",
+     "vector_rank": 30
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3725,
+    "output_tokens": 115
+   }
+  },
+  {
+   "answer": "This function takes a `CaseInsensitiveDict` of headers and returns the encoding based on the content type [C3:776-776].\n\nHere's how you can use it:\n\nThis approach ensures that the encoding is determined based on the content type, regardless of how the header name was capitalized [C1:102-127].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102803,
+     "end_line": 776,
+     "inferred": true,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/models.py",
+     "start_line": 776,
+     "symbol": "Response.__init__"
+    },
+    {
+     "chunk_id": 102499,
+     "end_line": 127,
+     "inferred": true,
+     "kind": "section",
+     "label": "C1",
+     "path": "docs/user/advanced.rst",
+     "start_line": 102,
+     "symbol": "advanced.rst"
+    }
+   ],
+   "error": null,
+   "id": "req-018",
+   "issues": [
+    "removed: not supported by any retrieved code (support 38%)",
+    "citations_inferred",
+    "removed: code example is not in the retrieved code"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How can response.headers['content-type'] work regardless of how the server capitalised the header name?",
+   "refused": false,
+   "removed_sentences": [
+    "To ensure that `response.headers['content-type']` works regardless of how the server capitalized the header name, we can use the `get_encoding_from_headers` function from the `requests.utils` module.",
+    "```python\nfrom requests import Response\nfrom requests.utils import get_encoding_from_headers\n\n# Assuming response is an instance of Response\ncontent_type = response.headers.get(\"content-type\")\nencoding = get_encoding_from_headers(CaseInsensitiveDict({\"Content-Type\": content_type}))\nprint(encoding)\n```"
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102499,
+     "end_line": 149,
+     "keyword_rank": 5,
+     "kind": "section",
+     "label": "C1",
+     "path": "docs/user/advanced.rst",
+     "score": 0.031514,
+     "similarity": 0.7675,
+     "start_line": 102,
+     "symbol": "advanced.rst",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 102941,
+     "end_line": 566,
+     "keyword_rank": 6,
+     "kind": "function",
+     "label": "C2",
+     "path": "src/requests/utils.py",
+     "score": 0.031025,
+     "similarity": 0.755,
+     "start_line": 547,
+     "symbol": "_parse_content_type_header",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102803,
+     "end_line": 799,
+     "keyword_rank": 11,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/requests/models.py",
+     "score": 0.030478,
+     "similarity": 0.7698,
+     "start_line": 765,
+     "symbol": "Response.__init__",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102942,
+     "end_line": 591,
+     "keyword_rank": 3,
+     "kind": "function",
+     "label": "C4",
+     "path": "src/requests/utils.py",
+     "score": 0.029387,
+     "similarity": 0.7314,
+     "start_line": 569,
+     "symbol": "get_encoding_from_headers",
+     "vector_rank": 14
+    },
+    {
+     "chunk_id": 102797,
+     "end_line": 652,
+     "keyword_rank": 21,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/models.py",
+     "score": 0.027971,
+     "similarity": 0.753,
+     "start_line": 645,
+     "symbol": "PreparedRequest.prepare_body",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 102563,
+     "end_line": 219,
+     "keyword_rank": 8,
+     "kind": "section",
+     "label": "C6",
+     "path": "docs/user/quickstart.rst",
+     "score": 0.027693,
+     "similarity": 0.7271,
+     "start_line": 189,
+     "symbol": "quickstart.rst",
+     "vector_rank": 17
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3107,
+    "output_tokens": 152
+   }
+  },
+  {
+   "answer": "To remove a cookie through the cookie jar's set method, you can use the `remove_cookie_by_name` function from the `requests` library. The citation for this information is [C1:239-240].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 1,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "citations": [
+    {
+     "chunk_id": 102720,
+     "end_line": 240,
+     "inferred": false,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/cookies.py",
+     "start_line": 239,
+     "symbol": "RequestsCookieJar.set"
+    }
+   ],
+   "error": null,
+   "id": "req-019",
+   "issues": [
+    "uncited_claim",
+    "removed: not supported by any retrieved code (support 0%)"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How do you remove a cookie through the cookie jar's set method?",
+   "refused": false,
+   "removed_sentences": [
+    "This function is defined in the `requests/cookies.py` file, which is located at line 239 of the source code."
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102720,
+     "end_line": 248,
+     "keyword_rank": 3,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/cookies.py",
+     "score": 0.031746,
+     "similarity": 0.7749,
+     "start_line": 229,
+     "symbol": "RequestsCookieJar.set",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 102738,
+     "end_line": 491,
+     "keyword_rank": 1,
+     "kind": "function",
+     "label": "C2",
+     "path": "src/requests/cookies.py",
+     "score": 0.031099,
+     "similarity": 0.7528,
+     "start_line": 479,
+     "symbol": "_copy_cookie_jar",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 102742,
+     "end_line": 601,
+     "keyword_rank": 4,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/cookies.py",
+     "score": 0.029139,
+     "similarity": 0.7151,
+     "start_line": 579,
+     "symbol": "cookiejar_from_dict",
+     "vector_rank": 14
+    },
+    {
+     "chunk_id": 102732,
+     "end_line": 389,
+     "keyword_rank": 13,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/requests/cookies.py",
+     "score": 0.029083,
+     "similarity": 0.7574,
+     "start_line": 382,
+     "symbol": "RequestsCookieJar.set_cookie",
+     "vector_rank": 5
+    },
+    {
+     "chunk_id": 102743,
+     "end_line": 625,
+     "keyword_rank": 6,
+     "kind": "function",
+     "label": "C5",
+     "path": "src/requests/cookies.py",
+     "score": 0.02885,
+     "similarity": 0.7153,
+     "start_line": 604,
+     "symbol": "merge_cookies",
+     "vector_rank": 13
+    },
+    {
+     "chunk_id": 102731,
+     "end_line": 380,
+     "keyword_rank": 28,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/cookies.py",
+     "score": 0.027757,
+     "similarity": 0.802,
+     "start_line": 376,
+     "symbol": "RequestsCookieJar.__delitem__",
+     "vector_rank": 1
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 1938,
+    "output_tokens": 77
+   }
+  },
+  {
+   "answer": "This module provides a high-level interface for HTTP/2 connections and requests [C4:158-183].",
+   "answerable": false,
+   "citation_correctness": null,
+   "citations": [
+    {
+     "chunk_id": 102624,
+     "end_line": 183,
+     "inferred": true,
+     "kind": "class",
+     "label": "C4",
+     "path": "src/requests/adapters.py",
+     "start_line": 158,
+     "symbol": "HTTPAdapter"
+    }
+   ],
+   "error": null,
+   "id": "req-020",
+   "issues": [
+    "removed: names `http2`, which is not in the retrieved code",
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does the library negotiate HTTP/2 with the server?",
+   "refused": false,
+   "removed_sentences": [
+    "To negotiate HTTP/2 with the server, the library uses the `http2` module, which is imported from `urllib3`.",
+    "The library sets the `http2` parameter to `True` in the session configuration to enable HTTP/2 support."
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102592,
+     "end_line": 57,
+     "keyword_rank": 4,
+     "kind": "module",
+     "label": "C1",
+     "path": "src/requests/__init__.py",
+     "score": 0.030777,
+     "similarity": 0.7391,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 102869,
+     "end_line": 621,
+     "keyword_rank": 18,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/sessions.py",
+     "score": 0.026519,
+     "similarity": 0.7219,
+     "start_line": 592,
+     "symbol": "Session.request",
+     "vector_rank": 13
+    },
+    {
+     "chunk_id": 102663,
+     "end_line": 47,
+     "keyword_rank": 27,
+     "kind": "function",
+     "label": "C3",
+     "path": "src/requests/api.py",
+     "score": 0.023399,
+     "similarity": 0.713,
+     "start_line": 24,
+     "symbol": "request",
+     "vector_rank": 24
+    },
+    {
+     "chunk_id": 102624,
+     "end_line": 199,
+     "keyword_rank": 25,
+     "kind": "class",
+     "label": "C4",
+     "path": "src/requests/adapters.py",
+     "score": 0.022403,
+     "similarity": 0.7092,
+     "start_line": 158,
+     "symbol": "HTTPAdapter",
+     "vector_rank": 34
+    },
+    {
+     "chunk_id": 102803,
+     "end_line": 799,
+     "keyword_rank": 29,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/requests/models.py",
+     "score": 0.022106,
+     "similarity": 0.7093,
+     "start_line": 765,
+     "symbol": "Response.__init__",
+     "vector_rank": 32
+    },
+    {
+     "chunk_id": 102641,
+     "end_line": 656,
+     "keyword_rank": 42,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/requests/adapters.py",
+     "score": 0.02104,
+     "similarity": 0.7102,
+     "start_line": 634,
+     "symbol": "HTTPAdapter.send",
+     "vector_rank": 29
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3832,
+    "output_tokens": 68
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo.",
+   "answerable": false,
+   "citation_correctness": null,
+   "citations": [],
+   "error": null,
+   "id": "req-021",
+   "issues": [
+    "weak evidence: best vector similarity 0.69 < 0.70 and no named identifier matched"
+   ],
+   "llm_called": false,
+   "model": null,
+   "question": "Where is the WebSocket connection handled?",
+   "refused": true,
+   "removed_sentences": [],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102636,
+     "end_line": 553,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/adapters.py",
+     "score": 0.030679,
+     "similarity": 0.6681,
+     "start_line": 512,
+     "symbol": "HTTPAdapter.get_connection",
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 102634,
+     "end_line": 482,
+     "keyword_rank": 5,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/requests/adapters.py",
+     "score": 0.026374,
+     "similarity": 0.6426,
+     "start_line": 455,
+     "symbol": "HTTPAdapter.get_connection_with_tls_context",
+     "vector_rank": 31
+    },
+    {
+     "chunk_id": 102624,
+     "end_line": 199,
+     "keyword_rank": 4,
+     "kind": "class",
+     "label": "C3",
+     "path": "src/requests/adapters.py",
+     "score": 0.025625,
+     "similarity": 0.6364,
+     "start_line": 158,
+     "symbol": "HTTPAdapter",
+     "vector_rank": 40
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+   }
+  },
+  {
+   "answer": "To send many requests concurrently with asyncio using the built-in async session, you can use the `Session` class from the `requests` library. Here's an example code snippet:\n\nThis code creates an asynchronous session using `requests.Session()`, then sends multiple HTTP GET requests concurrently to the specified URLs [C2:10-50].",
+   "answerable": false,
+   "citation_correctness": null,
+   "citations": [
+    {
+     "chunk_id": 102497,
+     "end_line": 50,
+     "inferred": true,
+     "kind": "section",
+     "label": "C2",
+     "path": "docs/user/advanced.rst",
+     "start_line": 10,
+     "symbol": "advanced.rst"
+    }
+   ],
+   "error": null,
+   "id": "req-022",
+   "issues": [
+    "uncited_claim",
+    "removed: code example is not in the retrieved code",
+    "citations_inferred",
+    "removed: names `asyncio.gather`, which is not in the retrieved code",
+    "removed: not supported by any retrieved code (support 33%)"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How do I send many requests concurrently with asyncio using the built-in async session?",
+   "refused": false,
+   "removed_sentences": [
+    "```python\nimport asyncio\nimport requests\n\nasync def send_requests():\n    async with requests.Session() as session:\n        urls = ['http://example.com', 'http://example.org', 'http://example.net']\n        tasks = [session.get(url) for url in urls]\n        responses = await asyncio.gather(*tasks)\n        for response in responses:\n            print(response.text)\n\nasyncio.run(send_requests())\n```",
+    "The `asyncio.gather` function is used to wait for all the tasks to complete and retrieve their responses.",
+    "Finally, the responses are printed out."
+   ],
+   "repo": "psf/requests",
+   "retrieved": [
+    {
+     "chunk_id": 102878,
+     "end_line": 792,
+     "keyword_rank": 43,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/requests/sessions.py",
+     "score": 0.026102,
+     "similarity": 0.7641,
+     "start_line": 752,
+     "symbol": "Session.send",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 102497,
+     "end_line": 56,
+     "keyword_rank": 1,
+     "kind": "section",
+     "label": "C2",
+     "path": "docs/user/advanced.rst",
+     "score": 0.021923,
+     "similarity": 0.7121,
+     "start_line": 1,
+     "symbol": "advanced.rst",
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 102854,
+     "end_line": 130,
+     "keyword_rank": 31,
+     "kind": "group",
+     "label": "C3",
+     "path": "src/requests/sessions.py",
+     "score": 0.021298,
+     "similarity": 0.6804,
+     "start_line": 108,
+     "symbol": "merge_hooks, SessionRedirectMixin",
+     "vector_rank": 37
+    },
+    {
+     "chunk_id": 102624,
+     "end_line": 199,
+     "keyword_rank": 41,
+     "kind": "class",
+     "label": "C4",
+     "path": "src/requests/adapters.py",
+     "score": 0.019335,
+     "similarity": 0.6699,
+     "start_line": 158,
+     "symbol": "HTTPAdapter",
+     "vector_rank": 46
+    },
+    {
+     "chunk_id": 102490,
+     "end_line": 132,
+     "keyword_rank": 17,
+     "kind": "section",
+     "label": "C5",
+     "path": "docs/index.rst",
+     "score": 0.018813,
+     "similarity": 0.7054,
+     "start_line": 53,
+     "symbol": "index.rst",
+     "vector_rank": 12
+    },
+    {
+     "chunk_id": 102519,
+     "end_line": 1067,
+     "keyword_rank": 27,
+     "kind": "section",
+     "label": "C6",
+     "path": "docs/user/advanced.rst",
+     "score": 0.018652,
+     "similarity": 0.7148,
+     "start_line": 1053,
+     "symbol": "advanced.rst",
+     "vector_rank": 6
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3865,
+    "output_tokens": 178
+   }
+  },
+  {
+   "answer": "The limiter uses a queue to manage the execution of functions [C5:51-76]. When a new function is added to the queue, it checks if the number of active functions is less than the allowed concurrency [C4:5-30]. If it is, the function is added to the queue and executed immediately [C5:51-76]. If not, the function is added to the end of the queue and waiting for an available slot [C2:16-39]. The limiter also has a clearQueue method that can be called to stop all running functions and clear the queue [C6:184-184].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103861,
+     "end_line": 76,
+     "inferred": true,
+     "kind": "function",
+     "label": "C5",
+     "path": "index.js",
+     "start_line": 51,
+     "symbol": "pLimit"
+    },
+    {
+     "chunk_id": 103867,
+     "end_line": 30,
+     "inferred": true,
+     "kind": "module",
+     "label": "C4",
+     "path": "index.test-d.ts",
+     "start_line": 5,
+     "symbol": null
+    },
+    {
+     "chunk_id": 103860,
+     "end_line": 39,
+     "inferred": true,
+     "kind": "function",
+     "label": "C2",
+     "path": "index.js",
+     "start_line": 16,
+     "symbol": "pLimit"
+    },
+    {
+     "chunk_id": 103932,
+     "end_line": 184,
+     "inferred": true,
+     "kind": "module",
+     "label": "C6",
+     "path": "test.js",
+     "start_line": 184,
+     "symbol": null
+    }
+   ],
+   "error": null,
+   "id": "pl-001",
+   "issues": [
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does the limiter make sure no more than the allowed number of functions run at once?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "sindresorhus/p-limit",
+   "retrieved": [
+    {
+     "chunk_id": 103863,
+     "end_line": 148,
+     "keyword_rank": 19,
+     "kind": "group",
+     "label": "C1",
+     "path": "index.js",
+     "score": 0.028531,
+     "similarity": 0.7617,
+     "start_line": 133,
+     "symbol": "limitFunction, validateConcurrency",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103860,
+     "end_line": 49,
+     "keyword_rank": 18,
+     "kind": "function",
+     "label": "C2",
+     "path": "index.js",
+     "score": 0.027313,
+     "similarity": 0.7403,
+     "start_line": 3,
+     "symbol": "pLimit",
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 103869,
+     "end_line": 58,
+     "keyword_rank": 10,
+     "kind": "section",
+     "label": "C3",
+     "path": "package.json",
+     "score": 0.024812,
+     "similarity": 0.6989,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 35
+    },
+    {
+     "chunk_id": 103867,
+     "end_line": 34,
+     "keyword_rank": 20,
+     "kind": "module",
+     "label": "C4",
+     "path": "index.test-d.ts",
+     "score": 0.024265,
+     "similarity": 0.7184,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 25
+    },
+    {
+     "chunk_id": 103861,
+     "end_line": 93,
+     "keyword_rank": 28,
+     "kind": "function",
+     "label": "C5",
+     "path": "index.js",
+     "score": 0.023709,
+     "similarity": 0.7207,
+     "start_line": 47,
+     "symbol": "pLimit",
+     "vector_rank": 21
+    },
+    {
+     "chunk_id": 103932,
+     "end_line": 185,
+     "keyword_rank": 36,
+     "kind": "module",
+     "label": "C6",
+     "path": "test.js",
+     "score": 0.023237,
+     "similarity": 0.7242,
+     "start_line": 106,
+     "symbol": null,
+     "vector_rank": 18
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 4078,
+    "output_tokens": 97
+   }
+  },
+  {
+   "answer": "When a limited function finishes, it resolves the promise immediately with the result of the function [C1:3-28]. If the function throws, it catches the error and rejects the promise with an AbortError [C4:213-226]. The `clearQueue` method is used to reject all pending promises when enabled, which prevents unhandled rejections [C4:192-223].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103860,
+     "end_line": 28,
+     "inferred": true,
+     "kind": "function",
+     "label": "C1",
+     "path": "index.js",
+     "start_line": 3,
+     "symbol": "pLimit"
+    },
+    {
+     "chunk_id": 103933,
+     "end_line": 226,
+     "inferred": true,
+     "kind": "module",
+     "label": "C4",
+     "path": "test.js",
+     "start_line": 213,
+     "symbol": null
+    },
+    {
+     "chunk_id": 103933,
+     "end_line": 223,
+     "inferred": true,
+     "kind": "module",
+     "label": "C4",
+     "path": "test.js",
+     "start_line": 192,
+     "symbol": null
+    }
+   ],
+   "error": null,
+   "id": "pl-002",
+   "issues": [
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "What happens when a limited function finishes or throws?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "sindresorhus/p-limit",
+   "retrieved": [
+    {
+     "chunk_id": 103860,
+     "end_line": 49,
+     "keyword_rank": 2,
+     "kind": "function",
+     "label": "C1",
+     "path": "index.js",
+     "score": 0.030622,
+     "similarity": 0.7282,
+     "start_line": 3,
+     "symbol": "pLimit",
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 103863,
+     "end_line": 148,
+     "keyword_rank": 7,
+     "kind": "group",
+     "label": "C2",
+     "path": "index.js",
+     "score": 0.029211,
+     "similarity": 0.7227,
+     "start_line": 133,
+     "symbol": "limitFunction, validateConcurrency",
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 103861,
+     "end_line": 93,
+     "keyword_rank": 4,
+     "kind": "function",
+     "label": "C3",
+     "path": "index.js",
+     "score": 0.028446,
+     "similarity": 0.6976,
+     "start_line": 47,
+     "symbol": "pLimit",
+     "vector_rank": 18
+    },
+    {
+     "chunk_id": 103933,
+     "end_line": 240,
+     "keyword_rank": 20,
+     "kind": "module",
+     "label": "C4",
+     "path": "test.js",
+     "score": 0.027652,
+     "similarity": 0.7377,
+     "start_line": 187,
+     "symbol": null,
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103939,
+     "end_line": 495,
+     "keyword_rank": 28,
+     "kind": "module",
+     "label": "C5",
+     "path": "test.js",
+     "score": 0.027493,
+     "similarity": 0.7629,
+     "start_line": 485,
+     "symbol": null,
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103862,
+     "end_line": 131,
+     "keyword_rank": 12,
+     "kind": "function",
+     "label": "C6",
+     "path": "index.js",
+     "score": 0.026389,
+     "similarity": 0.6949,
+     "start_line": 91,
+     "symbol": "pLimit",
+     "vector_rank": 20
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3249,
+    "output_tokens": 60
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [],
+   "error": null,
+   "id": "pl-003",
+   "issues": [],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How do I discard the tasks that are still waiting in the queue, and can they be rejected?",
+   "refused": true,
+   "removed_sentences": [],
+   "repo": "sindresorhus/p-limit",
+   "retrieved": [
+    {
+     "chunk_id": 103860,
+     "end_line": 49,
+     "keyword_rank": 10,
+     "kind": "function",
+     "label": "C1",
+     "path": "index.js",
+     "score": 0.028992,
+     "similarity": 0.6545,
+     "start_line": 3,
+     "symbol": "pLimit",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 103859,
+     "end_line": 1,
+     "keyword_rank": 9,
+     "kind": "module",
+     "label": "C2",
+     "path": "index.js",
+     "score": 0.028778,
+     "similarity": 0.6326,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 103861,
+     "end_line": 93,
+     "keyword_rank": 14,
+     "kind": "function",
+     "label": "C3",
+     "path": "index.js",
+     "score": 0.028665,
+     "similarity": 0.6763,
+     "start_line": 47,
+     "symbol": "pLimit",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103937,
+     "end_line": 388,
+     "keyword_rank": 21,
+     "kind": "group",
+     "label": "C4",
+     "path": "test.js",
+     "score": 0.027271,
+     "similarity": 0.6596,
+     "start_line": 366,
+     "symbol": "inputs",
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 103869,
+     "end_line": 58,
+     "keyword_rank": 15,
+     "kind": "section",
+     "label": "C5",
+     "path": "package.json",
+     "score": 0.026154,
+     "similarity": 0.5989,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 18
+    },
+    {
+     "chunk_id": 103862,
+     "end_line": 131,
+     "keyword_rank": 25,
+     "kind": "function",
+     "label": "C6",
+     "path": "index.js",
+     "score": 0.025463,
+     "similarity": 0.6225,
+     "start_line": 91,
+     "symbol": "pLimit",
+     "vector_rank": 13
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 3113,
+    "output_tokens": 10
+   }
+  },
+  {
+   "answer": "Yes, the concurrency limit can be changed after the limiter is created [C1:390-415]. When changing the concurrency limit, waiting tasks are not affected [C6:366-382].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103938,
+     "end_line": 415,
+     "inferred": true,
+     "kind": "module",
+     "label": "C1",
+     "path": "test.js",
+     "start_line": 390,
+     "symbol": null
+    },
+    {
+     "chunk_id": 103937,
+     "end_line": 382,
+     "inferred": true,
+     "kind": "group",
+     "label": "C6",
+     "path": "test.js",
+     "start_line": 366,
+     "symbol": "inputs"
+    }
+   ],
+   "error": null,
+   "id": "pl-004",
+   "issues": [
+    "citations_inferred",
+    "removed: C1:12-20 is outside test.js:390-483"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "Can the concurrency limit be changed after the limiter is created, and what happens to waiting tasks?",
+   "refused": false,
+   "removed_sentences": [
+    "The new concurrency limit is applied immediately to the existing tasks, and any new tasks added will be executed according to the new limit. [C1:12-20]"
+   ],
+   "repo": "sindresorhus/p-limit",
+   "retrieved": [
+    {
+     "chunk_id": 103938,
+     "end_line": 483,
+     "keyword_rank": 5,
+     "kind": "module",
+     "label": "C1",
+     "path": "test.js",
+     "score": 0.03009,
+     "similarity": 0.7565,
+     "start_line": 390,
+     "symbol": null,
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 103933,
+     "end_line": 240,
+     "keyword_rank": 7,
+     "kind": "module",
+     "label": "C2",
+     "path": "test.js",
+     "score": 0.028259,
+     "similarity": 0.7407,
+     "start_line": 187,
+     "symbol": null,
+     "vector_rank": 15
+    },
+    {
+     "chunk_id": 103860,
+     "end_line": 49,
+     "keyword_rank": 15,
+     "kind": "function",
+     "label": "C3",
+     "path": "index.js",
+     "score": 0.027826,
+     "similarity": 0.7564,
+     "start_line": 3,
+     "symbol": "pLimit",
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 103932,
+     "end_line": 185,
+     "keyword_rank": 4,
+     "kind": "module",
+     "label": "C4",
+     "path": "test.js",
+     "score": 0.02739,
+     "similarity": 0.717,
+     "start_line": 106,
+     "symbol": null,
+     "vector_rank": 25
+    },
+    {
+     "chunk_id": 103930,
+     "end_line": 55,
+     "keyword_rank": 11,
+     "kind": "group",
+     "label": "C5",
+     "path": "test.js",
+     "score": 0.026585,
+     "similarity": 0.7311,
+     "start_line": 25,
+     "symbol": "checkId, startContext",
+     "vector_rank": 20
+    },
+    {
+     "chunk_id": 103937,
+     "end_line": 388,
+     "keyword_rank": 29,
+     "kind": "group",
+     "label": "C6",
+     "path": "test.js",
+     "score": 0.024394,
+     "similarity": 0.7381,
+     "start_line": 366,
+     "symbol": "inputs",
+     "vector_rank": 16
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 4781,
+    "output_tokens": 64
+   }
+  },
+  {
+   "answer": "The `limit.map` function in the provided repository works by applying a given function to each element of an iterable (array, set, or iterator) concurrently, up to a specified concurrency limit. If iterating the input throws an error, the function will reject the promise for that iteration and continue with the next iteration until all iterations have completed [C2:302-327].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103936,
+     "end_line": 327,
+     "inferred": true,
+     "kind": "group",
+     "label": "C2",
+     "path": "test.js",
+     "start_line": 302,
+     "symbol": "inputs"
+    }
+   ],
+   "error": null,
+   "id": "pl-005",
+   "issues": [
+    "uncited_claim",
+    "citations_inferred",
+    "removed: not supported by any retrieved code (support 33%)"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does limit.map work and what does it do if iterating the input throws?",
+   "refused": false,
+   "removed_sentences": [
+    "This behavior is controlled by the `rejectOnClear` option in the `pLimit` function."
+   ],
+   "repo": "sindresorhus/p-limit",
+   "retrieved": [
+    {
+     "chunk_id": 103935,
+     "end_line": 300,
+     "keyword_rank": 1,
+     "kind": "module",
+     "label": "C1",
+     "path": "test.js",
+     "score": 0.032266,
+     "similarity": 0.8125,
+     "start_line": 249,
+     "symbol": null,
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103936,
+     "end_line": 364,
+     "keyword_rank": 6,
+     "kind": "group",
+     "label": "C2",
+     "path": "test.js",
+     "score": 0.031281,
+     "similarity": 0.8236,
+     "start_line": 302,
+     "symbol": "inputs",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103938,
+     "end_line": 483,
+     "keyword_rank": 4,
+     "kind": "module",
+     "label": "C3",
+     "path": "test.js",
+     "score": 0.030777,
+     "similarity": 0.7828,
+     "start_line": 390,
+     "symbol": null,
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103933,
+     "end_line": 240,
+     "keyword_rank": 2,
+     "kind": "module",
+     "label": "C4",
+     "path": "test.js",
+     "score": 0.030214,
+     "similarity": 0.7536,
+     "start_line": 187,
+     "symbol": null,
+     "vector_rank": 11
+    },
+    {
+     "chunk_id": 103867,
+     "end_line": 33,
+     "keyword_rank": 9,
+     "kind": "module",
+     "label": "C5",
+     "path": "index.test-d.ts",
+     "score": 0.029418,
+     "similarity": 0.7663,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 7
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 4655,
+    "output_tokens": 89
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo. (The model's answer could not be tied to any retrieved code, so it was discarded.)",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [],
+   "error": null,
+   "id": "pl-006",
+   "issues": [
+    "uncited_claim",
+    "removed: not supported by any retrieved code (support 30%)",
+    "removed: not supported by any retrieved code (support 27%)",
+    "removed: not supported by any retrieved code (support 25%)",
+    "no_valid_citation"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "What does limitFunction give me compared with pLimit?",
+   "refused": true,
+   "removed_sentences": [
+    "It uses the `pLimit` function internally to manage the concurrency and ensures that the original function is executed asynchronously within the specified concurrency limit.",
+    "This allows for efficient execution of multiple functions concurrently while maintaining a controlled number of active operations.",
+    "The `limitFunction` provides a more flexible and reusable way to apply concurrency limits to any asynchronous function, making it easier to integrate into larger applications."
+   ],
+   "repo": "sindresorhus/p-limit",
+   "retrieved": [
+    {
+     "chunk_id": 103860,
+     "end_line": 49,
+     "keyword_rank": 8,
+     "kind": "function",
+     "label": "C1",
+     "path": "index.js",
+     "score": 0.030835,
+     "similarity": 0.7702,
+     "start_line": 3,
+     "symbol": "pLimit",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103867,
+     "end_line": 34,
+     "keyword_rank": 4,
+     "kind": "module",
+     "label": "C2",
+     "path": "index.test-d.ts",
+     "score": 0.03055,
+     "similarity": 0.7472,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 103938,
+     "end_line": 483,
+     "keyword_rank": 1,
+     "kind": "module",
+     "label": "C3",
+     "path": "test.js",
+     "score": 0.029052,
+     "similarity": 0.7238,
+     "start_line": 390,
+     "symbol": null,
+     "vector_rank": 19
+    },
+    {
+     "chunk_id": 103863,
+     "end_line": 148,
+     "keyword_rank": 14,
+     "kind": "group",
+     "label": "C4",
+     "path": "index.js",
+     "score": 0.027212,
+     "similarity": 0.7386,
+     "start_line": 133,
+     "symbol": "limitFunction, validateConcurrency",
+     "vector_rank": 13
+    },
+    {
+     "chunk_id": 103935,
+     "end_line": 300,
+     "keyword_rank": 10,
+     "kind": "module",
+     "label": "C5",
+     "path": "test.js",
+     "score": 0.025649,
+     "similarity": 0.6989,
+     "start_line": 249,
+     "symbol": null,
+     "vector_rank": 28
+    },
+    {
+     "chunk_id": 103861,
+     "end_line": 93,
+     "keyword_rank": 13,
+     "kind": "function",
+     "label": "C6",
+     "path": "index.js",
+     "score": 0.025193,
+     "similarity": 0.6995,
+     "start_line": 47,
+     "symbol": "pLimit",
+     "vector_rank": 27
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 4310,
+    "output_tokens": 102
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [],
+   "error": null,
+   "id": "pl-007",
+   "issues": [],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "What values of concurrency are rejected and with which error?",
+   "refused": true,
+   "removed_sentences": [],
+   "repo": "sindresorhus/p-limit",
+   "retrieved": [
+    {
+     "chunk_id": 103860,
+     "end_line": 49,
+     "keyword_rank": 6,
+     "kind": "function",
+     "label": "C1",
+     "path": "index.js",
+     "score": 0.031545,
+     "similarity": 0.7525,
+     "start_line": 3,
+     "symbol": "pLimit",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 103862,
+     "end_line": 131,
+     "keyword_rank": 9,
+     "kind": "function",
+     "label": "C2",
+     "path": "index.js",
+     "score": 0.030366,
+     "similarity": 0.7319,
+     "start_line": 91,
+     "symbol": "pLimit",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103938,
+     "end_line": 483,
+     "keyword_rank": 15,
+     "kind": "module",
+     "label": "C3",
+     "path": "test.js",
+     "score": 0.029462,
+     "similarity": 0.7415,
+     "start_line": 390,
+     "symbol": null,
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103936,
+     "end_line": 364,
+     "keyword_rank": 1,
+     "kind": "group",
+     "label": "C4",
+     "path": "test.js",
+     "score": 0.028298,
+     "similarity": 0.6727,
+     "start_line": 302,
+     "symbol": "inputs",
+     "vector_rank": 24
+    },
+    {
+     "chunk_id": 103930,
+     "end_line": 55,
+     "keyword_rank": 14,
+     "kind": "group",
+     "label": "C5",
+     "path": "test.js",
+     "score": 0.027799,
+     "similarity": 0.6998,
+     "start_line": 25,
+     "symbol": "checkId, startContext",
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 103863,
+     "end_line": 148,
+     "keyword_rank": 10,
+     "kind": "group",
+     "label": "C6",
+     "path": "index.js",
+     "score": 0.026786,
+     "similarity": 0.6827,
+     "start_line": 133,
+     "symbol": "limitFunction, validateConcurrency",
+     "vector_rank": 20
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 4175,
+    "output_tokens": 10
+   }
+  },
+  {
+   "answer": "The package `yocto-queue` provides the queue data structure [C4:41-48]. It is used in the `pLimit` function to manage a queue of functions that need to be executed with limited concurrency [C6:2-30]. The `pLimit` function creates a new queue and uses it to execute the functions in a way that ensures that no more than the specified number of functions are running at any given time. The queue is cleared when the `clearQueue` method is called, and the queue size can be accessed using the `pendingCount` property [C6:19-27].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103869,
+     "end_line": 48,
+     "inferred": true,
+     "kind": "section",
+     "label": "C4",
+     "path": "package.json",
+     "start_line": 41,
+     "symbol": null
+    },
+    {
+     "chunk_id": 103867,
+     "end_line": 30,
+     "inferred": true,
+     "kind": "module",
+     "label": "C6",
+     "path": "index.test-d.ts",
+     "start_line": 2,
+     "symbol": null
+    },
+    {
+     "chunk_id": 103867,
+     "end_line": 27,
+     "inferred": true,
+     "kind": "module",
+     "label": "C6",
+     "path": "index.test-d.ts",
+     "start_line": 19,
+     "symbol": null
+    }
+   ],
+   "error": null,
+   "id": "pl-008",
+   "issues": [
+    "citations_inferred",
+    "uncited_claim"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "Which package provides the queue data structure and how is it used?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "sindresorhus/p-limit",
+   "retrieved": [
+    {
+     "chunk_id": 103859,
+     "end_line": 1,
+     "keyword_rank": 3,
+     "kind": "module",
+     "label": "C1",
+     "path": "index.js",
+     "score": 0.032002,
+     "similarity": 0.735,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103860,
+     "end_line": 49,
+     "keyword_rank": 4,
+     "kind": "function",
+     "label": "C2",
+     "path": "index.js",
+     "score": 0.030777,
+     "similarity": 0.7109,
+     "start_line": 3,
+     "symbol": "pLimit",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103861,
+     "end_line": 93,
+     "keyword_rank": 8,
+     "kind": "function",
+     "label": "C3",
+     "path": "index.js",
+     "score": 0.030579,
+     "similarity": 0.7315,
+     "start_line": 47,
+     "symbol": "pLimit",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103869,
+     "end_line": 58,
+     "keyword_rank": 9,
+     "kind": "section",
+     "label": "C4",
+     "path": "package.json",
+     "score": 0.028778,
+     "similarity": 0.692,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 103862,
+     "end_line": 131,
+     "keyword_rank": 15,
+     "kind": "function",
+     "label": "C5",
+     "path": "index.js",
+     "score": 0.027826,
+     "similarity": 0.7011,
+     "start_line": 91,
+     "symbol": "pLimit",
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 103867,
+     "end_line": 34,
+     "keyword_rank": 17,
+     "kind": "module",
+     "label": "C6",
+     "path": "index.test-d.ts",
+     "score": 0.024752,
+     "similarity": 0.6676,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 25
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3305,
+    "output_tokens": 108
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo.",
+   "answerable": false,
+   "citation_correctness": null,
+   "citations": [],
+   "error": null,
+   "id": "pl-009",
+   "issues": [],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does p-limit persist queued tasks to disk so they survive a process restart?",
+   "refused": true,
+   "removed_sentences": [],
+   "repo": "sindresorhus/p-limit",
+   "retrieved": [
+    {
+     "chunk_id": 103860,
+     "end_line": 49,
+     "keyword_rank": 11,
+     "kind": "function",
+     "label": "C1",
+     "path": "index.js",
+     "score": 0.027598,
+     "similarity": 0.6734,
+     "start_line": 3,
+     "symbol": "pLimit",
+     "vector_rank": 14
+    },
+    {
+     "chunk_id": 103933,
+     "end_line": 240,
+     "keyword_rank": 3,
+     "kind": "module",
+     "label": "C2",
+     "path": "test.js",
+     "score": 0.027109,
+     "similarity": 0.6451,
+     "start_line": 187,
+     "symbol": null,
+     "vector_rank": 29
+    },
+    {
+     "chunk_id": 103932,
+     "end_line": 185,
+     "keyword_rank": 1,
+     "kind": "module",
+     "label": "C3",
+     "path": "test.js",
+     "score": 0.025568,
+     "similarity": 0.6163,
+     "start_line": 106,
+     "symbol": null,
+     "vector_rank": 49
+    },
+    {
+     "chunk_id": 103938,
+     "end_line": 483,
+     "keyword_rank": 8,
+     "kind": "module",
+     "label": "C4",
+     "path": "test.js",
+     "score": 0.02451,
+     "similarity": 0.6267,
+     "start_line": 390,
+     "symbol": null,
+     "vector_rank": 42
+    },
+    {
+     "chunk_id": 103861,
+     "end_line": 93,
+     "keyword_rank": 43,
+     "kind": "function",
+     "label": "C5",
+     "path": "index.js",
+     "score": 0.024201,
+     "similarity": 0.6826,
+     "start_line": 47,
+     "symbol": "pLimit",
+     "vector_rank": 9
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 4598,
+    "output_tokens": 10
+   }
+  },
+  {
+   "answer": "To separate the value from the signature, Signer.unsign uses the `rsplit` method with `self.sep` as the separator [C3:72-108]. If there is no separator in the result, it raises a BadTimeSignature exception with a message indicating that the timestamp is missing [C4:126-135].\n\n```python\nif sep not in result:\n    if sig_error:\n        raise sig_error\n```\nThis line checks if the separator is not in the result and raises the appropriate exception based on whether a signature error occurred [C4:114-139].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103621,
+     "end_line": 108,
+     "inferred": true,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 72,
+     "symbol": "TimestampSigner.unsign"
+    },
+    {
+     "chunk_id": 103622,
+     "end_line": 135,
+     "inferred": true,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 126,
+     "symbol": "TimestampSigner.unsign"
+    },
+    {
+     "chunk_id": 103622,
+     "end_line": 139,
+     "inferred": true,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 114,
+     "symbol": "TimestampSigner.unsign"
+    }
+   ],
+   "error": null,
+   "id": "id-001",
+   "issues": [
+    "citations_inferred",
+    "removed: C1:25-26 is outside src/itsdangerous/signer.py:244-256"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does Signer.unsign separate the value from the signature and what does it raise on failure?",
+   "refused": false,
+   "removed_sentences": [
+    "The excerpt [C1:25-26] shows this code snippet:"
+   ],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103606,
+     "end_line": 256,
+     "keyword_rank": 3,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.032266,
+     "similarity": 0.847,
+     "start_line": 244,
+     "symbol": "Signer.unsign",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 103565,
+     "end_line": 104,
+     "keyword_rank": 4,
+     "kind": "class",
+     "label": "C2",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.03125,
+     "similarity": 0.7589,
+     "start_line": 69,
+     "symbol": "Serializer",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103621,
+     "end_line": 116,
+     "keyword_rank": 9,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.030622,
+     "similarity": 0.77,
+     "start_line": 72,
+     "symbol": "TimestampSigner.unsign",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103622,
+     "end_line": 158,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.030478,
+     "similarity": 0.7174,
+     "start_line": 114,
+     "symbol": "TimestampSigner.unsign",
+     "vector_rank": 11
+    },
+    {
+     "chunk_id": 103604,
+     "end_line": 225,
+     "keyword_rank": 2,
+     "kind": "group",
+     "label": "C5",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.02895,
+     "similarity": 0.6999,
+     "start_line": 215,
+     "symbol": "Signer.get_signature, Signer.sign",
+     "vector_rank": 18
+    },
+    {
+     "chunk_id": 103607,
+     "end_line": 266,
+     "keyword_rank": 18,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.028694,
+     "similarity": 0.7664,
+     "start_line": 258,
+     "symbol": "Signer.validate",
+     "vector_rank": 3
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 2820,
+    "output_tokens": 117
+   }
+  },
+  {
+   "answer": "The key derivation methods supported are `concat`, `django-concat`, and `hmac` [C3:91-93]. The `concat` method combines the secret key and salt to derive the signing key, while the `django-concat` method does the same but with a specific separator [C4:123-127]. The `hmac` method uses HMAC to derive the signing key [C1:206-207].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103599,
+     "end_line": 93,
+     "inferred": true,
+     "kind": "class",
+     "label": "C3",
+     "path": "src/itsdangerous/signer.py",
+     "start_line": 91,
+     "symbol": "Signer"
+    },
+    {
+     "chunk_id": 103600,
+     "end_line": 127,
+     "inferred": true,
+     "kind": "class",
+     "label": "C4",
+     "path": "src/itsdangerous/signer.py",
+     "start_line": 123,
+     "symbol": "Signer"
+    },
+    {
+     "chunk_id": 103603,
+     "end_line": 207,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/itsdangerous/signer.py",
+     "start_line": 206,
+     "symbol": "Signer.derive_key"
+    }
+   ],
+   "error": null,
+   "id": "id-002",
+   "issues": [
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "Which key derivation methods are supported and what does each do?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103603,
+     "end_line": 213,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.032787,
+     "similarity": 0.8114,
+     "start_line": 182,
+     "symbol": "Signer.derive_key",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 103601,
+     "end_line": 173,
+     "keyword_rank": 3,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.032002,
+     "similarity": 0.7379,
+     "start_line": 129,
+     "symbol": "Signer.__init__",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103599,
+     "end_line": 108,
+     "keyword_rank": 2,
+     "kind": "class",
+     "label": "C3",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.031754,
+     "similarity": 0.7095,
+     "start_line": 76,
+     "symbol": "Signer",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103600,
+     "end_line": 127,
+     "keyword_rank": 7,
+     "kind": "class",
+     "label": "C4",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.030798,
+     "similarity": 0.7244,
+     "start_line": 106,
+     "symbol": "Signer",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103571,
+     "end_line": 234,
+     "keyword_rank": 11,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.029236,
+     "similarity": 0.6902,
+     "start_line": 190,
+     "symbol": "Serializer.__init__",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103564,
+     "end_line": 65,
+     "keyword_rank": 6,
+     "kind": "class",
+     "label": "C6",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.02885,
+     "similarity": 0.6679,
+     "start_line": 40,
+     "symbol": "Serializer",
+     "vector_rank": 13
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3746,
+    "output_tokens": 68
+   }
+  },
+  {
+   "answer": "The timestamp signer embeds the signing time by appending a base64-encoded timestamp to the signed value [C3:118-143]. It then uses this timestamp to sign the value and also records the time of the signing in a separate field [C5:22-24]. The signer can enforce an expiry by checking if the current time is older than the stored timestamp and raising a `SignatureExpired` exception if it is [C1:195-213].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103622,
+     "end_line": 143,
+     "inferred": true,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 118,
+     "symbol": "TimestampSigner.unsign"
+    },
+    {
+     "chunk_id": 103615,
+     "end_line": 24,
+     "inferred": true,
+     "kind": "class",
+     "label": "C5",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 22,
+     "symbol": "TimestampSigner"
+    },
+    {
+     "chunk_id": 103627,
+     "end_line": 213,
+     "inferred": true,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 195,
+     "symbol": "TimedSerializer.loads"
+    }
+   ],
+   "error": null,
+   "id": "id-003",
+   "issues": [
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does the timestamp signer embed the signing time and enforce an expiry?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103627,
+     "end_line": 220,
+     "keyword_rank": 5,
+     "kind": "method",
+     "label": "C1",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.031258,
+     "similarity": 0.8319,
+     "start_line": 185,
+     "symbol": "TimedSerializer.loads",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103621,
+     "end_line": 116,
+     "keyword_rank": 4,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.03125,
+     "similarity": 0.8207,
+     "start_line": 72,
+     "symbol": "TimestampSigner.unsign",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103622,
+     "end_line": 158,
+     "keyword_rank": 6,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.030536,
+     "similarity": 0.8109,
+     "start_line": 114,
+     "symbol": "TimestampSigner.unsign",
+     "vector_rank": 5
+    },
+    {
+     "chunk_id": 103571,
+     "end_line": 234,
+     "keyword_rank": 2,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.029116,
+     "similarity": 0.7157,
+     "start_line": 190,
+     "symbol": "Serializer.__init__",
+     "vector_rank": 17
+    },
+    {
+     "chunk_id": 103615,
+     "end_line": 27,
+     "keyword_rank": 20,
+     "kind": "class",
+     "label": "C5",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.028629,
+     "similarity": 0.843,
+     "start_line": 22,
+     "symbol": "TimestampSigner",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103618,
+     "end_line": 51,
+     "keyword_rank": 22,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.027347,
+     "similarity": 0.8081,
+     "start_line": 45,
+     "symbol": "TimestampSigner.sign",
+     "vector_rank": 6
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3182,
+    "output_tokens": 74
+   }
+  },
+  {
+   "answer": "This behavior is consistent with how URL-safe strings are encoded and can be safely placed in URLs.] [C2:15-18]",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103635,
+     "end_line": 18,
+     "inferred": true,
+     "kind": "class",
+     "label": "C2",
+     "path": "src/itsdangerous/url_safe.py",
+     "start_line": 15,
+     "symbol": "URLSafeSerializerMixin"
+    }
+   ],
+   "error": null,
+   "id": "id-004",
+   "issues": [
+    "removed: the cited code does not contain what it says (support 29%)",
+    "removed: not supported by any retrieved code (support 29%)",
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "Why do URL-safe tokens sometimes start with a dot?",
+   "refused": false,
+   "removed_sentences": [
+    "[The code snippet in [C2] shows that URL-safe tokens sometimes start with a dot because it uses the `base64.urlsafe_b64decode` function, which appends a padding of `=` to the end of the base64-encoded string if the length is not a multiple of 4.",
+    "This padding is not included in the URL-safe string, so it appears as a dot at the beginning of the token."
+   ],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103636,
+     "end_line": 83,
+     "keyword_rank": 4,
+     "kind": "group",
+     "label": "C1",
+     "path": "src/itsdangerous/url_safe.py",
+     "score": 0.031754,
+     "similarity": 0.7221,
+     "start_line": 72,
+     "symbol": "URLSafeSerializer, URLSafeTimedSerializer",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103635,
+     "end_line": 69,
+     "keyword_rank": 9,
+     "kind": "class",
+     "label": "C2",
+     "path": "src/itsdangerous/url_safe.py",
+     "score": 0.030366,
+     "similarity": 0.7022,
+     "start_line": 15,
+     "symbol": "URLSafeSerializerMixin",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103634,
+     "end_line": 12,
+     "keyword_rank": 13,
+     "kind": "module",
+     "label": "C3",
+     "path": "src/itsdangerous/url_safe.py",
+     "score": 0.027032,
+     "similarity": 0.6506,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 15
+    },
+    {
+     "chunk_id": 103544,
+     "end_line": 17,
+     "keyword_rank": 3,
+     "kind": "module",
+     "label": "C4",
+     "path": "src/itsdangerous/__init__.py",
+     "score": 0.026862,
+     "similarity": 0.6241,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 31
+    },
+    {
+     "chunk_id": 103550,
+     "end_line": 38,
+     "keyword_rank": 8,
+     "kind": "function",
+     "label": "C5",
+     "path": "src/itsdangerous/encoding.py",
+     "score": 0.026611,
+     "similarity": 0.6321,
+     "start_line": 28,
+     "symbol": "base64_decode",
+     "vector_rank": 24
+    },
+    {
+     "chunk_id": 103468,
+     "end_line": 8,
+     "keyword_rank": 10,
+     "kind": "section",
+     "label": "C6",
+     "path": ".github/ISSUE_TEMPLATE/config.yml",
+     "score": 0.024812,
+     "similarity": 0.6201,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 35
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 2058,
+    "output_tokens": 109
+   }
+  },
+  {
+   "answer": "To rotate secret keys without invalidating existing signatures, you can follow these steps:\n\n1. [C3] The `__init__` method of the `Signer` class takes a list of secret keys as an argument.\n2. [C4] The `Serializer` class also takes a list of secret keys as an argument.\n3. [C5] When creating a `Serializer`, you can pass the same list of secret keys to both the `Signer` and `Serializer` instances.\n\nBy using the same list of secret keys for both the `Signer` and `Serializer` instances, you can rotate secret keys without invalidating existing signatures [C5:40-70].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 2,
+    "precision": 0.5,
+    "recall": 1.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103601,
+     "end_line": 173,
+     "inferred": false,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/signer.py",
+     "start_line": 129,
+     "symbol": "Signer.__init__"
+    },
+    {
+     "chunk_id": 103571,
+     "end_line": 234,
+     "inferred": false,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/itsdangerous/serializer.py",
+     "start_line": 190,
+     "symbol": "Serializer.__init__"
+    },
+    {
+     "chunk_id": 103564,
+     "end_line": 71,
+     "inferred": false,
+     "kind": "class",
+     "label": "C5",
+     "path": "src/itsdangerous/serializer.py",
+     "start_line": 40,
+     "symbol": "Serializer"
+    },
+    {
+     "chunk_id": 103564,
+     "end_line": 70,
+     "inferred": true,
+     "kind": "class",
+     "label": "C5",
+     "path": "src/itsdangerous/serializer.py",
+     "start_line": 40,
+     "symbol": "Serializer"
+    }
+   ],
+   "error": null,
+   "id": "id-005",
+   "issues": [
+    "removed: the cited code does not contain what it says (support 25%)",
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How can secret keys be rotated without invalidating existing signatures?",
+   "refused": false,
+   "removed_sentences": [
+    "[C6] This ensures that the `Signer` and `Serializer` instances use the same secret keys for signing and verifying data."
+   ],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103599,
+     "end_line": 108,
+     "keyword_rank": 5,
+     "kind": "class",
+     "label": "C1",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.031514,
+     "similarity": 0.7531,
+     "start_line": 76,
+     "symbol": "Signer",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103603,
+     "end_line": 213,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.031319,
+     "similarity": 0.7294,
+     "start_line": 182,
+     "symbol": "Signer.derive_key",
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 103601,
+     "end_line": 173,
+     "keyword_rank": 8,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.030579,
+     "similarity": 0.7519,
+     "start_line": 129,
+     "symbol": "Signer.__init__",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103571,
+     "end_line": 234,
+     "keyword_rank": 7,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.03055,
+     "similarity": 0.7509,
+     "start_line": 190,
+     "symbol": "Serializer.__init__",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103564,
+     "end_line": 71,
+     "keyword_rank": 4,
+     "kind": "class",
+     "label": "C5",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.029514,
+     "similarity": 0.7121,
+     "start_line": 40,
+     "symbol": "Serializer",
+     "vector_rank": 12
+    },
+    {
+     "chunk_id": 103602,
+     "end_line": 180,
+     "keyword_rank": 14,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.028665,
+     "similarity": 0.738,
+     "start_line": 175,
+     "symbol": "Signer.secret_key",
+     "vector_rank": 6
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3579,
+    "output_tokens": 165
+   }
+  },
+  {
+   "answer": "Fallback signers are a list of signer parameters to try when unsigning with the default signer fails [C1:69-94]. Each item can be a dict of signer_kwargs, a Signer class, or a tuple of (signer, signer_kwargs) [C1:70-88]. Defaults to [C1:102-104].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 1,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103565,
+     "end_line": 94,
+     "inferred": true,
+     "kind": "class",
+     "label": "C1",
+     "path": "src/itsdangerous/serializer.py",
+     "start_line": 69,
+     "symbol": "Serializer"
+    },
+    {
+     "chunk_id": 103565,
+     "end_line": 88,
+     "inferred": true,
+     "kind": "class",
+     "label": "C1",
+     "path": "src/itsdangerous/serializer.py",
+     "start_line": 70,
+     "symbol": "Serializer"
+    },
+    {
+     "chunk_id": 103565,
+     "end_line": 104,
+     "inferred": false,
+     "kind": "class",
+     "label": "C1",
+     "path": "src/itsdangerous/serializer.py",
+     "start_line": 102,
+     "symbol": "Serializer"
+    }
+   ],
+   "error": null,
+   "id": "id-006",
+   "issues": [
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "What are fallback signers and how does loads use them?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103565,
+     "end_line": 104,
+     "keyword_rank": 1,
+     "kind": "class",
+     "label": "C1",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.032787,
+     "similarity": 0.748,
+     "start_line": 69,
+     "symbol": "Serializer",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 103576,
+     "end_line": 307,
+     "keyword_rank": 2,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.031754,
+     "similarity": 0.7436,
+     "start_line": 287,
+     "symbol": "Serializer.iter_unsigners",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103571,
+     "end_line": 234,
+     "keyword_rank": 3,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.029958,
+     "similarity": 0.7032,
+     "start_line": 190,
+     "symbol": "Serializer.__init__",
+     "vector_rank": 11
+    },
+    {
+     "chunk_id": 103564,
+     "end_line": 71,
+     "keyword_rank": 7,
+     "kind": "class",
+     "label": "C4",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.029631,
+     "similarity": 0.7192,
+     "start_line": 40,
+     "symbol": "Serializer",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 103581,
+     "end_line": 365,
+     "keyword_rank": 6,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.02904,
+     "similarity": 0.7005,
+     "start_line": 349,
+     "symbol": "Serializer.loads_unsafe",
+     "vector_rank": 12
+    },
+    {
+     "chunk_id": 103570,
+     "end_line": 188,
+     "keyword_rank": 20,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.027885,
+     "similarity": 0.7378,
+     "start_line": 173,
+     "symbol": "Serializer.__init__",
+     "vector_rank": 5
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3201,
+    "output_tokens": 62
+   }
+  },
+  {
+   "answer": "The exception hierarchy for bad or expired data is as follows:\n\n[C1] BadData is the base class for all exceptions that ItsDangerous defines.\n[C2] TimedSerializer.loads raises BadSignature if the signature validation fails.\n[C3] BadPayload is raised if a payload is invalid. This could happen if the payload is loaded despite an invalid signature, or if there is a mismatch between the serializer and deserializer [C3:92-104]. The original exception that occurred during loading is stored on as:attr:`original_error` [C3:96-106].\n[C4] Serializer.loads raises BadSignature if the signature validation fails.\n[C5] TimestampSigner.unsign raises BadTimeSignature if the signature is not okay. This only happens for serializers that have a header that goes with the signature [C6:66-85].\n[C6] BadHeader is raised if a signed header is invalid in some form.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 3,
+    "precision": 0.3333333333333333,
+    "recall": 1.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103553,
+     "end_line": 19,
+     "inferred": false,
+     "kind": "group",
+     "label": "C1",
+     "path": "src/itsdangerous/exc.py",
+     "start_line": 1,
+     "symbol": "BadData"
+    },
+    {
+     "chunk_id": 103627,
+     "end_line": 220,
+     "inferred": false,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 185,
+     "symbol": "TimedSerializer.loads"
+    },
+    {
+     "chunk_id": 103558,
+     "end_line": 106,
+     "inferred": false,
+     "kind": "class",
+     "label": "C3",
+     "path": "src/itsdangerous/exc.py",
+     "start_line": 92,
+     "symbol": "BadPayload"
+    },
+    {
+     "chunk_id": 103558,
+     "end_line": 104,
+     "inferred": true,
+     "kind": "class",
+     "label": "C3",
+     "path": "src/itsdangerous/exc.py",
+     "start_line": 92,
+     "symbol": "BadPayload"
+    },
+    {
+     "chunk_id": 103558,
+     "end_line": 106,
+     "inferred": true,
+     "kind": "class",
+     "label": "C3",
+     "path": "src/itsdangerous/exc.py",
+     "start_line": 96,
+     "symbol": "BadPayload"
+    },
+    {
+     "chunk_id": 103579,
+     "end_line": 343,
+     "inferred": false,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/itsdangerous/serializer.py",
+     "start_line": 328,
+     "symbol": "Serializer.loads"
+    },
+    {
+     "chunk_id": 103622,
+     "end_line": 158,
+     "inferred": false,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 114,
+     "symbol": "TimestampSigner.unsign"
+    },
+    {
+     "chunk_id": 103557,
+     "end_line": 85,
+     "inferred": true,
+     "kind": "class",
+     "label": "C6",
+     "path": "src/itsdangerous/exc.py",
+     "start_line": 66,
+     "symbol": "BadHeader"
+    },
+    {
+     "chunk_id": 103557,
+     "end_line": 89,
+     "inferred": false,
+     "kind": "class",
+     "label": "C6",
+     "path": "src/itsdangerous/exc.py",
+     "start_line": 66,
+     "symbol": "BadHeader"
+    }
+   ],
+   "error": null,
+   "id": "id-007",
+   "issues": [
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "What is the exception hierarchy for bad or expired data?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103553,
+     "end_line": 19,
+     "keyword_rank": 3,
+     "kind": "group",
+     "label": "C1",
+     "path": "src/itsdangerous/exc.py",
+     "score": 0.032266,
+     "similarity": 0.7708,
+     "start_line": 1,
+     "symbol": "BadData",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 103627,
+     "end_line": 220,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.031778,
+     "similarity": 0.7066,
+     "start_line": 185,
+     "symbol": "TimedSerializer.loads",
+     "vector_rank": 5
+    },
+    {
+     "chunk_id": 103558,
+     "end_line": 106,
+     "keyword_rank": 4,
+     "kind": "class",
+     "label": "C3",
+     "path": "src/itsdangerous/exc.py",
+     "score": 0.031754,
+     "similarity": 0.7624,
+     "start_line": 92,
+     "symbol": "BadPayload",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103579,
+     "end_line": 343,
+     "keyword_rank": 10,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.028571,
+     "similarity": 0.6809,
+     "start_line": 328,
+     "symbol": "Serializer.loads",
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 103622,
+     "end_line": 158,
+     "keyword_rank": 15,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.028485,
+     "similarity": 0.7054,
+     "start_line": 114,
+     "symbol": "TimestampSigner.unsign",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103557,
+     "end_line": 89,
+     "keyword_rank": 13,
+     "kind": "class",
+     "label": "C6",
+     "path": "src/itsdangerous/exc.py",
+     "score": 0.027397,
+     "similarity": 0.6683,
+     "start_line": 66,
+     "symbol": "BadHeader",
+     "vector_rank": 13
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 2593,
+    "output_tokens": 189
+   }
+  },
+  {
+   "answer": "Base64 encoding is made URL-safe by adding padding characters to the end of the encoded string [C1:28-38].\n\n[C1:34-37]",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 1,
+    "precision": 1.0,
+    "recall": 1.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103550,
+     "end_line": 38,
+     "inferred": true,
+     "kind": "function",
+     "label": "C1",
+     "path": "src/itsdangerous/encoding.py",
+     "start_line": 28,
+     "symbol": "base64_decode"
+    },
+    {
+     "chunk_id": 103550,
+     "end_line": 37,
+     "inferred": false,
+     "kind": "function",
+     "label": "C1",
+     "path": "src/itsdangerous/encoding.py",
+     "start_line": 34,
+     "symbol": "base64_decode"
+    }
+   ],
+   "error": null,
+   "id": "id-008",
+   "issues": [
+    "citations_inferred",
+    "removed: not supported by any retrieved code (support 22%)",
+    "removed: not supported by any retrieved code (support 30%)"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How is base64 encoding made URL-safe and how is missing padding handled?",
+   "refused": false,
+   "removed_sentences": [
+    "This is done by appending one or more equal signs (`=`) to the end of the string, depending on whether the length of the encoded string is a multiple of 4.",
+    "The padding ensures that the encoded string is always a multiple of 4 bytes long, which is required for proper URL encoding."
+   ],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103550,
+     "end_line": 38,
+     "keyword_rank": 2,
+     "kind": "function",
+     "label": "C1",
+     "path": "src/itsdangerous/encoding.py",
+     "score": 0.032522,
+     "similarity": 0.8278,
+     "start_line": 28,
+     "symbol": "base64_decode",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 103635,
+     "end_line": 69,
+     "keyword_rank": 5,
+     "kind": "class",
+     "label": "C2",
+     "path": "src/itsdangerous/url_safe.py",
+     "score": 0.031258,
+     "similarity": 0.7864,
+     "start_line": 15,
+     "symbol": "URLSafeSerializerMixin",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103544,
+     "end_line": 17,
+     "keyword_rank": 1,
+     "kind": "module",
+     "label": "C3",
+     "path": "src/itsdangerous/__init__.py",
+     "score": 0.030886,
+     "similarity": 0.6875,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 103549,
+     "end_line": 25,
+     "keyword_rank": 10,
+     "kind": "function",
+     "label": "C4",
+     "path": "src/itsdangerous/encoding.py",
+     "score": 0.030415,
+     "similarity": 0.7986,
+     "start_line": 20,
+     "symbol": "base64_encode",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103636,
+     "end_line": 83,
+     "keyword_rank": 11,
+     "kind": "group",
+     "label": "C5",
+     "path": "src/itsdangerous/url_safe.py",
+     "score": 0.029236,
+     "similarity": 0.7099,
+     "start_line": 72,
+     "symbol": "URLSafeSerializer, URLSafeTimedSerializer",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103634,
+     "end_line": 12,
+     "keyword_rank": 7,
+     "kind": "module",
+     "label": "C6",
+     "path": "src/itsdangerous/url_safe.py",
+     "score": 0.029211,
+     "similarity": 0.6651,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 10
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 2050,
+    "output_tokens": 92
+   }
+  },
+  {
+   "answer": "The `loads` method on a timed serializer treats an expired signature by raising the `SignatureExpired` exception [C3:185-213]. This is because the method iterates over all signers to be tried for unsigning, starting with the configured signer and then constructing each signer specified in `fallback_signers` [C6:290-297]. If an expired signature is found, it is immediately raised without trying any other signers [C3:192-217].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103627,
+     "end_line": 213,
+     "inferred": true,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 185,
+     "symbol": "TimedSerializer.loads"
+    },
+    {
+     "chunk_id": 103576,
+     "end_line": 297,
+     "inferred": true,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/itsdangerous/serializer.py",
+     "start_line": 290,
+     "symbol": "Serializer.iter_unsigners"
+    },
+    {
+     "chunk_id": 103627,
+     "end_line": 217,
+     "inferred": true,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/timed.py",
+     "start_line": 192,
+     "symbol": "TimedSerializer.loads"
+    }
+   ],
+   "error": null,
+   "id": "id-009",
+   "issues": [
+    "citations_inferred",
+    "removed: not supported by any retrieved code (support 36%)"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does loads on a timed serializer treat an expired signature while fallback signers exist?",
+   "refused": false,
+   "removed_sentences": [
+    "This ensures that the serializer can handle expired signatures gracefully and provide a clear error message to the user."
+   ],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103565,
+     "end_line": 104,
+     "keyword_rank": 2,
+     "kind": "class",
+     "label": "C1",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.031754,
+     "similarity": 0.7972,
+     "start_line": 69,
+     "symbol": "Serializer",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103571,
+     "end_line": 234,
+     "keyword_rank": 1,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.031319,
+     "similarity": 0.7897,
+     "start_line": 190,
+     "symbol": "Serializer.__init__",
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 103627,
+     "end_line": 220,
+     "keyword_rank": 13,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/timed.py",
+     "score": 0.030092,
+     "similarity": 0.8383,
+     "start_line": 185,
+     "symbol": "TimedSerializer.loads",
+     "vector_rank": 1
+    },
+    {
+     "chunk_id": 103564,
+     "end_line": 71,
+     "keyword_rank": 5,
+     "kind": "class",
+     "label": "C4",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.03009,
+     "similarity": 0.7838,
+     "start_line": 40,
+     "symbol": "Serializer",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 103581,
+     "end_line": 365,
+     "keyword_rank": 9,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.028778,
+     "similarity": 0.781,
+     "start_line": 349,
+     "symbol": "Serializer.loads_unsafe",
+     "vector_rank": 10
+    },
+    {
+     "chunk_id": 103576,
+     "end_line": 307,
+     "keyword_rank": 3,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.027638,
+     "similarity": 0.744,
+     "start_line": 287,
+     "symbol": "Serializer.iter_unsigners",
+     "vector_rank": 25
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3458,
+    "output_tokens": 97
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo. (The model's answer could not be tied to any retrieved code, so it was discarded.)",
+   "answerable": false,
+   "citation_correctness": null,
+   "citations": [],
+   "error": null,
+   "id": "id-010",
+   "issues": [
+    "removed: names `AES-256`, `GCM`, which is not in the retrieved code",
+    "removed: names `AES-256`, `GCM`, which is not in the retrieved code",
+    "removed: names `AES-256`, `GCM`, which is not in the retrieved code",
+    "no_valid_citation"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "Which AES mode does the library use to encrypt the payload?",
+   "refused": true,
+   "removed_sentences": [
+    "The library uses AES-256-GCM mode to encrypt the payload.",
+    "This can be seen in the `load_payload` method of the `URLSafeSerializerMixin` class, which uses AES-256-GCM as the default serializer.",
+    "The `load_payload` method checks if the payload is base64 encoded and then attempts to decompress it using AES-256-GCM."
+   ],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103635,
+     "end_line": 69,
+     "keyword_rank": 2,
+     "kind": "class",
+     "label": "C1",
+     "path": "src/itsdangerous/url_safe.py",
+     "score": 0.032258,
+     "similarity": 0.7256,
+     "start_line": 15,
+     "symbol": "URLSafeSerializerMixin",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103573,
+     "end_line": 269,
+     "keyword_rank": 3,
+     "kind": "method",
+     "label": "C2",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.031746,
+     "similarity": 0.7169,
+     "start_line": 243,
+     "symbol": "Serializer.load_payload",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103558,
+     "end_line": 106,
+     "keyword_rank": 15,
+     "kind": "class",
+     "label": "C3",
+     "path": "src/itsdangerous/exc.py",
+     "score": 0.028958,
+     "similarity": 0.7053,
+     "start_line": 92,
+     "symbol": "BadPayload",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103582,
+     "end_line": 395,
+     "keyword_rank": 7,
+     "kind": "method",
+     "label": "C4",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.028439,
+     "similarity": 0.6855,
+     "start_line": 367,
+     "symbol": "Serializer._loads_unsafe_impl",
+     "vector_rank": 14
+    },
+    {
+     "chunk_id": 103581,
+     "end_line": 365,
+     "keyword_rank": 6,
+     "kind": "method",
+     "label": "C5",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.028309,
+     "similarity": 0.6847,
+     "start_line": 349,
+     "symbol": "Serializer.loads_unsafe",
+     "vector_rank": 16
+    },
+    {
+     "chunk_id": 103574,
+     "end_line": 276,
+     "keyword_rank": 20,
+     "kind": "method",
+     "label": "C6",
+     "path": "src/itsdangerous/serializer.py",
+     "score": 0.027885,
+     "similarity": 0.7035,
+     "start_line": 271,
+     "symbol": "Serializer.dump_payload",
+     "vector_rank": 5
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 2556,
+    "output_tokens": 83
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo.",
+   "answerable": false,
+   "citation_correctness": null,
+   "citations": [],
+   "error": null,
+   "id": "id-011",
+   "issues": [
+    "weak evidence: best vector similarity 0.67 < 0.70 and no named identifier matched"
+   ],
+   "llm_called": false,
+   "model": null,
+   "question": "Where are user passwords hashed with bcrypt before signing?",
+   "refused": true,
+   "removed_sentences": [],
+   "repo": "pallets/itsdangerous",
+   "retrieved": [
+    {
+     "chunk_id": 103599,
+     "end_line": 108,
+     "keyword_rank": 8,
+     "kind": "class",
+     "label": "C1",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.029857,
+     "similarity": 0.6649,
+     "start_line": 76,
+     "symbol": "Signer",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103596,
+     "end_line": 45,
+     "keyword_rank": 7,
+     "kind": "group",
+     "label": "C2",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.029631,
+     "similarity": 0.6572,
+     "start_line": 31,
+     "symbol": "NoneAlgorithm, _lazy_sha1",
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 103601,
+     "end_line": 173,
+     "keyword_rank": 10,
+     "kind": "method",
+     "label": "C3",
+     "path": "src/itsdangerous/signer.py",
+     "score": 0.029211,
+     "similarity": 0.6648,
+     "start_line": 129,
+     "symbol": "Signer.__init__",
+     "vector_rank": 7
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo. (The model's answer could not be tied to any retrieved code, so it was discarded.)",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [],
+   "error": null,
+   "id": "ch-001",
+   "issues": [
+    "removed: names `chalk.red.bold`, `bold`, which is not in the retrieved code",
+    "removed: names `bold`, which is not in the retrieved code",
+    "removed: the cited code does not contain what it says (support 0%)",
+    "no_valid_citation"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "When I chain styles like chalk.red.bold, how are the escape codes combined?",
+   "refused": true,
+   "removed_sentences": [
+    "To chain styles like `chalk.red.bold`, the escape codes are combined by applying the `bold` style first and then the `red` style.",
+    "This is done by calling the `bold` method on the `chalk` object, followed by the `red` method on the resulting object.",
+    "The escape codes for bold and red are concatenated to produce the final output. [C1:12-20]"
+   ],
+   "repo": "chalk/chalk",
+   "retrieved": [
+    {
+     "chunk_id": 103719,
+     "end_line": 92,
+     "keyword_rank": 17,
+     "kind": "section",
+     "label": "C1",
+     "path": "package.json",
+     "score": 0.028372,
+     "similarity": 0.7304,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 5
+    },
+    {
+     "chunk_id": 103772,
+     "end_line": 15,
+     "keyword_rank": 26,
+     "kind": "module",
+     "label": "C2",
+     "path": "source/index.js",
+     "score": 0.025517,
+     "similarity": 0.7124,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 12
+    },
+    {
+     "chunk_id": 103778,
+     "end_line": 105,
+     "keyword_rank": 16,
+     "kind": "function",
+     "label": "C3",
+     "path": "source/index.js",
+     "score": 0.024269,
+     "similarity": 0.6686,
+     "start_line": 86,
+     "symbol": "createModelConverters",
+     "vector_rank": 30
+    },
+    {
+     "chunk_id": 103779,
+     "end_line": 121,
+     "keyword_rank": 32,
+     "kind": "module",
+     "label": "C4",
+     "path": "source/index.js",
+     "score": 0.023215,
+     "similarity": 0.6906,
+     "start_line": 107,
+     "symbol": null,
+     "vector_rank": 21
+    },
+    {
+     "chunk_id": 103785,
+     "end_line": 262,
+     "keyword_rank": 21,
+     "kind": "module",
+     "label": "C5",
+     "path": "source/index.js",
+     "score": 0.023215,
+     "similarity": 0.667,
+     "start_line": 236,
+     "symbol": null,
+     "vector_rank": 32
+    },
+    {
+     "chunk_id": 103776,
+     "end_line": 63,
+     "keyword_rank": 15,
+     "kind": "group",
+     "label": "C6",
+     "path": "source/index.js",
+     "score": 0.022857,
+     "similarity": 0.6376,
+     "start_line": 52,
+     "symbol": "chalkFactory, createChalk",
+     "vector_rank": 45
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 2987,
+    "output_tokens": 85
+   }
+  },
+  {
+   "answer": "Chalk keeps colouring working when the text already contains a closing escape code by replacing any instances already present with a re-opening code before a linebreak and reopening after next line to fix a bleed issue on macOS [C5:203-228]. This is done by using the `stringReplaceAll` function, which replaces all occurrences of the closing escape code with the opening escape code [C5:219-219].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103784,
+     "end_line": 228,
+     "inferred": true,
+     "kind": "function",
+     "label": "C5",
+     "path": "source/index.js",
+     "start_line": 203,
+     "symbol": "applyStyle"
+    },
+    {
+     "chunk_id": 103784,
+     "end_line": 219,
+     "inferred": true,
+     "kind": "function",
+     "label": "C5",
+     "path": "source/index.js",
+     "start_line": 219,
+     "symbol": "applyStyle"
+    }
+   ],
+   "error": null,
+   "id": "ch-002",
+   "issues": [
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does Chalk keep colouring working when the text already contains a closing escape code?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "chalk/chalk",
+   "retrieved": [
+    {
+     "chunk_id": 103719,
+     "end_line": 92,
+     "keyword_rank": 25,
+     "kind": "section",
+     "label": "C1",
+     "path": "package.json",
+     "score": 0.02669,
+     "similarity": 0.7408,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 103785,
+     "end_line": 262,
+     "keyword_rank": 14,
+     "kind": "module",
+     "label": "C2",
+     "path": "source/index.js",
+     "score": 0.025008,
+     "similarity": 0.6859,
+     "start_line": 236,
+     "symbol": null,
+     "vector_rank": 27
+    },
+    {
+     "chunk_id": 103776,
+     "end_line": 63,
+     "keyword_rank": 13,
+     "kind": "group",
+     "label": "C3",
+     "path": "source/index.js",
+     "score": 0.024337,
+     "similarity": 0.6653,
+     "start_line": 52,
+     "symbol": "chalkFactory, createChalk",
+     "vector_rank": 34
+    },
+    {
+     "chunk_id": 103775,
+     "end_line": 50,
+     "keyword_rank": 27,
+     "kind": "group",
+     "label": "C4",
+     "path": "source/index.js",
+     "score": 0.024315,
+     "similarity": 0.7025,
+     "start_line": 35,
+     "symbol": "applyOptions, Chalk",
+     "vector_rank": 18
+    },
+    {
+     "chunk_id": 103784,
+     "end_line": 234,
+     "keyword_rank": 19,
+     "kind": "function",
+     "label": "C5",
+     "path": "source/index.js",
+     "score": 0.023894,
+     "similarity": 0.6835,
+     "start_line": 200,
+     "symbol": "applyStyle",
+     "vector_rank": 29
+    },
+    {
+     "chunk_id": 103757,
+     "end_line": 119,
+     "keyword_rank": 1,
+     "kind": "interface",
+     "label": "C6",
+     "path": "source/index.d.ts",
+     "score": 0.022587,
+     "similarity": 0.7779,
+     "start_line": 36,
+     "symbol": "ChalkInstance",
+     "vector_rank": 3
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 3981,
+    "output_tokens": 72
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [],
+   "error": null,
+   "id": "ch-003",
+   "issues": [
+    "weak evidence: best vector similarity 0.69 < 0.70 and no named identifier matched"
+   ],
+   "llm_called": false,
+   "model": null,
+   "question": "Why are styles closed and reopened around line breaks?",
+   "refused": true,
+   "removed_sentences": [],
+   "repo": "chalk/chalk",
+   "retrieved": [
+    {
+     "chunk_id": 103719,
+     "end_line": 92,
+     "keyword_rank": 5,
+     "kind": "section",
+     "label": "C1",
+     "path": "package.json",
+     "score": 0.029877,
+     "similarity": 0.6323,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 9
+    },
+    {
+     "chunk_id": 103784,
+     "end_line": 234,
+     "keyword_rank": 15,
+     "kind": "function",
+     "label": "C2",
+     "path": "source/index.js",
+     "score": 0.028958,
+     "similarity": 0.6698,
+     "start_line": 200,
+     "symbol": "applyStyle",
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103772,
+     "end_line": 15,
+     "keyword_rank": 9,
+     "kind": "module",
+     "label": "C3",
+     "path": "source/index.js",
+     "score": 0.028382,
+     "similarity": 0.6292,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 12
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+   }
+  },
+  {
+   "answer": "This function takes an optional `options` object as a parameter [C2:35-48]. If it is, the function calls the `applyOptions` function with the `chalk` object and the provided options [C4:52-62]. If not, it sets the default level to 0 using the `stdoutColor.level` property if available, or 0 otherwise [C1:236-241].\n\nTo override this default level, you can pass an `options` object when creating a new Chalk instance. For example, to set the default level to 5, you can use the following code:\n\nThis will create a new Chalk instance with a default colour level of 5 [C1:236-261].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103775,
+     "end_line": 48,
+     "inferred": true,
+     "kind": "group",
+     "label": "C2",
+     "path": "source/index.js",
+     "start_line": 35,
+     "symbol": "applyOptions, Chalk"
+    },
+    {
+     "chunk_id": 103776,
+     "end_line": 62,
+     "inferred": true,
+     "kind": "group",
+     "label": "C4",
+     "path": "source/index.js",
+     "start_line": 52,
+     "symbol": "chalkFactory, createChalk"
+    },
+    {
+     "chunk_id": 103785,
+     "end_line": 241,
+     "inferred": true,
+     "kind": "module",
+     "label": "C1",
+     "path": "source/index.js",
+     "start_line": 236,
+     "symbol": null
+    },
+    {
+     "chunk_id": 103785,
+     "end_line": 261,
+     "inferred": true,
+     "kind": "module",
+     "label": "C1",
+     "path": "source/index.js",
+     "start_line": 236,
+     "symbol": null
+    }
+   ],
+   "error": null,
+   "id": "ch-004",
+   "issues": [
+    "removed: C4:35-43 is outside source/index.js:52-63",
+    "citations_inferred",
+    "removed: not supported by any retrieved code (support 25%)",
+    "uncited_claim",
+    "removed: code example is not in the retrieved code"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How does a new Chalk instance decide its default colour level, and how can that be overridden?",
+   "refused": false,
+   "removed_sentences": [
+    "To determine the default colour level for a new Chalk instance, the code snippet in [C4:35-43] defines the `chalkFactory` function.",
+    "Inside this function, it checks if the `options.level` property is defined.",
+    "```javascript\nconst chalk = new Chalk({level: 5});\n```"
+   ],
+   "repo": "chalk/chalk",
+   "retrieved": [
+    {
+     "chunk_id": 103785,
+     "end_line": 262,
+     "keyword_rank": 4,
+     "kind": "module",
+     "label": "C1",
+     "path": "source/index.js",
+     "score": 0.030331,
+     "similarity": 0.7754,
+     "start_line": 236,
+     "symbol": null,
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 103775,
+     "end_line": 50,
+     "keyword_rank": 12,
+     "kind": "group",
+     "label": "C2",
+     "path": "source/index.js",
+     "score": 0.02904,
+     "similarity": 0.7921,
+     "start_line": 35,
+     "symbol": "applyOptions, Chalk",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103719,
+     "end_line": 92,
+     "keyword_rank": 24,
+     "kind": "section",
+     "label": "C3",
+     "path": "package.json",
+     "score": 0.025989,
+     "similarity": 0.7492,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 11
+    },
+    {
+     "chunk_id": 103776,
+     "end_line": 63,
+     "keyword_rank": 20,
+     "kind": "group",
+     "label": "C4",
+     "path": "source/index.js",
+     "score": 0.024846,
+     "similarity": 0.7222,
+     "start_line": 52,
+     "symbol": "chalkFactory, createChalk",
+     "vector_rank": 21
+    },
+    {
+     "chunk_id": 103774,
+     "end_line": 33,
+     "keyword_rank": 7,
+     "kind": "module",
+     "label": "C5",
+     "path": "source/index.js",
+     "score": 0.024826,
+     "similarity": 0.6527,
+     "start_line": 23,
+     "symbol": null,
+     "vector_rank": 41
+    },
+    {
+     "chunk_id": 103772,
+     "end_line": 15,
+     "keyword_rank": 26,
+     "kind": "module",
+     "label": "C6",
+     "path": "source/index.js",
+     "score": 0.024128,
+     "similarity": 0.7244,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 20
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 2696,
+    "output_tokens": 191
+   }
+  },
+  {
+   "answer": "The colour level can take values from 0 to 3. If an invalid value is provided, the function `assertValidLevel` will throw an error with the message \"The `level` should be an integer from 0 to 3\" [C4:17-19].",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103773,
+     "end_line": 19,
+     "inferred": true,
+     "kind": "function",
+     "label": "C4",
+     "path": "source/index.js",
+     "start_line": 17,
+     "symbol": "assertValidLevel"
+    }
+   ],
+   "error": null,
+   "id": "ch-005",
+   "issues": [
+    "uncited_claim",
+    "citations_inferred"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "What values can the colour level take and what happens with an invalid one?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "chalk/chalk",
+   "retrieved": [
+    {
+     "chunk_id": 103774,
+     "end_line": 33,
+     "keyword_rank": 1,
+     "kind": "module",
+     "label": "C1",
+     "path": "source/index.js",
+     "score": 0.029214,
+     "similarity": 0.6747,
+     "start_line": 23,
+     "symbol": null,
+     "vector_rank": 18
+    },
+    {
+     "chunk_id": 103772,
+     "end_line": 15,
+     "keyword_rank": 10,
+     "kind": "module",
+     "label": "C2",
+     "path": "source/index.js",
+     "score": 0.029211,
+     "similarity": 0.7099,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 7
+    },
+    {
+     "chunk_id": 103778,
+     "end_line": 105,
+     "keyword_rank": 12,
+     "kind": "function",
+     "label": "C3",
+     "path": "source/index.js",
+     "score": 0.02904,
+     "similarity": 0.7129,
+     "start_line": 86,
+     "symbol": "createModelConverters",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103773,
+     "end_line": 21,
+     "keyword_rank": 5,
+     "kind": "function",
+     "label": "C4",
+     "path": "source/index.js",
+     "score": 0.028372,
+     "similarity": 0.6759,
+     "start_line": 17,
+     "symbol": "assertValidLevel",
+     "vector_rank": 17
+    },
+    {
+     "chunk_id": 103785,
+     "end_line": 262,
+     "keyword_rank": 9,
+     "kind": "module",
+     "label": "C5",
+     "path": "source/index.js",
+     "score": 0.027826,
+     "similarity": 0.6826,
+     "start_line": 236,
+     "symbol": null,
+     "vector_rank": 15
+    },
+    {
+     "chunk_id": 103775,
+     "end_line": 50,
+     "keyword_rank": 11,
+     "kind": "group",
+     "label": "C6",
+     "path": "source/index.js",
+     "score": 0.027598,
+     "similarity": 0.6839,
+     "start_line": 35,
+     "symbol": "applyOptions, Chalk",
+     "vector_rank": 14
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 1947,
+    "output_tokens": 51
+   }
+  },
+  {
+   "answer": "To render RGB and HEX colours on terminals that only support 16 or 256 colours, the `ansi256` converter is used [C5:83-92]. This converter converts RGB values to an 8-bit unsigned number, which is then downsampled to the 16-color palette on terminals that only support basic colors (level 1) [C5:40-65]. The `ansi256` converter is defined in the `source/index.js` file, which is located at line 92 of the repository.",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103757,
+     "end_line": 92,
+     "inferred": true,
+     "kind": "interface",
+     "label": "C5",
+     "path": "source/index.d.ts",
+     "start_line": 83,
+     "symbol": "ChalkInstance"
+    },
+    {
+     "chunk_id": 103757,
+     "end_line": 65,
+     "inferred": true,
+     "kind": "interface",
+     "label": "C5",
+     "path": "source/index.d.ts",
+     "start_line": 40,
+     "symbol": "ChalkInstance"
+    }
+   ],
+   "error": null,
+   "id": "ch-006",
+   "issues": [
+    "citations_inferred",
+    "uncited_claim"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How are rgb and hex colours rendered on terminals that only support 16 or 256 colours?",
+   "refused": false,
+   "removed_sentences": [],
+   "repo": "chalk/chalk",
+   "retrieved": [
+    {
+     "chunk_id": 103778,
+     "end_line": 105,
+     "keyword_rank": 4,
+     "kind": "function",
+     "label": "C1",
+     "path": "source/index.js",
+     "score": 0.031498,
+     "similarity": 0.7385,
+     "start_line": 86,
+     "symbol": "createModelConverters",
+     "vector_rank": 3
+    },
+    {
+     "chunk_id": 103779,
+     "end_line": 121,
+     "keyword_rank": 11,
+     "kind": "module",
+     "label": "C2",
+     "path": "source/index.js",
+     "score": 0.02971,
+     "similarity": 0.7379,
+     "start_line": 107,
+     "symbol": null,
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103719,
+     "end_line": 92,
+     "keyword_rank": 12,
+     "kind": "section",
+     "label": "C3",
+     "path": "package.json",
+     "score": 0.027778,
+     "similarity": 0.6915,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 12
+    },
+    {
+     "chunk_id": 103780,
+     "end_line": 127,
+     "keyword_rank": 20,
+     "kind": "function",
+     "label": "C4",
+     "path": "source/index.js",
+     "score": 0.02337,
+     "similarity": 0.6268,
+     "start_line": 122,
+     "symbol": "styleFunction",
+     "vector_rank": 32
+    },
+    {
+     "chunk_id": 103757,
+     "end_line": 119,
+     "keyword_rank": 1,
+     "kind": "interface",
+     "label": "C5",
+     "path": "source/index.d.ts",
+     "score": 0.022766,
+     "similarity": 0.7434,
+     "start_line": 36,
+     "symbol": "ChalkInstance",
+     "vector_rank": 2
+    },
+    {
+     "chunk_id": 103784,
+     "end_line": 234,
+     "keyword_rank": 21,
+     "kind": "function",
+     "label": "C6",
+     "path": "source/index.js",
+     "score": 0.022762,
+     "similarity": 0.6149,
+     "start_line": 200,
+     "symbol": "applyStyle",
+     "vector_rank": 36
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 4048,
+    "output_tokens": 102
+   }
+  },
+  {
+   "answer": "To get a Chalk instance whose colour level follows stderr instead of stdout, you can use the `createChalk` function with the `stderrColor` option set to `true` [C1:238-259]. Here's how you can do it:",
+   "answerable": true,
+   "citation_correctness": {
+    "n_cited": 0,
+    "precision": null,
+    "recall": 0.0
+   },
+   "citations": [
+    {
+     "chunk_id": 103785,
+     "end_line": 259,
+     "inferred": true,
+     "kind": "module",
+     "label": "C1",
+     "path": "source/index.js",
+     "start_line": 238,
+     "symbol": null
+    }
+   ],
+   "error": null,
+   "id": "ch-007",
+   "issues": [
+    "citations_inferred",
+    "removed: C1:35-40 is outside source/index.js:236-262"
+   ],
+   "llm_called": true,
+   "model": "qwen2.5-coder-1.5b",
+   "question": "How do I get a Chalk instance whose colour level follows stderr instead of stdout?",
+   "refused": false,
+   "removed_sentences": [
+    "[C1:35-40] const chalk = createChalk({level: stderrColor ? stderrColor.level : 0});"
+   ],
+   "repo": "chalk/chalk",
+   "retrieved": [
+    {
+     "chunk_id": 103785,
+     "end_line": 262,
+     "keyword_rank": 4,
+     "kind": "module",
+     "label": "C1",
+     "path": "source/index.js",
+     "score": 0.030331,
+     "similarity": 0.7499,
+     "start_line": 236,
+     "symbol": null,
+     "vector_rank": 8
+    },
+    {
+     "chunk_id": 103775,
+     "end_line": 50,
+     "keyword_rank": 10,
+     "kind": "group",
+     "label": "C2",
+     "path": "source/index.js",
+     "score": 0.029437,
+     "similarity": 0.7622,
+     "start_line": 35,
+     "symbol": "applyOptions, Chalk",
+     "vector_rank": 6
+    },
+    {
+     "chunk_id": 103772,
+     "end_line": 15,
+     "keyword_rank": 9,
+     "kind": "module",
+     "label": "C3",
+     "path": "source/index.js",
+     "score": 0.027826,
+     "similarity": 0.7226,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 15
+    },
+    {
+     "chunk_id": 103719,
+     "end_line": 92,
+     "keyword_rank": 35,
+     "kind": "section",
+     "label": "C4",
+     "path": "package.json",
+     "score": 0.026151,
+     "similarity": 0.7652,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 4
+    },
+    {
+     "chunk_id": 103776,
+     "end_line": 63,
+     "keyword_rank": 21,
+     "kind": "group",
+     "label": "C5",
+     "path": "source/index.js",
+     "score": 0.024846,
+     "similarity": 0.7134,
+     "start_line": 52,
+     "symbol": "chalkFactory, createChalk",
+     "vector_rank": 20
+    },
+    {
+     "chunk_id": 103774,
+     "end_line": 33,
+     "keyword_rank": 6,
+     "kind": "module",
+     "label": "C6",
+     "path": "source/index.js",
+     "score": 0.024675,
+     "similarity": 0.6218,
+     "start_line": 23,
+     "symbol": null,
+     "vector_rank": 45
+    }
+   ],
+   "status": "partial",
+   "usage": {
+    "input_tokens": 2697,
+    "output_tokens": 74
+   }
+  },
+  {
+   "answer": "I couldn't find this in the repo.",
+   "answerable": false,
+   "citation_correctness": null,
+   "citations": [],
+   "error": null,
+   "id": "ch-008",
+   "issues": [
+    "weak evidence: best vector similarity 0.70 < 0.70 and no named identifier matched"
+   ],
+   "llm_called": false,
+   "model": null,
+   "question": "How does Chalk cache coloured output on disk to speed up repeated runs?",
+   "refused": true,
+   "removed_sentences": [],
+   "repo": "chalk/chalk",
+   "retrieved": [
+    {
+     "chunk_id": 103775,
+     "end_line": 50,
+     "keyword_rank": 11,
+     "kind": "group",
+     "label": "C1",
+     "path": "source/index.js",
+     "score": 0.027418,
+     "similarity": 0.614,
+     "start_line": 35,
+     "symbol": "applyOptions, Chalk",
+     "vector_rank": 15
+    },
+    {
+     "chunk_id": 103776,
+     "end_line": 63,
+     "keyword_rank": 8,
+     "kind": "group",
+     "label": "C2",
+     "path": "source/index.js",
+     "score": 0.026611,
+     "similarity": 0.5999,
+     "start_line": 52,
+     "symbol": "chalkFactory, createChalk",
+     "vector_rank": 24
+    },
+    {
+     "chunk_id": 103719,
+     "end_line": 92,
+     "keyword_rank": 25,
+     "kind": "section",
+     "label": "C3",
+     "path": "package.json",
+     "score": 0.025463,
+     "similarity": 0.6378,
+     "start_line": 1,
+     "symbol": null,
+     "vector_rank": 13
+    }
+   ],
+   "status": "not_found",
+   "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0
+   }
+  }
+ ],
+ "kind": "answers",
+ "label": "after-fix",
+ "summary": {
+  "answered": 37,
+  "answers_without_model_citation": 0.7428571428571429,
+  "citation_file_precision": 0.7592592592592592,
+  "citation_file_recall": 0.22857142857142856,
+  "correct_refusal_rate": 0.7142857142857143,
+  "errors": 0,
+  "false_refusal_rate": 0.18604651162790697,
+  "n": 50,
+  "n_answerable": 43,
+  "n_unanswerable": 7,
+  "verifier_removed_sentences_rate": 0.5135135135135135
+ }
+}
