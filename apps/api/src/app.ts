@@ -7,6 +7,8 @@ import { pool } from "./db.js";
 import { redis, createSubscriber } from "./redis.js";
 import { config, eventsChannel } from "./config.js";
 import { parseGithubUrl } from "./github.js";
+import { authRouter, loadUser, originGuard, requireLogin } from "./auth.js";
+import { admit, checkRepoOnGithub, type Admission } from "./limits.js";
 import { buildTree, key as docKey, renderExport, renderFile, renderFolder, renderRepo, type DocsData } from "./docs.js";
 
 const submitSchema = z.object({ url: z.string().min(1).max(200) });
@@ -26,17 +28,33 @@ const searchSchema = z.object({
   kind: z.string().max(30).optional(),
 });
 
-export function createApp() {
+export function createApp(opts: { fetchImpl?: typeof fetch } = {}) {
   const app = express();
   app.disable("x-powered-by");
-  app.use(cors({ origin: config.corsOrigin }));
+  // Only trust X-Forwarded-For when the number of proxy hops is configured; otherwise clients could spoof their IP
+  // and walk around every per-IP limit.
+  if (config.trustProxy > 0) app.set("trust proxy", config.trustProxy);
+  app.use((_req, res, next) => {
+    res.set({
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+      "Referrer-Policy": "no-referrer",
+      "Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'",
+      "Cross-Origin-Resource-Policy": "same-site",
+    });
+    next();
+  });
+  app.use(cors({ origin: config.corsOrigin, credentials: true }));
   app.use(express.json({ limit: "10kb" }));
+  app.use(loadUser);
+  app.use(originGuard);
+  app.use(authRouter(opts.fetchImpl));
 
   app.get("/health", async (_req, res) => {
     try {
       await pool.query("SELECT 1");
-      await redis.ping();
-      res.json({ ok: true });
+      if (!config.demoMode) await redis.ping();       // a read-only demo needs no queue
+      res.json({ ok: true, demoMode: config.demoMode });
     } catch {
       res.status(503).json({ ok: false });
     }
@@ -45,7 +63,7 @@ export function createApp() {
   // Submissions are expensive (clone + parse): tight per-IP limit.
   const submitLimiter = rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: true, legacyHeaders: false });
 
-  app.post("/repos", submitLimiter, async (req, res) => {
+  app.post("/repos", submitLimiter, requireLogin, async (req, res) => {
     const body = submitSchema.safeParse(req.body);
     const parsed = body.success ? parseGithubUrl(body.data.url) : null;
     if (!parsed) {
@@ -54,7 +72,14 @@ export function createApp() {
     }
 
     try {
-      const out = await enqueueAnalysis({ url: parsed.url, fullName: parsed.fullName }, "auto");
+      const known = await pool.query("SELECT id FROM repos WHERE url = $1", [parsed.url]);
+      const gate = await admit(req, { checkRepo: known.rowCount === 0 ? parsed : undefined, fetchImpl: opts.fetchImpl });
+      if (!gate.ok) {
+        if (gate.retryAfter) res.set("Retry-After", String(gate.retryAfter));
+        res.status(gate.status).json({ error: gate.error });
+        return;
+      }
+      const out = await enqueueAnalysis({ url: parsed.url, fullName: parsed.fullName }, "auto", gate.admission);
       res.status(202).json(out);
     } catch (err) {
       console.error(err);
@@ -64,7 +89,7 @@ export function createApp() {
 
   // Create (or reuse) the analysis job of a repo. The schema allows ONE queued/running job per repo: when one is already
   // active its id is returned, so clicking "analyse" twice just watches the same job.
-  async function enqueueAnalysis(target: { url?: string; fullName?: string; repoId?: number }, mode: "auto" | "full") {
+  async function enqueueAnalysis(target: { url?: string; fullName?: string; repoId?: number }, mode: "auto" | "full", who?: Admission) {
     const client = await pool.connect();
     try {
       await client.query("BEGIN");
@@ -88,7 +113,9 @@ export function createApp() {
       }
       let jobId: string;
       try {
-        const job = await client.query("INSERT INTO analysis_jobs (repo_id, requested_mode) VALUES ($1, $2) RETURNING id", [repoId, mode]);
+        const job = await client.query(
+          "INSERT INTO analysis_jobs (repo_id, requested_mode, requested_by, requested_by_key) VALUES ($1, $2, $3, $4) RETURNING id",
+          [repoId, mode, who?.userId ?? null, who?.key ?? null]);
         jobId = job.rows[0].id;
         await client.query("COMMIT");
       } catch (e) {
@@ -112,7 +139,7 @@ export function createApp() {
   const reanalyzeLimiter = rateLimit({ windowMs: 60_000, limit: 6, standardHeaders: true, legacyHeaders: false });
 
   // Re-analyse an existing repo. mode=auto re-processes only what changed since the last analysis; mode=full redoes everything.
-  app.post("/repos/:id/reanalyze", reanalyzeLimiter, async (req, res) => {
+  app.post("/repos/:id/reanalyze", reanalyzeLimiter, requireLogin, async (req, res) => {
     const id = idParam(req.params.id);
     if (!id) {
       res.status(400).json({ error: "Invalid repo id" });
@@ -129,7 +156,13 @@ export function createApp() {
       return;
     }
     try {
-      res.status(202).json(await enqueueAnalysis({ repoId: id }, body.data.mode));
+      const gate = await admit(req, { fetchImpl: opts.fetchImpl });
+      if (!gate.ok) {
+        if (gate.retryAfter) res.set("Retry-After", String(gate.retryAfter));
+        res.status(gate.status).json({ error: gate.error });
+        return;
+      }
+      res.status(202).json(await enqueueAnalysis({ repoId: id }, body.data.mode, gate.admission));
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "Could not create job" });
@@ -776,12 +809,25 @@ export function createApp() {
   });
 
   // Server-Sent Events: current state first, then live updates published by the worker.
+  const sseOpen = new Map<string, number>();
   app.get("/jobs/:id/events", async (req, res) => {
     const id = Number(req.params.id);
     if (!Number.isInteger(id) || id <= 0) {
       res.status(400).json({ error: "Invalid job id" });
       return;
     }
+    // Each stream holds a Redis connection: cap them per client so a few tabs cannot exhaust the pool.
+    const ip = req.ip ?? "unknown";
+    if ((sseOpen.get(ip) ?? 0) >= config.sseMaxPerIp) {
+      res.status(429).json({ error: "Too many open progress streams" });
+      return;
+    }
+    sseOpen.set(ip, (sseOpen.get(ip) ?? 0) + 1);
+    res.on("close", () => {
+      const n = (sseOpen.get(ip) ?? 1) - 1;
+      if (n <= 0) sseOpen.delete(ip);
+      else sseOpen.set(ip, n);
+    });
     res.set({
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
