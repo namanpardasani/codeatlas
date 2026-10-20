@@ -188,6 +188,27 @@
 - What makes the job idempotent? Unique (repo_id, path) + ON CONFLICT upsert + delete of vanished files in one transaction.
 - How do you stop SSRF? Allowlist of exactly https://github.com/<owner>/<repo>, no userinfo/port/query, repo name can't start with `-` (git option injection), re-validated in the worker, protocol.allow=never except https.
 
+## Day 7: incremental re-analysis and generated docs
+- **Layout:** `analyzer/analysis.py` (pipeline body, `PIPELINE_VERSION=7`), `analyzer/incremental.py` (diff), `analyzer/docs/` (facts, extractive, guard, prompts, generate), `docs_cli.py`, `bench_reindex.py`. Migrations 009 (job stats, `file_tokens`, `summary_cache`, `doc_summaries`, `repo_facts`) and 010 (one queued/running job per repo; it already existed in the dev DB unversioned, adopted idempotently). API: `POST /repos/:id/reanalyze`, `GET /repos/:id/analyses`, `/repos/:id/docs/{status,tree,page,export.md}`. UI: `ReanalyzePanel`, `DocsPanel`, `ui/Markdown`.
+- **Diff by content hash:** added / modified / deleted / renamed / unchanged. Renames pair identical-content files (name, then folder similarity). Rename+edit is treated as delete+add (limitation). Renamed files keep their rows and are only re-chunked (the path is in every chunk header).
+- **Global stages always recompute** (resolution, graph, duplicates via stored `file_tokens`, hotspots, git stats) from fresh plus reused data; that is why incremental equals full. A test suite (22 tests, random edit sequences, mutation-checked) enforces it.
+- **Forced full:** requested, first analysis, previous run not `ready` (crash guard), or `pipeline_version` changed.
+- **Docs:** bottom-up symbol -> file -> folder -> repo. Merkle input hashes; reuse keyed by (input_hash, prompt_version, model) via the doc row, then the shared `summary_cache`. Per-job call cap `DOCS_MAX_CALLS` (default 20), priority repo > folders > important files > complex symbols. Cap hit, LLM error or guard rejection -> deterministic extractive summary; the job never fails. Facts (entry points, run hints, README excerpt) are copied literally, no LLM. Docs run after the job is marked done.
+- **Guard (`docs/guard.py`):** drops sentences naming symbols/paths/URLs absent from the material, sentences with unsupported wording, ungrounded sentences, invented technical constructs; checks repo entry points; max 5 sentences / 900 chars. Word overlap cannot catch every error, so the footer says summaries are screened, not verified. `docs-v2` invalidates older summaries.
+- **Security:** generated text is HTML-escaped in exports; the web Markdown renderer blanks all URLs except `doc:` and renders no images; repo contents are untrusted prompt input (injection test: "PWNED." rejected).
+
+### Failure answers (Day 7)
+- LLM down / cap hit / guard rejects: extractive summary, docs status `partial`, job still done.
+- Crash mid-incremental: repo not `ready` -> next run is full.
+- Pipeline version bump: next run is full, docs summaries regenerate if the prompt version changed.
+- Second re-analysis request while one runs: API returns the active job.
+
+### Interview Q&A (Day 7)
+- Why content hashes, not mtimes/git diff? Work from any clone, detect renames, and the same hash keys the caches.
+- How is invalidation correct? A summary's input hash covers its material and children's hashes, so any change below changes everything above (Merkle).
+- Why cap LLM calls? Free-tier/latency/cost bound; the fallback keeps output complete.
+- How do you keep generated docs honest? Literal facts, guard, extractive fallback, honest footer; limits stated.
+
 ## Progress log
 - 2026-10-16 Day 1, Step 1: monorepo folders, docker-compose.yml, .env.example. Postgres+pgvector (0.8.7) and Redis healthy.
 - 2026-10-16 Day 1 complete: schema + migrate.sh, Express API (POST /repos, GET /jobs/:id, SSE), Python worker (Streams, safe clone, inventory), React progress UI. Verified end to end on octocat/Hello-World. 21 API tests + 22 worker tests pass.
@@ -199,3 +220,4 @@
 - 2026-10-19 Day 5 complete: AST-aware chunker + fixed baseline, local embeddings (bge-small, measured ~3 chunks/s on this CPU), pgvector HNSW + GIN, hybrid RRF search with switchable mode/chunking, search service + API + UI. Verified on psf/requests (1213 chunks, 783 embedded in ~4 min first time, 0 on re-run; ~15 ms/query). Tests: worker 373, API 37, web builds. Quizzes dropped by request.
 - 2026-10-19 Day 6 (build): LLM layer, usage caps, RAG pipeline with evidence refusal, injection-hardened prompt, citation verifier (mutation-tested), SSE chat API with sessions, chat UI + code viewer. Tests: worker 483, API 43. Bug found by running the real thing: a test cleanup deleted the whole embedding cache (fixed).
 - 2026-10-19 Day 6 complete: chat with streaming, verified + inferred citations, injection-hardened prompt, sessions/history, code viewer; validated against a real local LLM (llama.cpp + Qwen2.5-Coder-1.5B, free) which exposed 8 failure modes (see "Known RAG failure modes"), all fixed or documented. Also fixed an intermittent test-suite hang (stdlib reverse-DNS in http.server under WSL's flaky DNS; the production search service had the same startup risk). Tests: worker 512, API 43, web builds.
+- 2026-10-20 Day 7 complete: incremental re-analysis (equivalent to full, tested), docs generation with caching/budget/guards, reanalyze + docs APIs, docs viewer, Markdown export. psf/requests, 5-file change: 1.7 s incremental vs 238 s full cold cache (-99%) and 3-4.6 s full warm cache (-45-64%); most of the saving is the vector cache. Live p-limit unchanged re-analysis: 90 ms, 16 files reused, 0 embedded (full: 19.7 s). Real local LLM exposed invented details ("generator function"), fixed by CLAIM_TERMS and entry-point check (docs-v2). Tests: worker 593, API 62. Docs viewer not viewed in a browser.
