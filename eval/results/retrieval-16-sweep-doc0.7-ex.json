@@ -1,0 +1,3791 @@
+{
+ "config": {
+  "ast_max_chars": 1800,
+  "doc_weight": 0.7,
+  "embedder": "BAAI/bge-small-en-v1.5",
+  "filter": {
+   "exclude_tag": "heldout",
+   "only_tag": null
+  },
+  "k": 10,
+  "n_questions": 32,
+  "rerank_candidates": 20,
+  "reranker": null,
+  "rrf_k": 60,
+  "variants": [
+   "ast/hybrid",
+   "fixed/hybrid"
+  ]
+ },
+ "dataset_hash": "c21d34b17debc47fa496441f6eca7025f5d6aac5ef2c6a611c92ac323e16f1a3",
+ "git_sha": "7600365",
+ "id": 16,
+ "items": {
+  "ast/hybrid": [
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-001",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       186,
+       228
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "SessionRedirectMixin.resolve_redirects"
+     },
+     {
+      "lines": [
+       286,
+       307
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "SessionRedirectMixin.resolve_redirects"
+     },
+     {
+      "lines": [
+       876,
+       889
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.is_redirect, Response.is_permanent_redirect"
+     },
+     {
+      "lines": [
+       790,
+       829
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.send"
+     },
+     {
+      "lines": [
+       226,
+       262
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "SessionRedirectMixin.resolve_redirects"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-003",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       370,
+       392
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "SessionRedirectMixin.rebuild_method"
+     },
+     {
+      "lines": [
+       707,
+       748
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": "HTTPAdapter.send"
+     },
+     {
+      "lines": [
+       765,
+       799
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.__init__"
+     },
+     {
+      "lines": [
+       24,
+       47
+      ],
+      "path": "src/requests/api.py",
+      "relevant": false,
+      "symbol": "request"
+     },
+     {
+      "lines": [
+       790,
+       829
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.send"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-004",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       752,
+       792
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "Session.send"
+     },
+     {
+      "lines": [
+       260,
+       288
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "SessionRedirectMixin.resolve_redirects"
+     },
+     {
+      "lines": [
+       790,
+       829
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "Session.send"
+     },
+     {
+      "lines": [
+       505,
+       555
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.__enter__, Session.__exit__, Session.prepare_request"
+     },
+     {
+      "lines": [
+       634,
+       667
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": "HTTPAdapter.send"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0
+    ],
+    "id": "req-005",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       557,
+       594
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.request"
+     },
+     {
+      "lines": [
+       619,
+       653
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.request"
+     },
+     {
+      "lines": [
+       76,
+       105
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "merge_setting"
+     },
+     {
+      "lines": [
+       505,
+       555
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.__enter__, Session.__exit__, Session.prepare_request"
+     },
+     {
+      "lines": [
+       752,
+       792
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.send"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-007",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       576,
+       610
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": "PreparedRequest.prepare_body"
+     },
+     {
+      "lines": [
+       24,
+       47
+      ],
+      "path": "src/requests/api.py",
+      "relevant": false,
+      "symbol": "request"
+     },
+     {
+      "lines": [
+       102,
+       149
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     },
+     {
+      "lines": [
+       645,
+       652
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": "PreparedRequest.prepare_body"
+     },
+     {
+      "lines": [
+       117,
+       134
+      ],
+      "path": "src/requests/api.py",
+      "relevant": false,
+      "symbol": "post"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0,
+     1
+    ],
+    "id": "req-008",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       654,
+       668
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "PreparedRequest.prepare_content_length"
+     },
+     {
+      "lines": [
+       608,
+       647
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": "PreparedRequest.prepare_body"
+     },
+     {
+      "lines": [
+       914,
+       951
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.iter_content"
+     },
+     {
+      "lines": [
+       569,
+       591
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "get_encoding_from_headers"
+     },
+     {
+      "lines": [
+       645,
+       652
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": "PreparedRequest.prepare_body"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-010",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1144,
+       1171
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": "Response.raise_for_status"
+     },
+     {
+      "lines": [
+       707,
+       748
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": "HTTPAdapter.send"
+     },
+     {
+      "lines": [
+       861,
+       874
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.ok"
+     },
+     {
+      "lines": [
+       72,
+       106
+      ],
+      "path": "src/requests/status_codes.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       837,
+       845
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.__bool__"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0
+    ],
+    "id": "req-011",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1091,
+       1124
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.json"
+     },
+     {
+      "lines": [
+       1053,
+       1089
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": "Response.text"
+     },
+     {
+      "lines": [
+       633,
+       671
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "get_unicode_from_response"
+     },
+     {
+      "lines": [
+       765,
+       799
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.__init__"
+     },
+     {
+      "lines": [
+       732,
+       763
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-013",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       665,
+       709
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": "HTTPAdapter.send"
+     },
+     {
+      "lines": [
+       82,
+       150
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": "Timeout, ConnectTimeout, ReadTimeout\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026"
+     },
+     {
+      "lines": [
+       45,
+       71
+      ],
+      "path": "src/requests/api.py",
+      "relevant": false,
+      "symbol": "request"
+     },
+     {
+      "lines": [
+       592,
+       621
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.request"
+     },
+     {
+      "lines": [
+       634,
+       667
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": "HTTPAdapter.send"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-014",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       307,
+       347
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": "HTTPAdapter.cert_verify"
+     },
+     {
+      "lines": [
+       122,
+       155
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": "BaseAdapter"
+     },
+     {
+      "lines": [
+       455,
+       482
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": "HTTPAdapter.get_connection_with_tls_context"
+     },
+     {
+      "lines": [
+       345,
+       363
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": "HTTPAdapter.cert_verify"
+     },
+     {
+      "lines": [
+       634,
+       667
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": "HTTPAdapter.send"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 5,
+    "found": [
+     0
+    ],
+    "id": "req-016",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       565,
+       597
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": "HTTPAdapter.request_url"
+     },
+     {
+      "lines": [
+       911,
+       939
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "resolve_proxies"
+     },
+     {
+      "lines": [
+       810,
+       838
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "should_bypass_proxies"
+     },
+     {
+      "lines": [
+       480,
+       510
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": "HTTPAdapter.get_connection_with_tls_context"
+     },
+     {
+      "lines": [
+       885,
+       908
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": "select_proxy"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-017",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       273,
+       315
+      ],
+      "path": "src/requests/auth.py",
+      "relevant": true,
+      "symbol": "HTTPDigestAuth.handle_401"
+     },
+     {
+      "lines": [
+       158,
+       199
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": "HTTPAdapter"
+     },
+     {
+      "lines": [
+       592,
+       621
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.request"
+     },
+     {
+      "lines": [
+       82,
+       150
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": "Timeout, ConnectTimeout, ReadTimeout\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026"
+     },
+     {
+      "lines": [
+       442,
+       479
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.__init__"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "req-018",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       102,
+       149
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     },
+     {
+      "lines": [
+       547,
+       566
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "_parse_content_type_header"
+     },
+     {
+      "lines": [
+       765,
+       799
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.__init__"
+     },
+     {
+      "lines": [
+       569,
+       591
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "get_encoding_from_headers"
+     },
+     {
+      "lines": [
+       645,
+       652
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "PreparedRequest.prepare_body"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-019",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       229,
+       248
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": true,
+      "symbol": "RequestsCookieJar.set"
+     },
+     {
+      "lines": [
+       479,
+       491
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": false,
+      "symbol": "_copy_cookie_jar"
+     },
+     {
+      "lines": [
+       579,
+       601
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": false,
+      "symbol": "cookiejar_from_dict"
+     },
+     {
+      "lines": [
+       382,
+       389
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": false,
+      "symbol": "RequestsCookieJar.set_cookie"
+     },
+     {
+      "lines": [
+       604,
+       625
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": false,
+      "symbol": "merge_cookies"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0,
+     1
+    ],
+    "id": "pl-001",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       133,
+       148
+      ],
+      "path": "index.js",
+      "relevant": false,
+      "symbol": "limitFunction, validateConcurrency"
+     },
+     {
+      "lines": [
+       3,
+       49
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       1,
+       58
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       34
+      ],
+      "path": "index.test-d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       47,
+       93
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "pl-003",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       3,
+       49
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       1,
+       1
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       47,
+       93
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       366,
+       388
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "inputs"
+     },
+     {
+      "lines": [
+       1,
+       58
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0
+    ],
+    "id": "pl-004",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       390,
+       483
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       187,
+       240
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       3,
+       49
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       106,
+       185
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       25,
+       55
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "checkId, startContext"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0
+    ],
+    "id": "pl-006",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       3,
+       49
+      ],
+      "path": "index.js",
+      "relevant": false,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       1,
+       34
+      ],
+      "path": "index.test-d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       390,
+       483
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       133,
+       148
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "limitFunction, validateConcurrency"
+     },
+     {
+      "lines": [
+       249,
+       300
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 6,
+    "found": [
+     0
+    ],
+    "id": "pl-007",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       3,
+       49
+      ],
+      "path": "index.js",
+      "relevant": false,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       91,
+       131
+      ],
+      "path": "index.js",
+      "relevant": false,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       390,
+       483
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       302,
+       364
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "inputs"
+     },
+     {
+      "lines": [
+       25,
+       55
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "checkId, startContext"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "pl-008",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       1,
+       1
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       3,
+       49
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       47,
+       93
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       1,
+       58
+      ],
+      "path": "package.json",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       91,
+       131
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "id-001",
+    "n_targets": 1,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       244,
+       256
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": true,
+      "symbol": "Signer.unsign"
+     },
+     {
+      "lines": [
+       69,
+       104
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer"
+     },
+     {
+      "lines": [
+       72,
+       116
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimestampSigner.unsign"
+     },
+     {
+      "lines": [
+       114,
+       158
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimestampSigner.unsign"
+     },
+     {
+      "lines": [
+       215,
+       225
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer.get_signature, Signer.sign"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "id-002",
+    "n_targets": 1,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       182,
+       213
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": true,
+      "symbol": "Signer.derive_key"
+     },
+     {
+      "lines": [
+       129,
+       173
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer.__init__"
+     },
+     {
+      "lines": [
+       76,
+       108
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer"
+     },
+     {
+      "lines": [
+       106,
+       127
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer"
+     },
+     {
+      "lines": [
+       190,
+       234
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer.__init__"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-004",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       72,
+       83
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": false,
+      "symbol": "URLSafeSerializer, URLSafeTimedSerializer"
+     },
+     {
+      "lines": [
+       15,
+       69
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": true,
+      "symbol": "URLSafeSerializerMixin"
+     },
+     {
+      "lines": [
+       1,
+       12
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       17
+      ],
+      "path": "src/itsdangerous/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       28,
+       38
+      ],
+      "path": "src/itsdangerous/encoding.py",
+      "relevant": false,
+      "symbol": "base64_decode"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-006",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       69,
+       104
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer"
+     },
+     {
+      "lines": [
+       287,
+       307
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": true,
+      "symbol": "Serializer.iter_unsigners"
+     },
+     {
+      "lines": [
+       190,
+       234
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer.__init__"
+     },
+     {
+      "lines": [
+       40,
+       71
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer"
+     },
+     {
+      "lines": [
+       349,
+       365
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer.loads_unsafe"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "id-007",
+    "n_targets": 1,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       1,
+       19
+      ],
+      "path": "src/itsdangerous/exc.py",
+      "relevant": true,
+      "symbol": "BadData"
+     },
+     {
+      "lines": [
+       185,
+       220
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimedSerializer.loads"
+     },
+     {
+      "lines": [
+       92,
+       106
+      ],
+      "path": "src/itsdangerous/exc.py",
+      "relevant": true,
+      "symbol": "BadPayload"
+     },
+     {
+      "lines": [
+       328,
+       343
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer.loads"
+     },
+     {
+      "lines": [
+       114,
+       158
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimestampSigner.unsign"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-008",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       28,
+       38
+      ],
+      "path": "src/itsdangerous/encoding.py",
+      "relevant": true,
+      "symbol": "base64_decode"
+     },
+     {
+      "lines": [
+       15,
+       69
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": false,
+      "symbol": "URLSafeSerializerMixin"
+     },
+     {
+      "lines": [
+       1,
+       17
+      ],
+      "path": "src/itsdangerous/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       20,
+       25
+      ],
+      "path": "src/itsdangerous/encoding.py",
+      "relevant": true,
+      "symbol": "base64_encode"
+     },
+     {
+      "lines": [
+       72,
+       83
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": false,
+      "symbol": "URLSafeSerializer, URLSafeTimedSerializer"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0
+    ],
+    "id": "id-009",
+    "n_targets": 1,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       69,
+       104
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer"
+     },
+     {
+      "lines": [
+       190,
+       234
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer.__init__"
+     },
+     {
+      "lines": [
+       185,
+       220
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": "TimedSerializer.loads"
+     },
+     {
+      "lines": [
+       40,
+       71
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer"
+     },
+     {
+      "lines": [
+       349,
+       365
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer.loads_unsafe"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "ch-001",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       15
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       86,
+       105
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": "createModelConverters"
+     },
+     {
+      "lines": [
+       107,
+       121
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       236,
+       262
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 5,
+    "found": [
+     0
+    ],
+    "id": "ch-002",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       236,
+       262
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       52,
+       63
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": "chalkFactory, createChalk"
+     },
+     {
+      "lines": [
+       35,
+       50
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": "applyOptions, Chalk"
+     },
+     {
+      "lines": [
+       200,
+       234
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "applyStyle"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0
+    ],
+    "id": "ch-004",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       236,
+       262
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       35,
+       50
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "applyOptions, Chalk"
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       52,
+       63
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": "chalkFactory, createChalk"
+     },
+     {
+      "lines": [
+       23,
+       33
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0
+    ],
+    "id": "ch-005",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       23,
+       33
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       15
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       86,
+       105
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": "createModelConverters"
+     },
+     {
+      "lines": [
+       17,
+       21
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "assertValidLevel"
+     },
+     {
+      "lines": [
+       236,
+       262
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "ch-007",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       236,
+       262
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       35,
+       50
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "applyOptions, Chalk"
+     },
+     {
+      "lines": [
+       1,
+       15
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       52,
+       63
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "chalkFactory, createChalk"
+     }
+    ],
+    "warnings": []
+   }
+  ],
+  "fixed/hybrid": [
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0
+    ],
+    "id": "req-001",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       769,
+       819
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       116,
+       154
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       191,
+       234
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       69,
+       150
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       815,
+       865
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 6,
+    "found": [
+     0
+    ],
+    "id": "req-003",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       774,
+       814
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       769,
+       819
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       689,
+       734
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       732,
+       773
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       56
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-004",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       732,
+       773
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       70,
+       125
+      ],
+      "path": "src/requests/api.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       643,
+       695
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       689,
+       734
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       769,
+       819
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0
+    ],
+    "id": "req-005",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       70,
+       125
+      ],
+      "path": "src/requests/api.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       67,
+       119
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       643,
+       695
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       389,
+       456
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       488,
+       535
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-007",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       642,
+       684
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       561,
+       608
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       119,
+       162
+      ],
+      "path": "src/requests/api.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       544,
+       606
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       689,
+       734
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "req-008",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       604,
+       647
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       642,
+       684
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       544,
+       606
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1023,
+       1076
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       895,
+       934
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 8,
+    "found": [
+     0
+    ],
+    "id": "req-010",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       724,
+       748
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       809,
+       857
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       853,
+       899
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       685,
+       728
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       51,
+       114
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-011",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1069,
+       1111
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       774,
+       814
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       853,
+       899
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1023,
+       1076
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       895,
+       934
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-013",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       685,
+       728
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       646,
+       687
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       51,
+       114
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       41,
+       75
+      ],
+      "path": "src/requests/api.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       346,
+       410
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-014",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       292,
+       339
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       414,
+       448
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       445,
+       484
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       116,
+       162
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       334,
+       378
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-016",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       862,
+       925
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       563,
+       607
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       521,
+       569
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       821,
+       872
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       921,
+       986
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-017",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       290,
+       333
+      ],
+      "path": "src/requests/auth.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       160,
+       208
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       104,
+       156
+      ],
+      "path": "src/requests/auth.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       41,
+       75
+      ],
+      "path": "src/requests/api.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1375,
+       1418
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "req-018",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       544,
+       606
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       642,
+       684
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1080,
+       1135
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       426,
+       474
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       561,
+       608
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 7,
+    "found": [
+     0
+    ],
+    "id": "req-019",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       377,
+       421
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       453,
+       504
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       150,
+       199
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       335,
+       381
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       550,
+       612
+      ],
+      "path": "src/requests/cookies.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0,
+     1
+    ],
+    "id": "pl-001",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       120,
+       148
+      ],
+      "path": "index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       68,
+       155
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       60
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       34
+      ],
+      "path": "index.test-d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       58
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "pl-003",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       1,
+       60
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       58,
+       133
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       315,
+       376
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       204,
+       266
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       372,
+       467
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0
+    ],
+    "id": "pl-004",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       372,
+       467
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       80
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       60
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       68,
+       155
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       204,
+       266
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0
+    ],
+    "id": "pl-006",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       1,
+       34
+      ],
+      "path": "index.test-d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       372,
+       467
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       68,
+       155
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       120,
+       148
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       80
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 7,
+    "found": [
+     0
+    ],
+    "id": "pl-007",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       315,
+       376
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       60
+      ],
+      "path": "index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       58,
+       133
+      ],
+      "path": "index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       80
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       372,
+       467
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "pl-008",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       1,
+       60
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       58
+      ],
+      "path": "package.json",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       58,
+       133
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       204,
+       266
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       34
+      ],
+      "path": "index.test-d.ts",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "id-001",
+    "n_targets": 1,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       214,
+       266
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       49,
+       99
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       281,
+       328
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       186,
+       228
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       98,
+       142
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "id-002",
+    "n_targets": 1,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       176,
+       218
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       53,
+       94
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       130,
+       179
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       92,
+       133
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       199,
+       246
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-004",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       56,
+       83
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       61
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       17
+      ],
+      "path": "src/itsdangerous/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       54
+      ],
+      "path": "src/itsdangerous/encoding.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       164,
+       205
+      ],
+      "path": "pyproject.toml",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-006",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       281,
+       328
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       73,
+       116
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       44,
+       79
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       324,
+       372
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       199,
+       246
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "id-007",
+    "n_targets": 1,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       1,
+       65
+      ],
+      "path": "src/itsdangerous/exc.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       58,
+       106
+      ],
+      "path": "src/itsdangerous/exc.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       186,
+       228
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       98,
+       142
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       61
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-008",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       1,
+       54
+      ],
+      "path": "src/itsdangerous/encoding.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       56,
+       83
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       61
+      ],
+      "path": "src/itsdangerous/url_safe.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       17
+      ],
+      "path": "src/itsdangerous/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       214,
+       266
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 8,
+    "found": [
+     0
+    ],
+    "id": "id-009",
+    "n_targets": 1,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       199,
+       246
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       324,
+       372
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       281,
+       328
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       73,
+       116
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       242,
+       286
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 6,
+    "found": [
+     0
+    ],
+    "id": "ch-001",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       210,
+       256
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       54,
+       104
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       64
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       251,
+       262
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "ch-002",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       210,
+       256
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       64
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       54,
+       104
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       251,
+       262
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "ch-004",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       1,
+       64
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       54,
+       104
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       210,
+       256
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       251,
+       262
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "ch-005",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       1,
+       64
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       103,
+       173
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       54,
+       104
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       210,
+       256
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "ch-007",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       1,
+       64
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       54,
+       104
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       251,
+       262
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       210,
+       256
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   }
+  ]
+ },
+ "kind": "retrieval",
+ "label": "sweep-doc0.7-ex",
+ "summary": {
+  "ast/hybrid": {
+   "hit@1": 0.5,
+   "hit@10": 0.9375,
+   "hit@3": 0.78125,
+   "hit@5": 0.90625,
+   "hit@5_ci95": [
+    0.78125,
+    1.0
+   ],
+   "mrr": 0.6583333333333333,
+   "mrr_ci95": [
+    0.5328125,
+    0.7838541666666666
+   ],
+   "n": 32,
+   "recall@1": 0.46875,
+   "recall@10": 0.921875,
+   "recall@3": 0.703125,
+   "recall@5": 0.859375
+  },
+  "fixed/hybrid": {
+   "hit@1": 0.625,
+   "hit@10": 0.96875,
+   "hit@3": 0.75,
+   "hit@5": 0.78125,
+   "hit@5_ci95": [
+    0.625,
+    0.90625
+   ],
+   "mrr": 0.7068452380952381,
+   "mrr_ci95": [
+    0.5731026785714286,
+    0.8364955357142857
+   ],
+   "n": 32,
+   "recall@1": 0.5625,
+   "recall@10": 0.953125,
+   "recall@3": 0.71875,
+   "recall@5": 0.75
+  }
+ }
+}

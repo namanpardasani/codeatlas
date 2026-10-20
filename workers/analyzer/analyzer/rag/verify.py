@@ -28,6 +28,7 @@ from .evidence import IDENT_LIKE
 GROUP = re.compile(r"\[\s*(C\d+(?::\d+(?:-\d+)?)?(?:\s*[,;]\s*C\d+(?::\d+(?:-\d+)?)?)*)\s*\]")
 REF = re.compile(r"C(\d+)(?::(\d+)(?:-(\d+))?)?")
 BACKTICK = re.compile(r"`([^`\n]+)`")
+BACKTICK_SPAN = re.compile(r"`[^`\n]+`")
 IDENT = re.compile(r"[A-Za-z_][\w]*(?:\.[A-Za-z_]\w*)*")
 BULLET = re.compile(r"^(\s*(?:[-*+]|\d+[.)])\s+)")
 SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z`\[(\"'])")
@@ -147,8 +148,30 @@ def _split_sentences(line: str) -> list[str]:
     return out
 
 
+# Acronyms and constants a sentence asserts ("AES-128", "CBC", "TLS", "FORCE_COLOR"): specific claims that must appear
+# in the retrieved code. Day 9: a model answered "how does it encrypt with AES?" for a library that only signs.
+ACRONYM = re.compile(r"\b[A-Z][A-Z0-9_]+(?:-\d+)?\b")
+GENERIC_ACRONYMS = frozenset("""API APIS URL URLS URI HTTP HTTPS JSON XML HTML CSS CLI ID IDS IO OS UI FAQ README TODO NOTE ASCII UTF EOF
+CPU RAM GET POST PUT PATCH DELETE HEAD OPTIONS TRUE FALSE NULL NONE OK NOT AND OR PYTHON JAVASCRIPT TYPESCRIPT NODE
+JS TS PY SDK IDE PR OSS MIT""".split())
+
+
+def _acronyms_missing(sentence: str, blob: str) -> list[str]:
+    text = BACKTICK_SPAN.sub(" ", GROUP.sub("", sentence))
+    low = blob.lower()
+    out = []
+    for m in ACRONYM.finditer(text):
+        tok = m.group(0)
+        base = re.sub(r"-\d+$", "", tok)
+        if base in GENERIC_ACRONYMS or len(base) < 2:
+            continue
+        if base.lower() not in low:
+            out.append(tok)
+    return list(dict.fromkeys(out))
+
+
 def _symbols_missing(sentence: str, blob: str) -> list[str]:
-    missing = []
+    missing = _acronyms_missing(sentence, blob)
     for token in BACKTICK.findall(GROUP.sub("", sentence)):
         token = token.strip().removesuffix("()")
         if not IDENT.fullmatch(token):
@@ -181,8 +204,12 @@ def verify_answer(answer: str, chunks: list[ContextChunk]) -> Verified:
                 fence.append(raw)
                 body = [ln.strip() for ln in fence[1:-1] if len(ln.strip()) >= 4 and re.search(r"\w", ln)]
                 if body and sum(_norm(ln) in blob_norm for ln in body) < 0.6 * len(body):
-                    v.issues.append("code_not_in_repo")
-                out_lines.extend(fence)
+                    # invented code is a fabricated claim like any other sentence: drop it (Day 9: a model wrote a whole
+                    # asyncio example for a library with no async API and the old "keep and flag" rule let it through)
+                    v.removed.append("\n".join(fence))
+                    v.issues.append("removed: code example is not in the retrieved code")
+                else:
+                    out_lines.extend(fence)
                 in_fence, fence = False, []
             else:
                 in_fence, fence = True, [raw]
@@ -215,8 +242,9 @@ def verify_answer(answer: str, chunks: list[ContextChunk]) -> Verified:
             kept.append(clean)
         if kept:
             out_lines.append(prefix + " ".join(kept))
-    if in_fence:  # unterminated fence: keep what the model wrote
-        out_lines.extend(fence)
+    if in_fence:  # unterminated fence: cannot be checked, so it is not kept
+        v.removed.append("\n".join(fence))
+        v.issues.append("removed: unterminated code block")
 
     text = re.sub(r"\n{3,}", "\n\n", "\n".join(out_lines)).strip()
     v.citations = list(used.values())

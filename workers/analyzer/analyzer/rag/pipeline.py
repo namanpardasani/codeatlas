@@ -28,6 +28,16 @@ def wants_tests(*texts: str) -> bool:
     return bool(re.search(r"\b(tests?|testing|pytest|spec|unit)\b", " ".join(texts), re.I))
 
 
+DOC_INTENT = re.compile(r"\b(readme|docs?|documentation|documented|install(ation)?|usage|tutorial|examples?|changelog|"
+                        r"typescript|types?|typings|api reference|license)\b", re.I)
+
+
+def doc_weight_for(*texts: str) -> float:
+    """Questions about how the code WORKS prefer implementation over documentation; a question that asks for docs,
+    install steps, examples or types keeps documentation at full weight."""
+    return 1.0 if DOC_INTENT.search(" ".join(texts)) else config.RAG_DOC_WEIGHT
+
+
 def _chunk_info(c: ContextChunk) -> dict:
     h = c.hit
     return {"label": c.label, "chunk_id": h.chunk_id, "path": h.path, "start_line": c.shown_start,
@@ -68,7 +78,7 @@ def answer(conn, embedder, llm, repo_id: int, question: str, *, history: list[tu
         # "how does X work" is answered by source code; test files and docs would otherwise crowd it out
         tests_wanted = wants_tests(question, query)
         result = search(conn, embedder, repo_id, query, mode="hybrid", chunking="ast", limit=config.RAG_CANDIDATES,
-                        exclude_tests=not tests_wanted)
+                        exclude_tests=not tests_wanted, doc_weight=doc_weight_for(question, query))
         hits = result.hits
         if reranker and hits:
             hits = rerank_hits(hits, query, reranker)

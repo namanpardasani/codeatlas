@@ -41,7 +41,7 @@ log = logging.getLogger("analyzer.analysis")
 
 # Bump when parsing / chunking / storage semantics change: previous results are then not trusted and the next
 # analysis runs in full.
-PIPELINE_VERSION = 7
+PIPELINE_VERSION = 8
 
 Progress = Callable[[str, int], None]
 

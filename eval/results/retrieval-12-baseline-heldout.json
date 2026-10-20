@@ -1,0 +1,5280 @@
+{
+ "config": {
+  "ast_max_chars": 1800,
+  "embedder": "BAAI/bge-small-en-v1.5",
+  "filter": {
+   "exclude_tag": null,
+   "only_tag": "heldout"
+  },
+  "k": 10,
+  "n_questions": 11,
+  "rerank_candidates": 20,
+  "reranker": "Xenova/ms-marco-MiniLM-L-6-v2",
+  "rrf_k": 60,
+  "variants": [
+   "fixed/vector",
+   "fixed/keyword",
+   "fixed/hybrid",
+   "ast/vector",
+   "ast/keyword",
+   "ast/hybrid",
+   "fixed/hybrid+rerank",
+   "ast/hybrid+rerank"
+  ]
+ },
+ "dataset_hash": "c21d34b17debc47fa496441f6eca7025f5d6aac5ef2c6a611c92ac323e16f1a3",
+ "git_sha": "7600365",
+ "id": 12,
+ "items": {
+  "ast/hybrid": [
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0
+    ],
+    "id": "req-002",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1310,
+       1353
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       334,
+       368
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "SessionRedirectMixin.rebuild_proxies"
+     },
+     {
+      "lines": [
+       132,
+       152
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "SessionRedirectMixin.send, SessionRedirectMixin.get_redirect_target"
+     },
+     {
+      "lines": [
+       154,
+       184
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "SessionRedirectMixin.should_strip_auth"
+     },
+     {
+      "lines": [
+       226,
+       262
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "SessionRedirectMixin.resolve_redirects"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-006",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       831,
+       868
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "Session.merge_environment_settings"
+     },
+     {
+      "lines": [
+       911,
+       939
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "resolve_proxies"
+     },
+     {
+      "lines": [
+       636,
+       691
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     },
+     {
+      "lines": [
+       591,
+       634
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     },
+     {
+      "lines": [
+       873,
+       882
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "get_environ_proxies"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0,
+     1
+    ],
+    "id": "req-009",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1053,
+       1089
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.text"
+     },
+     {
+      "lines": [
+       1091,
+       1124
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": "Response.json"
+     },
+     {
+      "lines": [
+       765,
+       799
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.__init__"
+     },
+     {
+      "lines": [
+       140,
+       187
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": "quickstart.rst"
+     },
+     {
+      "lines": [
+       99,
+       138
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": "quickstart.rst"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "req-012",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       111,
+       156
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       33
+      ],
+      "path": "src/requests/compat.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1008,
+       1051
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     },
+     {
+      "lines": [
+       235,
+       293
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       295,
+       337
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-015",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       231,
+       280
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": "get_netrc_auth"
+     },
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": "authentication.rst"
+     },
+     {
+      "lines": [
+       221,
+       257
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": "quickstart.rst"
+     },
+     {
+      "lines": [
+       1048,
+       1090
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       309,
+       332
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "SessionRedirectMixin.rebuild_auth"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0,
+     1
+    ],
+    "id": "pl-002",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       111,
+       138
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       46
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": "LimitFunction"
+     },
+     {
+      "lines": [
+       142,
+       164
+      ],
+      "path": "recipes.md",
+      "relevant": false,
+      "symbol": "Recipes > Reusable limited function"
+     },
+     {
+      "lines": [
+       3,
+       49
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       113,
+       132
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "p-limit > API > limitFunction(fn, options) <sup>named export</sup>"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-005",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       249,
+       300
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       302,
+       364
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "inputs"
+     },
+     {
+      "lines": [
+       390,
+       483
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       46
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": "LimitFunction"
+     },
+     {
+      "lines": [
+       187,
+       240
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-003",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       185,
+       220
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimedSerializer.loads"
+     },
+     {
+      "lines": [
+       72,
+       116
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": "TimestampSigner.unsign"
+     },
+     {
+      "lines": [
+       114,
+       158
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": "TimestampSigner.unsign"
+     },
+     {
+      "lines": [
+       1,
+       28
+      ],
+      "path": "docs/timed.rst",
+      "relevant": false,
+      "symbol": "timed.rst"
+     },
+     {
+      "lines": [
+       190,
+       234
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer.__init__"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "id-005",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       104,
+       148
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": "concepts.rst"
+     },
+     {
+      "lines": [
+       76,
+       108
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer"
+     },
+     {
+      "lines": [
+       182,
+       213
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer.derive_key"
+     },
+     {
+      "lines": [
+       1,
+       51
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": "concepts.rst"
+     },
+     {
+      "lines": [
+       129,
+       173
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer.__init__"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 6,
+    "found": [
+     1
+    ],
+    "id": "ch-003",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       175,
+       190
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Styles > Modifiers"
+     },
+     {
+      "lines": [
+       173,
+       173
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Styles"
+     },
+     {
+      "lines": [
+       44,
+       110
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Usage"
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       182,
+       270
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "ChalkInstance"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0
+    ],
+    "id": "ch-006",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       36,
+       119
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "ChalkInstance"
+     },
+     {
+      "lines": [
+       253,
+       278
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "256 and Truecolor color support"
+     },
+     {
+      "lines": [
+       86,
+       105
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "createModelConverters"
+     },
+     {
+      "lines": [
+       117,
+       184
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "ChalkInstance"
+     },
+     {
+      "lines": [
+       107,
+       121
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   }
+  ],
+  "ast/hybrid+rerank": [
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-002",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       154,
+       184
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "SessionRedirectMixin.should_strip_auth"
+     },
+     {
+      "lines": [
+       221,
+       257
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": "quickstart.rst"
+     },
+     {
+      "lines": [
+       1310,
+       1353
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       309,
+       332
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "SessionRedirectMixin.rebuild_auth"
+     },
+     {
+      "lines": [
+       334,
+       368
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "SessionRedirectMixin.rebuild_proxies"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0
+    ],
+    "id": "req-006",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       636,
+       691
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     },
+     {
+      "lines": [
+       831,
+       868
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "Session.merge_environment_settings"
+     },
+     {
+      "lines": [
+       744,
+       767
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       1367,
+       1396
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       591,
+       634
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-009",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1091,
+       1124
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": "Response.json"
+     },
+     {
+      "lines": [
+       1053,
+       1089
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.text"
+     },
+     {
+      "lines": [
+       911,
+       961
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       896,
+       913
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.apparent_encoding, Response.iter_content"
+     },
+     {
+      "lines": [
+       140,
+       187
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": "quickstart.rst"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "req-012",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       295,
+       337
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       581,
+       660
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       1164,
+       1207
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       111,
+       156
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1008,
+       1051
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0
+    ],
+    "id": "req-015",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       221,
+       257
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": "quickstart.rst"
+     },
+     {
+      "lines": [
+       231,
+       280
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": "get_netrc_auth"
+     },
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": "authentication.rst"
+     },
+     {
+      "lines": [
+       1048,
+       1090
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       104,
+       153
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-002",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       78,
+       88
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "p-limit > API > limit.map(iterable, mapperFunction)"
+     },
+     {
+      "lines": [
+       142,
+       164
+      ],
+      "path": "recipes.md",
+      "relevant": false,
+      "symbol": "Recipes > Reusable limited function"
+     },
+     {
+      "lines": [
+       159,
+       165
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "p-limit > API > limitedFunction.clearQueue()"
+     },
+     {
+      "lines": [
+       302,
+       364
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "inputs"
+     },
+     {
+      "lines": [
+       366,
+       388
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "inputs"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-005",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       78,
+       88
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "p-limit > API > limit.map(iterable, mapperFunction)"
+     },
+     {
+      "lines": [
+       302,
+       364
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "inputs"
+     },
+     {
+      "lines": [
+       366,
+       388
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "inputs"
+     },
+     {
+      "lines": [
+       1,
+       46
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": "LimitFunction"
+     },
+     {
+      "lines": [
+       390,
+       483
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-003",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       22,
+       27
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimestampSigner"
+     },
+     {
+      "lines": [
+       1,
+       28
+      ],
+      "path": "docs/timed.rst",
+      "relevant": false,
+      "symbol": "timed.rst"
+     },
+     {
+      "lines": [
+       185,
+       220
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimedSerializer.loads"
+     },
+     {
+      "lines": [
+       45,
+       51
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": "TimestampSigner.sign"
+     },
+     {
+      "lines": [
+       72,
+       116
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": "TimestampSigner.unsign"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "id-005",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       104,
+       148
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": "concepts.rst"
+     },
+     {
+      "lines": [
+       76,
+       108
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer"
+     },
+     {
+      "lines": [
+       1,
+       51
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": "concepts.rst"
+     },
+     {
+      "lines": [
+       69,
+       104
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer"
+     },
+     {
+      "lines": [
+       129,
+       173
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer.__init__"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     1
+    ],
+    "id": "ch-003",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       200,
+       234
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "applyStyle"
+     },
+     {
+      "lines": [
+       65,
+       84
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       173,
+       173
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Styles"
+     },
+     {
+      "lines": [
+       175,
+       190
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Styles > Modifiers"
+     },
+     {
+      "lines": [
+       44,
+       110
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Usage"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 7,
+    "found": [
+     0
+    ],
+    "id": "ch-006",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       253,
+       278
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "256 and Truecolor color support"
+     },
+     {
+      "lines": [
+       36,
+       119
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "ChalkInstance"
+     },
+     {
+      "lines": [
+       117,
+       184
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "ChalkInstance"
+     },
+     {
+      "lines": [
+       12,
+       29
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "Options"
+     },
+     {
+      "lines": [
+       145,
+       151
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "API > supportsColor"
+     }
+    ],
+    "warnings": []
+   }
+  ],
+  "ast/keyword": [
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "req-002",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1098,
+       1119
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "_validate_header_part"
+     },
+     {
+      "lines": [
+       1,
+       23
+      ],
+      "path": "src/requests/_internal_utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1087,
+       1095
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "check_header_validity"
+     },
+     {
+      "lines": [
+       38,
+       109
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "RequestEncodingMixin"
+     },
+     {
+      "lines": [
+       407,
+       436
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "parse_list_header"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-006",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       831,
+       868
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "Session.merge_environment_settings"
+     },
+     {
+      "lines": [
+       636,
+       691
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     },
+     {
+      "lines": [
+       911,
+       939
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "resolve_proxies"
+     },
+     {
+      "lines": [
+       196,
+       244
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     },
+     {
+      "lines": [
+       591,
+       634
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 10,
+    "found": [
+     0
+    ],
+    "id": "req-009",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       557,
+       594
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "Session.request"
+     },
+     {
+      "lines": [
+       323,
+       358
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Request.__init__, Request.__repr__"
+     },
+     {
+      "lines": [
+       1053,
+       1089
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.text"
+     },
+     {
+      "lines": [
+       20,
+       39
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": "RequestException, InvalidJSONError"
+     },
+     {
+      "lines": [
+       424,
+       454
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "PreparedRequest.prepare, PreparedRequest.__repr__"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "req-012",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       60,
+       96
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": "check_compatibility"
+     },
+     {
+      "lines": [
+       111,
+       156
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       33
+      ],
+      "path": "src/requests/compat.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       57
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       295,
+       337
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-015",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       231,
+       280
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": "get_netrc_auth"
+     },
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": "authentication.rst"
+     },
+     {
+      "lines": [
+       221,
+       257
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": "quickstart.rst"
+     },
+     {
+      "lines": [
+       42,
+       81
+      ],
+      "path": "docs/dev/contributing.rst",
+      "relevant": false,
+      "symbol": "contributing.rst"
+     },
+     {
+      "lines": [
+       111,
+       158
+      ],
+      "path": "docs/conf.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0,
+     1
+    ],
+    "id": "pl-002",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       111,
+       138
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       3,
+       49
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       1,
+       46
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": "LimitFunction"
+     },
+     {
+      "lines": [
+       47,
+       93
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": "pLimit"
+     },
+     {
+      "lines": [
+       142,
+       164
+      ],
+      "path": "recipes.md",
+      "relevant": false,
+      "symbol": "Recipes > Reusable limited function"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-005",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       249,
+       300
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       187,
+       240
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       106,
+       185
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       390,
+       483
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       61,
+       91
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     1
+    ],
+    "id": "id-003",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       69,
+       104
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer"
+     },
+     {
+      "lines": [
+       190,
+       234
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer.__init__"
+     },
+     {
+      "lines": [
+       40,
+       71
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer"
+     },
+     {
+      "lines": [
+       72,
+       116
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": "TimestampSigner.unsign"
+     },
+     {
+      "lines": [
+       185,
+       220
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimedSerializer.loads"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 10,
+    "found": [
+     1
+    ],
+    "id": "id-005",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       182,
+       213
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer.derive_key"
+     },
+     {
+      "lines": [
+       1,
+       51
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": "concepts.rst"
+     },
+     {
+      "lines": [
+       104,
+       148
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": "concepts.rst"
+     },
+     {
+      "lines": [
+       40,
+       71
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer"
+     },
+     {
+      "lines": [
+       76,
+       108
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "ch-003",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       175,
+       190
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Styles > Modifiers"
+     },
+     {
+      "lines": [
+       1,
+       57
+      ],
+      "path": "benchmark.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       182,
+       270
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "ChalkInstance"
+     },
+     {
+      "lines": [
+       44,
+       110
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Usage"
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0
+    ],
+    "id": "ch-006",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       36,
+       119
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "ChalkInstance"
+     },
+     {
+      "lines": [
+       117,
+       184
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "ChalkInstance"
+     },
+     {
+      "lines": [
+       253,
+       278
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "256 and Truecolor color support"
+     },
+     {
+      "lines": [
+       86,
+       105
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "createModelConverters"
+     },
+     {
+      "lines": [
+       122,
+       143
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "API > chalk.level"
+     }
+    ],
+    "warnings": []
+   }
+  ],
+  "ast/vector": [
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-002",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       154,
+       184
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "SessionRedirectMixin.should_strip_auth"
+     },
+     {
+      "lines": [
+       1310,
+       1353
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       226,
+       262
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "SessionRedirectMixin.resolve_redirects"
+     },
+     {
+      "lines": [
+       309,
+       332
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": "SessionRedirectMixin.rebuild_auth"
+     },
+     {
+      "lines": [
+       1882,
+       1965
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0
+    ],
+    "id": "req-006",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       873,
+       882
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "get_environ_proxies"
+     },
+     {
+      "lines": [
+       831,
+       868
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": "Session.merge_environment_settings"
+     },
+     {
+      "lines": [
+       911,
+       939
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": "resolve_proxies"
+     },
+     {
+      "lines": [
+       81,
+       97
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       50,
+       102
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "req-009",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1091,
+       1124
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": "Response.json"
+     },
+     {
+      "lines": [
+       1053,
+       1089
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": "Response.text"
+     },
+     {
+      "lines": [
+       1008,
+       1037
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": "guess_json_utf"
+     },
+     {
+      "lines": [
+       1002,
+       1005
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       725,
+       764
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-012",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       707,
+       748
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": "HTTPAdapter.send"
+     },
+     {
+      "lines": [
+       111,
+       156
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1008,
+       1051
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": "advanced.rst"
+     },
+     {
+      "lines": [
+       581,
+       660
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": "HISTORY.md"
+     },
+     {
+      "lines": [
+       82,
+       150
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": "Timeout, ConnectTimeout, ReadTimeout\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-015",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       231,
+       280
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": "get_netrc_auth"
+     },
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": "authentication.rst"
+     },
+     {
+      "lines": [
+       221,
+       257
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": "quickstart.rst"
+     },
+     {
+      "lines": [
+       81,
+       97
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       146,
+       155
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": "authentication.rst"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 9,
+    "found": [
+     0,
+     1
+    ],
+    "id": "pl-002",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       111,
+       138
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       485,
+       495
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       142,
+       164
+      ],
+      "path": "recipes.md",
+      "relevant": false,
+      "symbol": "Recipes > Reusable limited function"
+     },
+     {
+      "lines": [
+       1,
+       46
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": "LimitFunction"
+     },
+     {
+      "lines": [
+       113,
+       132
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "p-limit > API > limitFunction(fn, options) <sup>named export</sup>"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-005",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       78,
+       88
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "p-limit > API > limit.map(iterable, mapperFunction)"
+     },
+     {
+      "lines": [
+       302,
+       364
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "inputs"
+     },
+     {
+      "lines": [
+       249,
+       300
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       46
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": "LimitFunction"
+     },
+     {
+      "lines": [
+       366,
+       388
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": "inputs"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-003",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       1,
+       28
+      ],
+      "path": "docs/timed.rst",
+      "relevant": false,
+      "symbol": "timed.rst"
+     },
+     {
+      "lines": [
+       22,
+       27
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimestampSigner"
+     },
+     {
+      "lines": [
+       185,
+       220
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": "TimedSerializer.loads"
+     },
+     {
+      "lines": [
+       72,
+       116
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": "TimestampSigner.unsign"
+     },
+     {
+      "lines": [
+       114,
+       158
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": "TimestampSigner.unsign"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "id-005",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       104,
+       148
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": "concepts.rst"
+     },
+     {
+      "lines": [
+       76,
+       108
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer"
+     },
+     {
+      "lines": [
+       129,
+       173
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": "Signer.__init__"
+     },
+     {
+      "lines": [
+       190,
+       234
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": "Serializer.__init__"
+     },
+     {
+      "lines": [
+       53,
+       102
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": "concepts.rst"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     1
+    ],
+    "id": "ch-003",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       173,
+       173
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Styles"
+     },
+     {
+      "lines": [
+       114,
+       120
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "API > chalk.`<style>[.<style>...](string, [string...])`"
+     },
+     {
+      "lines": [
+       175,
+       190
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "Styles > Modifiers"
+     },
+     {
+      "lines": [
+       200,
+       234
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "applyStyle"
+     },
+     {
+      "lines": [
+       152,
+       170
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": "createStyler"
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0
+    ],
+    "id": "ch-006",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       253,
+       278
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": "256 and Truecolor color support"
+     },
+     {
+      "lines": [
+       36,
+       119
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": "ChalkInstance"
+     },
+     {
+      "lines": [
+       86,
+       105
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": "createModelConverters"
+     },
+     {
+      "lines": [
+       107,
+       121
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       10
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   }
+  ],
+  "fixed/hybrid": [
+   {
+    "file_in_top_k": true,
+    "first_rank": 8,
+    "found": [
+     0
+    ],
+    "id": "req-002",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1284,
+       1331
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       482,
+       543
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1080,
+       1135
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       183,
+       221
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       308,
+       351
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0
+    ],
+    "id": "req-006",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       638,
+       692
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       862,
+       925
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       815,
+       865
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       921,
+       986
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       761,
+       824
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-009",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1069,
+       1111
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       895,
+       934
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       774,
+       814
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       145,
+       189
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       103,
+       151
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "req-012",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       112,
+       183
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1328,
+       1377
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       69,
+       119
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       320,
+       367
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       81
+      ],
+      "path": "src/requests/compat.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-015",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       208,
+       269
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       264,
+       304
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       53
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       49,
+       98
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       184,
+       226
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 7,
+    "found": [
+     0,
+     1
+    ],
+    "id": "pl-002",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       89,
+       138
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       114,
+       178
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       41,
+       101
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       81
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       47
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-005",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       262,
+       321
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       204,
+       266
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       41,
+       101
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       315,
+       376
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       372,
+       467
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-003",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       186,
+       228
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       49,
+       99
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       98,
+       142
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       28
+      ],
+      "path": "docs/timed.rst",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 8,
+    "found": [
+     1
+    ],
+    "id": "id-005",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       103,
+       149
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       176,
+       218
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       43,
+       106
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       130,
+       179
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     1
+    ],
+    "id": "ch-003",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       58,
+       125
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       64
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       207,
+       294
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       210,
+       256
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       152,
+       189
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 9,
+    "found": [
+     0
+    ],
+    "id": "ch-006",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       62,
+       145
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       71
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       246,
+       277
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       137,
+       212
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       277,
+       299
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   }
+  ],
+  "fixed/hybrid+rerank": [
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0
+    ],
+    "id": "req-002",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       225,
+       268
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       183,
+       221
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       482,
+       543
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       150,
+       195
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       308,
+       351
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0
+    ],
+    "id": "req-006",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       638,
+       692
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       179,
+       232
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       599,
+       642
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       815,
+       865
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1449,
+       1497
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-009",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1069,
+       1111
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       895,
+       934
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       145,
+       189
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       774,
+       814
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       56
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "req-012",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1328,
+       1377
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       320,
+       367
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       112,
+       183
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1284,
+       1331
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       966,
+       1016
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-015",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       264,
+       304
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       49,
+       98
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       74,
+       124
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       225,
+       268
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       53
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-002",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       77,
+       118
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       120,
+       148
+      ],
+      "path": "index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       114,
+       178
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       204,
+       266
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       89,
+       138
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-005",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       77,
+       118
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       262,
+       321
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       315,
+       376
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       41,
+       101
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       204,
+       266
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-003",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       1,
+       28
+      ],
+      "path": "docs/timed.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       186,
+       228
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       49,
+       99
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       138,
+       191
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 8,
+    "found": [
+     1
+    ],
+    "id": "id-005",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       103,
+       149
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       199,
+       246
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       44,
+       79
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       130,
+       179
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     1
+    ],
+    "id": "ch-003",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       210,
+       256
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       103,
+       173
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       161,
+       216
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       54,
+       104
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       188,
+       254
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "ch-006",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       246,
+       277
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       62,
+       145
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       119,
+       154
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       71
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       137,
+       212
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   }
+  ],
+  "fixed/keyword": [
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "req-002",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1080,
+       1135
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       403,
+       458
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       51
+      ],
+      "path": "src/requests/_internal_utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1284,
+       1331
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       453,
+       499
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-006",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       815,
+       865
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       638,
+       692
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       862,
+       925
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       179,
+       232
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       646,
+       687
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-009",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1069,
+       1111
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       56
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       322,
+       378
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       422,
+       470
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       531,
+       579
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "req-012",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1,
+       73
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       112,
+       183
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       81
+      ],
+      "path": "src/requests/compat.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1328,
+       1377
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       85
+      ],
+      "path": "docs/api.rst",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-015",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       208,
+       269
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       264,
+       304
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       53
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       184,
+       226
+      ],
+      "path": "docs/user/quickstart.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       36,
+       79
+      ],
+      "path": "docs/dev/contributing.rst",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0,
+     1
+    ],
+    "id": "pl-002",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       89,
+       138
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       60
+      ],
+      "path": "index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       41,
+       101
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       81
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       77,
+       118
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": false,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-005",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       41,
+       101
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       204,
+       266
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       262,
+       321
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       81
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       80
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-003",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       113,
+       159
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       156,
+       203
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       44,
+       79
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       73,
+       116
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     1
+    ],
+    "id": "id-005",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       176,
+       218
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       103,
+       149
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       53,
+       94
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       43,
+       106
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "ch-003",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       152,
+       189
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       57
+      ],
+      "path": "benchmark.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       207,
+       294
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       92
+      ],
+      "path": "package.json",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       58,
+       125
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0
+    ],
+    "id": "ch-006",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       1,
+       71
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       62,
+       145
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       54,
+       104
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       246,
+       277
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       137,
+       212
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   }
+  ],
+  "fixed/vector": [
+   {
+    "file_in_top_k": true,
+    "first_rank": 4,
+    "found": [
+     0
+    ],
+    "id": "req-002",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       482,
+       543
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       2001,
+       2081
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1284,
+       1331
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       150,
+       195
+      ],
+      "path": "src/requests/sessions.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       748,
+       781
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 8,
+    "found": [
+     0
+    ],
+    "id": "req-006",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1449,
+       1497
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       638,
+       692
+      ],
+      "path": "docs/user/advanced.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       921,
+       986
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       862,
+       925
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       761,
+       824
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "req-009",
+    "n_targets": 2,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       1069,
+       1111
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1550,
+       1625
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       978,
+       1034
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1110,
+       1154
+      ],
+      "path": "src/requests/models.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       895,
+       934
+      ],
+      "path": "src/requests/models.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 2,
+    "found": [
+     0
+    ],
+    "id": "req-012",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       107,
+       162
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       724,
+       748
+      ],
+      "path": "src/requests/adapters.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       56
+      ],
+      "path": "src/requests/exceptions.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       112,
+       183
+      ],
+      "path": "src/requests/__init__.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1284,
+       1331
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0
+    ],
+    "id": "req-015",
+    "n_targets": 1,
+    "repo": "psf/requests",
+    "top": [
+     {
+      "lines": [
+       264,
+       304
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       208,
+       269
+      ],
+      "path": "src/requests/utils.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       49,
+       98
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1055,
+       1107
+      ],
+      "path": "HISTORY.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       53
+      ],
+      "path": "docs/user/authentication.rst",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "pl-002",
+    "n_targets": 2,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       114,
+       178
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       89,
+       138
+      ],
+      "path": "index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       204,
+       266
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       120,
+       148
+      ],
+      "path": "index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       79,
+       162
+      ],
+      "path": "recipes.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 10,
+    "found": [
+     0
+    ],
+    "id": "pl-005",
+    "n_targets": 1,
+    "repo": "sindresorhus/p-limit",
+    "top": [
+     {
+      "lines": [
+       315,
+       376
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       77,
+       118
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       262,
+       321
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       372,
+       467
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       204,
+       266
+      ],
+      "path": "test.js",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 3,
+    "found": [
+     0,
+     1
+    ],
+    "id": "id-003",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       1,
+       28
+      ],
+      "path": "docs/timed.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       186,
+       228
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       52
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       49,
+       99
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       138,
+       191
+      ],
+      "path": "src/itsdangerous/timed.py",
+      "relevant": true,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": null,
+    "found": [],
+    "id": "id-005",
+    "n_targets": 2,
+    "repo": "pallets/itsdangerous",
+    "top": [
+     {
+      "lines": [
+       103,
+       149
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       43,
+       106
+      ],
+      "path": "docs/concepts.rst",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       130,
+       179
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       176,
+       218
+      ],
+      "path": "src/itsdangerous/signer.py",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       199,
+       246
+      ],
+      "path": "src/itsdangerous/serializer.py",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 1,
+    "found": [
+     0,
+     1
+    ],
+    "id": "ch-003",
+    "n_targets": 2,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       210,
+       256
+      ],
+      "path": "source/index.js",
+      "relevant": true,
+      "symbol": null
+     },
+     {
+      "lines": [
+       58,
+       125
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       103,
+       173
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       64
+      ],
+      "path": "source/index.js",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       277,
+       299
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   },
+   {
+    "file_in_top_k": true,
+    "first_rank": 10,
+    "found": [
+     0
+    ],
+    "id": "ch-006",
+    "n_targets": 1,
+    "repo": "chalk/chalk",
+    "top": [
+     {
+      "lines": [
+       62,
+       145
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       246,
+       277
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       1,
+       71
+      ],
+      "path": "source/index.d.ts",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       277,
+       299
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     },
+     {
+      "lines": [
+       299,
+       320
+      ],
+      "path": "readme.md",
+      "relevant": false,
+      "symbol": null
+     }
+    ],
+    "warnings": []
+   }
+  ]
+ },
+ "kind": "retrieval",
+ "label": "baseline-heldout",
+ "summary": {
+  "ast/hybrid": {
+   "hit@1": 0.18181818181818182,
+   "hit@10": 0.7272727272727273,
+   "hit@3": 0.45454545454545453,
+   "hit@5": 0.6363636363636364,
+   "hit@5_ci95": [
+    0.36363636363636365,
+    0.9090909090909091
+   ],
+   "mrr": 0.36363636363636365,
+   "mrr_ci95": [
+    0.18181818181818182,
+    0.5757575757575757
+   ],
+   "n": 11,
+   "recall@1": 0.18181818181818182,
+   "recall@10": 0.6818181818181818,
+   "recall@3": 0.36363636363636365,
+   "recall@5": 0.5454545454545454
+  },
+  "ast/hybrid+rerank": {
+   "hit@1": 0.2727272727272727,
+   "hit@10": 0.6363636363636364,
+   "hit@3": 0.45454545454545453,
+   "hit@5": 0.5454545454545454,
+   "hit@5_ci95": [
+    0.2727272727272727,
+    0.8181818181818182
+   ],
+   "mrr": 0.3993506493506494,
+   "mrr_ci95": [
+    0.18181818181818182,
+    0.6493506493506493
+   ],
+   "n": 11,
+   "recall@1": 0.18181818181818182,
+   "recall@10": 0.5454545454545454,
+   "recall@3": 0.36363636363636365,
+   "recall@5": 0.45454545454545453
+  },
+  "ast/keyword": {
+   "hit@1": 0.18181818181818182,
+   "hit@10": 0.6363636363636364,
+   "hit@3": 0.2727272727272727,
+   "hit@5": 0.45454545454545453,
+   "hit@5_ci95": [
+    0.18181818181818182,
+    0.7272727272727273
+   ],
+   "mrr": 0.29090909090909095,
+   "mrr_ci95": [
+    0.09090909090909091,
+    0.5181818181818182
+   ],
+   "n": 11,
+   "recall@1": 0.18181818181818182,
+   "recall@10": 0.5,
+   "recall@3": 0.2727272727272727,
+   "recall@5": 0.4090909090909091
+  },
+  "ast/vector": {
+   "hit@1": 0.36363636363636365,
+   "hit@10": 0.8181818181818182,
+   "hit@3": 0.5454545454545454,
+   "hit@5": 0.7272727272727273,
+   "hit@5_ci95": [
+    0.45454545454545453,
+    1.0
+   ],
+   "mrr": 0.494949494949495,
+   "mrr_ci95": [
+    0.26515151515151514,
+    0.75
+   ],
+   "n": 11,
+   "recall@1": 0.3181818181818182,
+   "recall@10": 0.7727272727272727,
+   "recall@3": 0.5454545454545454,
+   "recall@5": 0.6363636363636364
+  },
+  "fixed/hybrid": {
+   "hit@1": 0.2727272727272727,
+   "hit@10": 0.8181818181818182,
+   "hit@3": 0.36363636363636365,
+   "hit@5": 0.45454545454545453,
+   "hit@5_ci95": [
+    0.18181818181818182,
+    0.7272727272727273
+   ],
+   "mrr": 0.37157287157287155,
+   "mrr_ci95": [
+    0.15476190476190477,
+    0.6215728715728716
+   ],
+   "n": 11,
+   "recall@1": 0.18181818181818182,
+   "recall@10": 0.6818181818181818,
+   "recall@3": 0.3181818181818182,
+   "recall@5": 0.36363636363636365
+  },
+  "fixed/hybrid+rerank": {
+   "hit@1": 0.2727272727272727,
+   "hit@10": 0.6363636363636364,
+   "hit@3": 0.36363636363636365,
+   "hit@5": 0.5454545454545454,
+   "hit@5_ci95": [
+    0.2727272727272727,
+    0.8181818181818182
+   ],
+   "mrr": 0.375,
+   "mrr_ci95": [
+    0.14772727272727273,
+    0.6363636363636364
+   ],
+   "n": 11,
+   "recall@1": 0.18181818181818182,
+   "recall@10": 0.5,
+   "recall@3": 0.22727272727272727,
+   "recall@5": 0.45454545454545453
+  },
+  "fixed/keyword": {
+   "hit@1": 0.36363636363636365,
+   "hit@10": 0.6363636363636364,
+   "hit@3": 0.5454545454545454,
+   "hit@5": 0.6363636363636364,
+   "hit@5_ci95": [
+    0.36363636363636365,
+    0.9090909090909091
+   ],
+   "mrr": 0.4621212121212121,
+   "mrr_ci95": [
+    0.20454545454545456,
+    0.7272727272727273
+   ],
+   "n": 11,
+   "recall@1": 0.2727272727272727,
+   "recall@10": 0.5454545454545454,
+   "recall@3": 0.45454545454545453,
+   "recall@5": 0.5
+  },
+  "fixed/vector": {
+   "hit@1": 0.2727272727272727,
+   "hit@10": 0.8181818181818182,
+   "hit@3": 0.45454545454545453,
+   "hit@5": 0.5454545454545454,
+   "hit@5_ci95": [
+    0.2727272727272727,
+    0.8181818181818182
+   ],
+   "mrr": 0.40075757575757576,
+   "mrr_ci95": [
+    0.17954545454545456,
+    0.6553030303030303
+   ],
+   "n": 11,
+   "recall@1": 0.18181818181818182,
+   "recall@10": 0.8181818181818182,
+   "recall@3": 0.36363636363636365,
+   "recall@5": 0.5
+  }
+ }
+}

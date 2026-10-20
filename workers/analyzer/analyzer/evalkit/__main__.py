@@ -25,11 +25,14 @@ Q_DEFAULT = ROOT / "eval" / "questions.yaml"
 G_DEFAULT = ROOT / "eval" / "graph_truth.yaml"
 
 
+_FILTER = {"only": None, "exclude": None}
+
+
 def load_ds(path: str):
     if not Path(path).exists():
         raise SystemExit(f"{path} does not exist. Write it first (format: eval/README.md).")
     ds, problems = schema.load_questions(path)
-    return ds, problems
+    return schema.select(ds, _FILTER["only"], _FILTER["exclude"]), problems
 
 
 def cmd_validate(a, conn) -> int:
@@ -70,7 +73,8 @@ def _ready(a, conn):
         for p in problems:
             print(f"PROBLEM: {p}", file=sys.stderr)
         raise SystemExit("Fix the problems above (run `validate`) before evaluating. Nothing was run.")
-    if (gaps := schema.completeness(ds)) and not a.allow_incomplete:
+    full, _ = schema.load_questions(a.questions)           # completeness is about the FILE, not the tag filter
+    if (gaps := schema.completeness(full)) and not a.allow_incomplete:
         for g in gaps:
             print(f"INCOMPLETE: {g}", file=sys.stderr)
         raise SystemExit("The question set is incomplete; add --allow-incomplete to run on what exists "
@@ -102,6 +106,7 @@ def cmd_retrieval(a, conn) -> int:
     summary, items = retrieval.run_retrieval(conn, embedder, scorer, ds, ids, variants)
     cfg = retrieval.run_config(variants, embedder.name, rname)
     cfg["n_questions"] = sum(1 for q in ds.questions if q.answerable)
+    cfg["filter"] = {"only_tag": a.only_tag, "exclude_tag": a.exclude_tag}
     run_id = store.save_run(conn, "retrieval", a.label, ds.sha256, cfg, summary, items)
     print(f"retrieval run {run_id} ({a.label or 'unlabelled'}) saved\n")
     print(report.retrieval_table(summary))
@@ -124,7 +129,8 @@ def cmd_answers(a, conn) -> int:
     summary, items = answers_mod.run_answers(conn, get_embedder(), llm, ds, ids, reranker,
                                              set(a.only.split(",")) if a.only else None,
                                              lambda n, t, i, s: print(f"[{n}/{t}] {i}: {s}", flush=True))
-    cfg = {"llm": llm.name, "model": llm.model, "rerank": a.rerank, "n_questions": len(items)}
+    cfg = {"llm": llm.name, "model": llm.model, "rerank": a.rerank, "n_questions": len(items),
+           "filter": {"only_tag": a.only_tag, "exclude_tag": a.exclude_tag}}
     run_id = store.save_run(conn, "answers", a.label, ds.sha256, cfg, summary, items)
     print(f"\nanswers run {run_id} saved\n" + report.answers_block(summary, None))
     return 0
@@ -232,6 +238,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--questions", default=str(Q_DEFAULT))
     ap.add_argument("--graph", default=str(G_DEFAULT))
+    ap.add_argument("--only-tag", help="evaluate only questions with this tag (e.g. heldout)")
+    ap.add_argument("--exclude-tag", help="skip questions with this tag (develop on --exclude-tag heldout)")
     sub = ap.add_subparsers(dest="cmd", required=True)
     sub.add_parser("validate")
     p = sub.add_parser("retrieval"); p.add_argument("--label", default=""); p.add_argument("--variants", default="all")
@@ -249,6 +257,7 @@ def main() -> int:
     p = sub.add_parser("report"); p.add_argument("--retrieval", type=int); p.add_argument("--compare", type=int)
     p.add_argument("--answers", type=int); p.add_argument("--judge", type=int); p.add_argument("--graph-run", type=int)
     a = ap.parse_args()
+    _FILTER["only"], _FILTER["exclude"] = a.only_tag, a.exclude_tag
     conn = db.connect()
     fn = {"validate": cmd_validate, "retrieval": cmd_retrieval, "answers": cmd_answers, "judge": cmd_judge,
           "spotcheck": cmd_spotcheck, "agreement": cmd_agreement, "graph-eval": cmd_graph, "failures": cmd_failures,

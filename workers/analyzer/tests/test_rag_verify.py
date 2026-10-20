@@ -129,12 +129,29 @@ def test_bullets_headings_and_paragraphs_keep_their_structure():
     assert "- Hashing uses sha256 [C2]." in r.text
 
 
-def test_code_blocks_are_kept_and_flagged_when_they_are_not_from_the_repo():
+def test_code_blocks_from_the_repo_are_kept_and_invented_ones_are_removed():
     quoted = "Here is the code [C1]:\n```python\ndef retry_with_backoff(fn, attempts=5):\n    time.sleep(delay)\n```"
     assert v(quoted).status == "answered"
     invented = "It works like this [C1]:\n```python\nfor attempt in range(10):\n    requests.get(url, retries=attempt)\n```"
     r = v(invented)
-    assert r.status == "partial" and "code_not_in_repo" in r.issues and "requests.get" in r.text
+    assert "requests.get" not in r.text and "```" not in r.text and r.status == "partial"
+    assert any("code example" in i for i in r.issues) and len(r.removed) == 1
+
+
+def test_unterminated_code_block_is_not_kept():
+    r = v("It works like this [C1]:\n```python\nwhile True:\n    pass")
+    assert "while True" not in r.text and any("unterminated" in i for i in r.issues)
+
+
+def test_acronyms_not_in_the_retrieved_code_are_removed_even_with_a_real_citation():
+    r = v("`retry_with_backoff` sleeps between attempts [C1]. It encrypts the payload with AES-128 in CBC mode [C1].")
+    assert "AES" not in r.text and "sleeps between attempts" in r.text and len(r.removed) == 1
+    assert any("AES-128" in i for i in r.issues)
+
+
+def test_acronyms_that_are_in_the_code_or_generic_are_fine():
+    r = v("Passwords are hashed with SHA256 and compared [C2]. The HTTP API returns JSON [C2].")
+    assert r.removed == [] and "SHA256" in r.text
 
 
 def test_verification_is_idempotent():
@@ -159,8 +176,8 @@ def test_huge_answers_stay_fast():
 
 # ---- support check: does the cited code contain what the sentence says? ---------------------------------
 def test_a_real_citation_does_not_rescue_a_sentence_the_cited_code_does_not_support():
-    r = v("`retry_with_backoff` sleeps between attempts [C1]. It encrypts every payload with AES and stores keys in a vault [C1].")
-    assert "AES" not in r.text and "sleeps between attempts" in r.text
+    r = v("`retry_with_backoff` sleeps between attempts [C1]. It encrypts every payload with a block cipher and stores keys in a vault [C1].")
+    assert "block cipher" not in r.text and "sleeps between attempts" in r.text
     assert any("does not contain what it says" in x for x in r.issues)
 
 

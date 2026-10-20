@@ -58,15 +58,29 @@ class PyResolver:
         here = posixpath.dirname(from_path)  # scripts can import siblings (sys.path[0])
         return self.roots + ([here] if here not in self.roots else [])
 
-    def _submodule_targets(self, root: str, parts: list[str], names: list[str]) -> list[str]:
-        out = []
+    def _submodule_targets(self, root: str, parts: list[str], names: list[str]) -> tuple[list[str], bool]:
+        """Files of the names that are submodules, and whether EVERY imported name is one (no attribute, no `*`)."""
+        out, all_sub = [], bool(names)
         for n in names:
             if n == "*":
+                all_sub = False
                 continue
             m = self._find_module(root, parts + [n])
             if m and m[0] == "file":
                 out.append(m[1])
-        return out
+            else:
+                all_sub = False
+        return out, all_sub
+
+    @staticmethod
+    def _combine(package_file: str | None, subs: list[str], all_sub: bool) -> list[str]:
+        """`from pkg import a, b` where a and b are submodules depends on pkg/a.py and pkg/b.py. The package's own
+        __init__.py only runs as a side effect; counting it would make every child "import" its parent, which
+        re-exports the children and fabricates cycles. Keep it when some name is defined in __init__ itself."""
+        targets = list(subs)
+        if package_file and not (subs and all_sub):
+            targets.append(package_file)
+        return sorted(dict.fromkeys(targets))
 
     def resolve(self, item: ImportItem) -> Resolution:
         if item.level > 0:
@@ -78,12 +92,9 @@ class PyResolver:
             found = self._find_module(root, parts)
             if not found:
                 continue
-            targets: list[str] = []
-            if found[0] == "file":
-                targets.append(found[1])
-            if item.kind == "from":
-                targets += self._submodule_targets(root, parts, item.names)
-            targets = sorted(dict.fromkeys(targets))
+            pkg_file = found[1] if found[0] == "file" else None
+            subs, all_sub = self._submodule_targets(root, parts, item.names) if item.kind == "from" else ([], False)
+            targets = self._combine(pkg_file, subs, all_sub)
             if targets:
                 return Resolution("internal", targets)
             return Resolution("unresolved", reason=f"namespace package {'.'.join(parts)} has no matching module")
@@ -104,12 +115,9 @@ class PyResolver:
             base = posixpath.dirname(base)
         parts = item.specifier.split(".") if item.specifier else []
         found = self._find_module(base, parts)
-        targets: list[str] = []
-        if found and found[0] == "file":
-            targets.append(found[1])
-        if item.kind == "from":
-            targets += self._submodule_targets(base, parts, item.names)
-        targets = sorted(dict.fromkeys(targets))
+        pkg_file = found[1] if found and found[0] == "file" else None
+        subs, all_sub = self._submodule_targets(base, parts, item.names) if item.kind == "from" else ([], False)
+        targets = self._combine(pkg_file, subs, all_sub)
         if targets:
             return Resolution("internal", targets)
         return Resolution("unresolved", reason="relative import target not found")

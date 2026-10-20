@@ -1,0 +1,160 @@
+# Dependency-edge ground truth. AUTHORSHIP: written by Claude by reading the import statements of each file in the
+# closed file sets below (grep of `import` / `from` lines, checked against the sources), before any graph evaluation.
+# Direction: [importer, imported]. Only static imports between the listed files count; imports of external packages,
+# stdlib, vendored code (skipped by the analyser) and string paths passed to child processes are out of scope.
+version: 1
+repos:
+  - repo: pallets/itsdangerous
+    files:
+      - src/itsdangerous/__init__.py
+      - src/itsdangerous/_json.py
+      - src/itsdangerous/encoding.py
+      - src/itsdangerous/exc.py
+      - src/itsdangerous/serializer.py
+      - src/itsdangerous/signer.py
+      - src/itsdangerous/timed.py
+      - src/itsdangerous/url_safe.py
+    edges:
+      - [src/itsdangerous/encoding.py, src/itsdangerous/exc.py]
+      - [src/itsdangerous/__init__.py, src/itsdangerous/encoding.py]
+      - [src/itsdangerous/__init__.py, src/itsdangerous/exc.py]
+      - [src/itsdangerous/__init__.py, src/itsdangerous/serializer.py]
+      - [src/itsdangerous/__init__.py, src/itsdangerous/signer.py]
+      - [src/itsdangerous/__init__.py, src/itsdangerous/timed.py]
+      - [src/itsdangerous/__init__.py, src/itsdangerous/url_safe.py]
+      - [src/itsdangerous/url_safe.py, src/itsdangerous/_json.py]
+      - [src/itsdangerous/url_safe.py, src/itsdangerous/encoding.py]
+      - [src/itsdangerous/url_safe.py, src/itsdangerous/exc.py]
+      - [src/itsdangerous/url_safe.py, src/itsdangerous/serializer.py]
+      - [src/itsdangerous/url_safe.py, src/itsdangerous/timed.py]
+      - [src/itsdangerous/signer.py, src/itsdangerous/encoding.py]
+      - [src/itsdangerous/signer.py, src/itsdangerous/exc.py]
+      - [src/itsdangerous/timed.py, src/itsdangerous/encoding.py]
+      - [src/itsdangerous/timed.py, src/itsdangerous/exc.py]
+      - [src/itsdangerous/timed.py, src/itsdangerous/serializer.py]
+      - [src/itsdangerous/timed.py, src/itsdangerous/signer.py]
+      - [src/itsdangerous/serializer.py, src/itsdangerous/encoding.py]
+      - [src/itsdangerous/serializer.py, src/itsdangerous/exc.py]
+      - [src/itsdangerous/serializer.py, src/itsdangerous/signer.py]
+  - repo: chalk/chalk
+    files:
+      - source/index.js
+      - source/utilities.js
+      - test/chalk.js
+      - test/instance.js
+      - test/level.js
+      - test/visible.js
+      - test/no-color-support.js
+      - test/_fixture.js
+      - test/_force-color-fixture.js
+      - test/force-color.js
+    edges:
+      - [source/index.js, source/utilities.js]
+      - [test/chalk.js, source/index.js]
+      - [test/instance.js, source/index.js]
+      - [test/level.js, source/index.js]
+      - [test/visible.js, source/index.js]
+      - [test/no-color-support.js, source/index.js]
+      - [test/_fixture.js, source/index.js]
+      - [test/_force-color-fixture.js, source/index.js]
+  - repo: sindresorhus/p-limit
+    files: [index.js, index.d.ts, test.js, benchmark.js, scripts/benchmarker.js]
+    edges:
+      - [test.js, index.js]
+      - [benchmark.js, index.js]
+      - [benchmark.js, scripts/benchmarker.js]
+  - repo: psf/requests
+    # help.py is excluded: its `from . import __version__` is ambiguous (module vs the string re-exported by __init__).
+    # Edges include imports under `if TYPE_CHECKING:` (they are real static import statements).
+    files:
+      - src/requests/__init__.py
+      - src/requests/__version__.py
+      - src/requests/_internal_utils.py
+      - src/requests/_types.py
+      - src/requests/adapters.py
+      - src/requests/api.py
+      - src/requests/auth.py
+      - src/requests/certs.py
+      - src/requests/compat.py
+      - src/requests/cookies.py
+      - src/requests/exceptions.py
+      - src/requests/hooks.py
+      - src/requests/models.py
+      - src/requests/packages.py
+      - src/requests/sessions.py
+      - src/requests/status_codes.py
+      - src/requests/structures.py
+      - src/requests/utils.py
+    edges:
+      - [src/requests/adapters.py, src/requests/_types.py]
+      - [src/requests/adapters.py, src/requests/auth.py]
+      - [src/requests/adapters.py, src/requests/compat.py]
+      - [src/requests/adapters.py, src/requests/cookies.py]
+      - [src/requests/adapters.py, src/requests/exceptions.py]
+      - [src/requests/adapters.py, src/requests/models.py]
+      - [src/requests/adapters.py, src/requests/structures.py]
+      - [src/requests/adapters.py, src/requests/utils.py]
+      - [src/requests/api.py, src/requests/sessions.py]
+      - [src/requests/api.py, src/requests/models.py]
+      - [src/requests/api.py, src/requests/_types.py]
+      - [src/requests/auth.py, src/requests/_internal_utils.py]
+      - [src/requests/auth.py, src/requests/compat.py]
+      - [src/requests/auth.py, src/requests/cookies.py]
+      - [src/requests/auth.py, src/requests/utils.py]
+      - [src/requests/auth.py, src/requests/models.py]
+      - [src/requests/cookies.py, src/requests/_internal_utils.py]
+      - [src/requests/cookies.py, src/requests/_types.py]
+      - [src/requests/cookies.py, src/requests/compat.py]
+      - [src/requests/cookies.py, src/requests/models.py]
+      - [src/requests/exceptions.py, src/requests/compat.py]
+      - [src/requests/exceptions.py, src/requests/models.py]
+      - [src/requests/hooks.py, src/requests/_types.py]
+      - [src/requests/hooks.py, src/requests/models.py]
+      - [src/requests/__init__.py, src/requests/exceptions.py]
+      - [src/requests/__init__.py, src/requests/packages.py]
+      - [src/requests/__init__.py, src/requests/utils.py]
+      - [src/requests/__init__.py, src/requests/__version__.py]
+      - [src/requests/__init__.py, src/requests/api.py]
+      - [src/requests/__init__.py, src/requests/models.py]
+      - [src/requests/__init__.py, src/requests/sessions.py]
+      - [src/requests/__init__.py, src/requests/status_codes.py]
+      - [src/requests/_internal_utils.py, src/requests/compat.py]
+      - [src/requests/models.py, src/requests/_types.py]
+      - [src/requests/models.py, src/requests/_internal_utils.py]
+      - [src/requests/models.py, src/requests/auth.py]
+      - [src/requests/models.py, src/requests/compat.py]
+      - [src/requests/models.py, src/requests/cookies.py]
+      - [src/requests/models.py, src/requests/exceptions.py]
+      - [src/requests/models.py, src/requests/hooks.py]
+      - [src/requests/models.py, src/requests/status_codes.py]
+      - [src/requests/models.py, src/requests/structures.py]
+      - [src/requests/models.py, src/requests/utils.py]
+      - [src/requests/models.py, src/requests/adapters.py]
+      - [src/requests/packages.py, src/requests/compat.py]
+      - [src/requests/sessions.py, src/requests/_internal_utils.py]
+      - [src/requests/sessions.py, src/requests/_types.py]
+      - [src/requests/sessions.py, src/requests/adapters.py]
+      - [src/requests/sessions.py, src/requests/auth.py]
+      - [src/requests/sessions.py, src/requests/compat.py]
+      - [src/requests/sessions.py, src/requests/cookies.py]
+      - [src/requests/sessions.py, src/requests/exceptions.py]
+      - [src/requests/sessions.py, src/requests/hooks.py]
+      - [src/requests/sessions.py, src/requests/models.py]
+      - [src/requests/sessions.py, src/requests/status_codes.py]
+      - [src/requests/sessions.py, src/requests/structures.py]
+      - [src/requests/sessions.py, src/requests/utils.py]
+      - [src/requests/status_codes.py, src/requests/structures.py]
+      - [src/requests/structures.py, src/requests/compat.py]
+      - [src/requests/_types.py, src/requests/auth.py]
+      - [src/requests/_types.py, src/requests/cookies.py]
+      - [src/requests/_types.py, src/requests/models.py]
+      - [src/requests/_types.py, src/requests/structures.py]
+      - [src/requests/utils.py, src/requests/certs.py]
+      - [src/requests/utils.py, src/requests/__version__.py]
+      - [src/requests/utils.py, src/requests/_internal_utils.py]
+      - [src/requests/utils.py, src/requests/_types.py]
+      - [src/requests/utils.py, src/requests/compat.py]
+      - [src/requests/utils.py, src/requests/cookies.py]
+      - [src/requests/utils.py, src/requests/exceptions.py]
+      - [src/requests/utils.py, src/requests/structures.py]
+      - [src/requests/utils.py, src/requests/models.py]
