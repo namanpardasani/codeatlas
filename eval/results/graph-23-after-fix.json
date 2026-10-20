@@ -1,0 +1,78 @@
+{
+ "config": {
+  "repos": [
+   "pallets/itsdangerous",
+   "chalk/chalk",
+   "sindresorhus/p-limit",
+   "psf/requests"
+  ]
+ },
+ "dataset_hash": "f3174f6e0d355b8cd095b839914901dd6cc943eb23a5eaf2457416b36f0341cd",
+ "git_sha": "e2697cd",
+ "id": 23,
+ "items": [
+  {
+   "f1": 1.0,
+   "false_negative_diagnosis": {},
+   "false_negatives": [],
+   "false_positives": [],
+   "files": 8,
+   "precision": 1.0,
+   "predicted": 21,
+   "recall": 1.0,
+   "repo": "pallets/itsdangerous",
+   "tp": 21,
+   "truth": 21
+  },
+  {
+   "f1": 1.0,
+   "false_negative_diagnosis": {},
+   "false_negatives": [],
+   "false_positives": [],
+   "files": 10,
+   "precision": 1.0,
+   "predicted": 8,
+   "recall": 1.0,
+   "repo": "chalk/chalk",
+   "tp": 8,
+   "truth": 8
+  },
+  {
+   "f1": 1.0,
+   "false_negative_diagnosis": {},
+   "false_negatives": [],
+   "false_positives": [],
+   "files": 5,
+   "precision": 1.0,
+   "predicted": 3,
+   "recall": 1.0,
+   "repo": "sindresorhus/p-limit",
+   "tp": 3,
+   "truth": 3
+  },
+  {
+   "f1": 1.0,
+   "false_negative_diagnosis": {},
+   "false_negatives": [],
+   "false_positives": [],
+   "files": 18,
+   "precision": 1.0,
+   "predicted": 72,
+   "recall": 1.0,
+   "repo": "psf/requests",
+   "tp": 72,
+   "truth": 72
+  }
+ ],
+ "kind": "graph",
+ "label": "after-fix",
+ "summary": {
+  "f1": 1.0,
+  "precision": 1.0,
+  "predicted": 104,
+  "recall": 1.0,
+  "repos": 4,
+  "tp": 104,
+  "truth": 104
+ }
+}
