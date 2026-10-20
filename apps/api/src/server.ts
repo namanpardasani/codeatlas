@@ -2,7 +2,13 @@ import express from "express";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { createApp } from "./app.js";
-import { config } from "./config.js";
+import { config, productionProblems } from "./config.js";
+
+const problems = productionProblems();
+if (problems.length) {
+  console.error("Refusing to start in production:\n - " + problems.join("\n - "));
+  process.exit(1);
+}
 
 const api = createApp();
 const webDist = process.env.WEB_DIST;

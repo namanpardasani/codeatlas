@@ -235,3 +235,16 @@ describe("browser safety", () => {
     expect(res.headers["x-powered-by"]).toBeUndefined();
   });
 });
+
+describe("production start-up checks", async () => {
+  const { productionProblems } = await import("./config.js");
+  it("refuses development defaults in production and accepts a proper configuration", () => {
+    const dev = { ...config, github: { clientId: "", clientSecret: "" } };
+    expect(productionProblems(dev, { NODE_ENV: "development" } as never)).toEqual([]);
+    const bad = productionProblems({ ...dev, clientSalt: "dev-only-salt", databaseUrl: "postgres://u:change-me-locally@h/db", authRequired: true, publicUrl: "http://x" } as never, { NODE_ENV: "production" } as never);
+    expect(bad.length).toBeGreaterThanOrEqual(4);
+    const good = productionProblems({ ...dev, clientSalt: "x".repeat(32), databaseUrl: "postgres://u:strong@h/db", redisUrl: "redis://h", authRequired: true,
+      github: { clientId: "a", clientSecret: "b" }, publicUrl: "https://app.example/api", demoMode: false } as never, { NODE_ENV: "production" } as never);
+    expect(good).toEqual([]);
+  });
+});

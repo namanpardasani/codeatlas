@@ -72,3 +72,19 @@ def test_file_count_limit_raises(tmp_path, monkeypatch):
 ])
 def test_is_test_path(path, expected):
     assert is_test_path(path) is expected
+
+
+def test_total_entry_cap_stops_repos_of_millions_of_tiny_or_ignored_files(tmp_path, monkeypatch):
+    monkeypatch.setattr(config, "MAX_WALK_ENTRIES", 5)
+    for i in range(6):
+        write(tmp_path, f"x{i}.lock", "")          # skipped files still count towards the cap
+    with pytest.raises(InventoryError):
+        build_inventory(tmp_path)
+
+
+def test_hostile_gitignore_is_bounded(tmp_path):
+    write(tmp_path, ".gitignore", "a\n" * 200_000)   # far above the size cap: ignored, never compiled
+    write(tmp_path, "ok.py")
+    assert "ok.py" in {r.path for r in build_inventory(tmp_path)}
+    write(tmp_path, ".gitignore", "*.py\n" + "x" * 1000 + "\n")   # an overlong line is dropped, the rest applies
+    assert "ok.py" not in {r.path for r in build_inventory(tmp_path)}

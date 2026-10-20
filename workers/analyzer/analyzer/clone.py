@@ -81,7 +81,7 @@ def _run_clone(cmd: list[str], dest: Path) -> None:
 def clone(url: str, dest: Path, history: bool = True) -> str:
     """Clone `url` into `dest` (bounded history if `history`); return the HEAD commit sha."""
     # Defence in depth: API validates too, but the worker never trusts its queue input.
-    if not URL_RE.match(url) or url.rsplit("/", 1)[-1].startswith("-"):
+    if not URL_RE.fullmatch(url) or url.rsplit("/", 1)[-1].startswith(("-", ".")):   # fullmatch: `$` would accept a trailing newline
         raise CloneError("URL rejected by allowlist")
     if dest.exists():
         shutil.rmtree(dest)

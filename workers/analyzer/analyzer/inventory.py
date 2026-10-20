@@ -26,6 +26,10 @@ LANGUAGES = {
 }
 
 
+MAX_GITIGNORE_BYTES = 64 * 1024
+MAX_GITIGNORE_LINES = 2000
+
+
 class InventoryError(Exception):
     pass
 
@@ -60,7 +64,11 @@ def _load_gitignore(root: Path) -> pathspec.PathSpec | None:
     if not gi.is_file() or gi.is_symlink():
         return None
     try:
-        return pathspec.PathSpec.from_lines("gitignore", gi.read_text(errors="replace").splitlines())
+        # bounded: a hostile .gitignore must not be able to burn CPU in the pattern compiler/matcher
+        if gi.stat().st_size > MAX_GITIGNORE_BYTES:
+            return None
+        lines = gi.read_text(errors="replace").splitlines()[:MAX_GITIGNORE_LINES]
+        return pathspec.PathSpec.from_lines("gitignore", [ln for ln in lines if len(ln) <= 300])
     except Exception:
         return None
 
@@ -69,6 +77,7 @@ def build_inventory(root: Path) -> list[FileRecord]:
     root = root.resolve()
     spec = _load_gitignore(root)
     records: list[FileRecord] = []
+    seen = 0          # every directory entry looked at, kept or not: a repo of 3 million empty files must not stall the worker
 
     for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
         rel_dir = Path(dirpath).relative_to(root).as_posix()
@@ -80,6 +89,9 @@ def build_inventory(root: Path) -> list[FileRecord]:
             and not (spec and spec.match_file(f"{rel_dir + '/' if rel_dir else ''}{d}/"))
             and not os.path.islink(os.path.join(dirpath, d))
         )
+        seen += len(filenames)
+        if seen > config.MAX_WALK_ENTRIES:
+            raise InventoryError(f"repo has more than {config.MAX_WALK_ENTRIES} files")
         for fname in sorted(filenames):
             rel = f"{rel_dir}/{fname}" if rel_dir else fname
             full = os.path.join(dirpath, fname)

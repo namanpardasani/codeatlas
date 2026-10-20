@@ -15,6 +15,8 @@ from analyzer.clone import CloneError, clone
     "https://127.0.0.1/a/b",
     "https://user:pw@github.com/a/b",
     "https://github.com/a/b\n--config=x",
+    "https://github.com/a/b\n",          # `$` in a regex would accept a trailing newline
+    "https://github.com/a/.hidden",
 ])
 def test_rejects_non_allowlisted_urls(url, tmp_path):
     with pytest.raises(CloneError):

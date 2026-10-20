@@ -35,3 +35,15 @@ export const config = {
 };
 
 export const eventsChannel = (jobId: number | string) => `job:${jobId}:events`;
+
+/** Problems that make a production start unsafe. Development keeps its convenient defaults. */
+export function productionProblems(c: typeof config = config, e: NodeJS.ProcessEnv = process.env): string[] {
+  if (e.NODE_ENV !== "production") return [];
+  const out: string[] = [];
+  if (c.clientSalt === "dev-only-salt") out.push("CLIENT_SALT is the development default");
+  if (/change-me/.test(c.databaseUrl)) out.push("DATABASE_URL still contains the placeholder password");
+  if (c.authRequired && !(c.github.clientId && c.github.clientSecret)) out.push("AUTH_REQUIRED=1 but GITHUB_CLIENT_ID/SECRET are not set");
+  if (!c.publicUrl.startsWith("https://")) out.push("PUBLIC_URL must be https:// (session cookies are Secure)");
+  if (!c.demoMode && /change-me/.test(c.redisUrl)) out.push("REDIS_URL still contains the placeholder password");
+  return out;
+}
