@@ -29,6 +29,61 @@ services:
       timeout: 3s
       retries: 10
 
+  # ---- application (docker compose --profile app up --build) -------------------------------------------------
+  # Postgres/Redis above are enough for local development with `npm run dev` / `uv run`; these run the whole product.
+  migrate:
+    profiles: ["app"]
+    build: { context: ., dockerfile: workers/analyzer/Dockerfile }
+    command: ["python", "-m", "analyzer.migrate"]
+    environment: &db
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+    depends_on: { postgres: { condition: service_healthy } }
+
+  worker:
+    profiles: ["app"]
+    build: { context: ., dockerfile: workers/analyzer/Dockerfile }
+    restart: unless-stopped
+    environment:
+      <<: *db
+      REDIS_URL: redis://redis:6379
+    volumes: ["worker-cache:/home/atlas/.cache"]
+    depends_on: { migrate: { condition: service_completed_successfully }, redis: { condition: service_healthy } }
+
+  search:
+    profiles: ["app"]
+    build: { context: ., dockerfile: workers/analyzer/Dockerfile }
+    command: ["python", "-m", "analyzer.service"]
+    restart: unless-stopped
+    environment:
+      <<: *db
+      LLM_PROVIDER: ${LLM_PROVIDER:-fake}
+      LLM_MODEL: ${LLM_MODEL:-}
+      LLM_API_KEY: ${LLM_API_KEY:-}
+      LLM_BASE_URL: ${LLM_BASE_URL:-}
+    volumes: ["worker-cache:/home/atlas/.cache"]
+    expose: ["8001"]            # internal only: never publish this port
+    depends_on: { migrate: { condition: service_completed_successfully } }
+
+  app:
+    profiles: ["app"]
+    build: { context: ., dockerfile: Dockerfile }
+    restart: unless-stopped
+    ports: ["127.0.0.1:${API_PORT:-4000}:4000"]
+    environment:
+      <<: *db
+      REDIS_URL: redis://redis:6379
+      SEARCH_URL: http://search:8001
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:4000}
+      PUBLIC_URL: ${PUBLIC_URL:-http://localhost:4000/api}
+      CLIENT_SALT: ${CLIENT_SALT:-dev-only-salt}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+      AUTH_REQUIRED: ${AUTH_REQUIRED:-0}
+      DEMO_MODE: ${DEMO_MODE:-0}
+      NODE_ENV: ${NODE_ENV:-development}
+    depends_on: { migrate: { condition: service_completed_successfully }, redis: { condition: service_healthy } }
+
 volumes:
+  worker-cache:
   pgdata:
   redisdata:
