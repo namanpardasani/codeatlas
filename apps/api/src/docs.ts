@@ -61,8 +61,11 @@ export type LinkFor = ((type: "file" | "folder" | "repo", path: string) => strin
 export const key = (type: string, ref: string) => `${type}:${ref}`;
 const esc = (s: string) => s.replace(/</g, "&lt;");                         // generated text must never inject HTML
 const short = (s: string, n = 200) => {
-  const m = /^(.+?[.!?])(\s|$)/s.exec(s.replace(/\s+/g, " ").trim());
-  return esc((m ? m[1]! : s).slice(0, n));
+  const text = s.replace(/\s+/g, " ").trim();
+  const m = /^(.+?[.!?])(\s|$)/s.exec(text);
+  const first = m ? m[1]! : text;
+  // a long first sentence is cut at a word boundary with an ellipsis, never mid-word
+  return esc(first.length <= n ? first : first.slice(0, first.lastIndexOf(" ", n) > 0 ? first.lastIndexOf(" ", n) : n) + "…");
 };
 const link = (lf: LinkFor, type: "file" | "folder" | "repo", path: string, label?: string) =>
   lf ? `[\`${label ?? path}\`](${lf(type, path)})` : `\`${label ?? path}\``;

@@ -33,6 +33,14 @@ const DATA: DocsData = {
 const link = (t: string, p: string) => `doc:${t}:${encodeURIComponent(p)}`;
 
 describe("docs renderers", () => {
+  it("long first sentences are cut at a word boundary with an ellipsis, short ones are untouched", () => {
+    const long = { ...DATA, summaries: new Map(DATA.summaries).set("file:pkg/core.py", { summary: "word ".repeat(80) + "end.", source: "llm" as const, model: "m" }) };
+    const line = renderFolder(long, "pkg", null).split("\n").find((l) => l.includes("pkg/core.py"))!;
+    expect(line.endsWith("…")).toBe(true);
+    expect(line).not.toMatch(/wor…$/);
+    expect(renderFolder(DATA, "pkg", null)).toContain("`pkg/core.py` computes totals.");
+  });
+
   it("the repo page has the overview, facts, entry points, literal run hints, key modules, risks and the honesty footer", () => {
     const md = renderRepo(DATA, link);
     expect(md).toContain("# acme/demo");
