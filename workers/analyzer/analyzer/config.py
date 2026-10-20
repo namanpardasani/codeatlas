@@ -22,6 +22,7 @@ CONSUMER = os.environ.get("WORKER_NAME", f"worker-{os.getpid()}")
 CLONE_TIMEOUT_S = int(os.environ.get("CLONE_TIMEOUT_S", "120"))
 MAX_REPO_BYTES = int(os.environ.get("MAX_REPO_BYTES", str(150 * 1024 * 1024)))
 MAX_FILES = int(os.environ.get("MAX_FILES", "5000"))
+MAX_WALK_ENTRIES = int(os.environ.get("MAX_WALK_ENTRIES", "50000"))   # all files on disk, before ignore rules
 MAX_FILE_BYTES = int(os.environ.get("MAX_FILE_BYTES", str(1024 * 1024)))
 MAX_PARSE_BYTES = int(os.environ.get("MAX_PARSE_BYTES", str(512 * 1024)))
 PARSE_TIMEOUT_S = float(os.environ.get("PARSE_TIMEOUT_S", "10"))
