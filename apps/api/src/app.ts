@@ -64,7 +64,39 @@ export function createApp(opts: { fetchImpl?: typeof fetch } = {}) {
   // Submissions are expensive (clone + parse): tight per-IP limit.
   const submitLimiter = rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: true, legacyHeaders: false });
 
-  app.post("/repos", submitLimiter, requireLogin, async (req, res) => {
+  // Public list of analysed repositories (the demo's front door). Only public, ready repos; nothing private.
+  app.get("/repos", async (_req, res) => {
+    const r = await pool.query(
+      `SELECT r.id, r.full_name, r.url,
+              (SELECT j.commit_sha FROM analysis_jobs j WHERE j.repo_id = r.id AND j.status = 'done' ORDER BY j.id DESC LIMIT 1) AS commit_sha,
+              (SELECT j.finished_at FROM analysis_jobs j WHERE j.repo_id = r.id AND j.status = 'done' ORDER BY j.id DESC LIMIT 1) AS analyzed_at,
+              (SELECT count(*)::int FROM files f WHERE f.repo_id = r.id) AS files
+       FROM repos r WHERE r.status = 'ready' AND r.is_public AND r.full_name NOT LIKE 'test/%'
+       ORDER BY r.full_name LIMIT 50`,
+    );
+    res.json(r.rows);
+  });
+
+  // Read-only demo: "mapping" a repository that is already analysed just opens it (no job, no queue, no login). Anything
+  // else falls through to the normal path, which refuses it in demo mode.
+  const demoOpen: express.RequestHandler = async (req, res, next) => {
+    if (!config.demoMode) return next();
+    const body = submitSchema.safeParse(req.body);
+    const parsed = body.success ? parseGithubUrl(body.data.url) : null;
+    if (!parsed) return next();
+    const k = await pool.query(
+      `SELECT r.id, (SELECT j.id FROM analysis_jobs j WHERE j.repo_id = r.id AND j.status = 'done' ORDER BY j.id DESC LIMIT 1) AS job
+       FROM repos r WHERE r.url = $1 AND r.status = 'ready' AND r.is_public`,
+      [parsed.url],
+    );
+    if (k.rows[0]?.job) {
+      res.json({ repoId: String(k.rows[0].id), jobId: String(k.rows[0].job), alreadyRunning: false, existing: true });
+      return;
+    }
+    next();
+  };
+
+  app.post("/repos", submitLimiter, demoOpen, requireLogin, async (req, res) => {
     const body = submitSchema.safeParse(req.body);
     const parsed = body.success ? parseGithubUrl(body.data.url) : null;
     if (!parsed) {
@@ -845,7 +877,8 @@ export function createApp(opts: { fetchImpl?: typeof fetch } = {}) {
     const send = (data: unknown) => res.write(`data: ${JSON.stringify(data)}\n\n`);
 
     const sub = createSubscriber();
-    await sub.subscribe(eventsChannel(id));
+    sub.on("error", () => {});               // no Redis (read-only demo): fall back to the job row below, no live updates
+    await sub.subscribe(eventsChannel(id)).catch(() => {});
     sub.on("message", (_ch, message) => {
       res.write(`data: ${message}\n\n`);
       try {

@@ -23,7 +23,7 @@ if (webDist && existsSync(join(webDist, "index.html"))) {
     if (p.includes("/assets/")) res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
   } }));
   root.get(/^\/(?!api\/).*/, (_req, res) => {
-    res.set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://avatars.githubusercontent.com; frame-ancestors 'none'");
+    res.set("Content-Security-Policy", "default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://avatars.githubusercontent.com; frame-ancestors 'none'");
     res.set("X-Content-Type-Options", "nosniff");
     res.sendFile(join(webDist, "index.html"));
   });

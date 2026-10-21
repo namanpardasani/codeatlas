@@ -100,3 +100,39 @@ describe("re-analysis API", () => {
     expect((await request(app()).get("/repos/abc/analyses")).status).toBe(400);
   });
 });
+
+describe("analysed-repo list and the read-only demo front door", () => {
+  it("lists ready public repos; the demo opens an analysed repo without queueing and refuses an unknown one", async ({ skip }) => {
+    if (!dbUp) skip();
+    const { config } = await import("./config.js");
+    const ins = await pool.query(
+      `INSERT INTO repos (url, full_name, status) VALUES ('https://github.com/demoopen/ready','demoopen/ready','ready')
+       ON CONFLICT (url) DO UPDATE SET status = 'ready', is_public = true RETURNING id`);
+    const rid = Number(ins.rows[0].id);
+    await pool.query("DELETE FROM analysis_jobs WHERE repo_id = $1", [rid]);
+    const job = await pool.query("INSERT INTO analysis_jobs (repo_id, status, commit_sha, finished_at) VALUES ($1,'done','abc1234',now()) RETURNING id", [rid]);
+    try {
+      const list = await request(app()).get("/repos");
+      expect(list.status).toBe(200);
+      const mine = list.body.find((r: { full_name: string }) => r.full_name === "demoopen/ready");
+      expect(mine).toMatchObject({ id: String(rid), commit_sha: "abc1234" });
+      expect(list.body.every((r: { full_name: string }) => !r.full_name.startsWith("test/"))).toBe(true);
+
+      config.demoMode = true;
+      xadd.mockClear();
+      const open = await request(app()).post("/repos").send({ url: "https://github.com/demoopen/ready" });
+      expect(open.status).toBe(200);
+      expect(open.body).toMatchObject({ repoId: String(rid), jobId: String(job.rows[0].id), existing: true });
+      expect(xadd).not.toHaveBeenCalled();                       // nothing queued
+      const unknown = await request(app()).post("/repos").send({ url: "https://github.com/demoopen/never-analysed" });
+      expect(unknown.status).toBe(403);                          // analysis stays disabled
+      // a private repo is never opened through the demo door
+      await pool.query("UPDATE repos SET is_public = false WHERE id = $1", [rid]);
+      expect((await request(app()).post("/repos").send({ url: "https://github.com/demoopen/ready" })).status).toBe(403);
+      expect((await request(app()).get("/repos")).body.some((r: { full_name: string }) => r.full_name === "demoopen/ready")).toBe(false);
+    } finally {
+      config.demoMode = false;
+      await pool.query("DELETE FROM repos WHERE id = $1", [rid]);
+    }
+  });
+});

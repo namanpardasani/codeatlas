@@ -11,11 +11,12 @@ export const config = {
   clientSalt: env.CLIENT_SALT ?? "dev-only-salt",
   // internal Python service that owns the embedding model (loopback only, never exposed publicly)
   searchUrl: env.SEARCH_URL ?? `http://127.0.0.1:${env.SEARCH_PORT ?? 8001}`,
-  corsOrigin: env.WEB_ORIGIN ?? env.CORS_ORIGIN ?? "http://localhost:5173",
+  corsOrigin: env.WEB_ORIGIN ?? env.CORS_ORIGIN ?? env.RENDER_EXTERNAL_URL ?? "http://localhost:5173",
 
   // ---- Day 10: access control and limits ----
   // Public base URL of THIS API as the browser sees it (used for the OAuth callback and the Secure cookie flag).
-  publicUrl: env.PUBLIC_URL ?? `http://localhost:${env.API_PORT ?? 4000}`,
+  // Render sets RENDER_EXTERNAL_URL itself, so the free demo needs no manual URL settings
+  publicUrl: env.PUBLIC_URL ?? (env.RENDER_EXTERNAL_URL ? `${env.RENDER_EXTERNAL_URL}/api` : `http://localhost:${env.API_PORT ?? 4000}`),
   github: { clientId: env.GITHUB_CLIENT_ID ?? "", clientSecret: env.GITHUB_CLIENT_SECRET ?? "" },
   // true: submitting/re-analysing a repository needs a GitHub login. Off by default for local development.
   authRequired: env.AUTH_REQUIRED === "1",
