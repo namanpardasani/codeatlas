@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
 
 export interface Column<T> {
   header: string;
@@ -13,7 +13,7 @@ export interface SortState {
   dir: "asc" | "desc";
 }
 
-/** Data-driven table so pages never hand-style cells. */
+/** Data-driven table so pages never hand-style cells. Clickable rows are keyboard operable (Enter / Space). */
 export function Table<T>({
   columns,
   rows,
@@ -34,15 +34,21 @@ export function Table<T>({
   empty?: string;
 }) {
   if (rows.length === 0) return <p className="text-muted">{empty}</p>;
+  const key = (row: T) => (e: KeyboardEvent) => {
+    if (onRowClick && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      onRowClick(row);
+    }
+  };
   return (
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-left">
         <thead>
-          <tr className="border-b border-border text-small text-muted">
+          <tr className="border-b border-line text-[12px] text-muted">
             {columns.map((c) => (
-              <th key={c.header} className={`px-gap py-gap font-medium ${c.className ?? ""}`}>
+              <th key={c.header} className={`px-3 py-2 font-medium ${c.className ?? ""}`} aria-sort={sort && sort.key === c.sortKey ? (sort.dir === "asc" ? "ascending" : "descending") : undefined}>
                 {c.sortKey && onSort ? (
-                  <button className="font-medium" onClick={() => onSort(c.sortKey!)}>
+                  <button className="font-medium hover:text-text" onClick={() => onSort(c.sortKey!)}>
                     {c.header}
                     {sort?.key === c.sortKey && (sort.dir === "asc" ? " ▲" : " ▼")}
                   </button>
@@ -58,12 +64,14 @@ export function Table<T>({
             <tr
               key={rowKey(row)}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
-              className={`border-b border-border ${onRowClick ? "cursor-pointer" : ""} ${
-                isSelected?.(row) ? "bg-subtle" : ""
+              onKeyDown={onRowClick ? key(row) : undefined}
+              tabIndex={onRowClick ? 0 : undefined}
+              className={`border-b border-line transition-colors duration-150 hover:bg-surface-2 ${onRowClick ? "cursor-pointer" : ""} ${
+                isSelected?.(row) ? "bg-surface-2" : ""
               }`}
             >
               {columns.map((c) => (
-                <td key={c.header} className={`px-gap py-gap align-top ${c.className ?? ""}`}>
+                <td key={c.header} className={`px-3 py-3 align-middle ${c.className ?? ""}`}>
                   {c.render(row)}
                 </td>
               ))}
