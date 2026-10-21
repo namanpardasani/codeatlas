@@ -1,0 +1,20 @@
+# Render Blueprint: the free, read-only demo (API + web in one service, pre-analysed repos in Neon).
+# See docs/DEPLOYMENT.md (Tier 1). Create it with: Render dashboard > New > Blueprint > pick this repo.
+services:
+  - type: web
+    name: codeatlas-demo
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DEMO_MODE
+        value: "1"
+      - key: DATABASE_URL          # the Neon connection string (...neon.tech/neondb?sslmode=require)
+        sync: false
+      - key: CLIENT_SALT
+        generateValue: true
+      # PUBLIC_URL and WEB_ORIGIN default to Render's RENDER_EXTERNAL_URL, so nothing else to set.
