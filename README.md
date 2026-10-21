@@ -8,10 +8,11 @@ citations**, writes documentation, re-analyses only what changed, and exposes ev
 > **Demo video:** _placeholder: add the link after recording_
 > **Scope:** public GitHub repositories only. **Private repositories are not supported.**
 
-| Screenshot placeholders (add later) | |
+| | |
 |---|---|
-| ![graph](docs/img/graph.png) _dependency graph with cycles_ | ![hotspots](docs/img/hotspots.png) _hotspot ranking and reasons_ |
-| ![chat](docs/img/chat.png) _answer with verified citations_ | ![docs](docs/img/docs.png) _generated documentation_ |
+| ![landing](docs/img/landing.png) _landing_ | ![overview](docs/img/overview.png) _overview of psf/requests_ |
+| ![graph](docs/img/graph.png) _dependency map: regions, a selected file, an import cycle_ | ![hotspots](docs/img/hotspots.png) _hotspot ranking with reasons_ |
+| ![docs](docs/img/docs.png) _generated documentation_ | _chat with verified citations: screenshot to add (needs a running LLM)_ |
 
 ## Features
 

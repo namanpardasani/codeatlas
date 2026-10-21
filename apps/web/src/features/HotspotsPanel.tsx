@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { getHotspots, type HotspotItem, type HotspotsResponse } from "../api";
-import { Badge, Panel, Table, type Column, type SortState, type Tone } from "../components/ui";
+import { Badge, Panel, ScoreBar, Table, type Column, type SortState, type Tone } from "../components/ui";
 
-const severityTone: Record<string, Tone> = { high: "danger", medium: "warning", low: "neutral" };
+const severityTone: Record<string, Tone> = { high: "amber", medium: "amber", low: "neutral" };
 const FACTOR_LABEL: Record<string, string> = {
   complexity: "complex", churn: "churn", cycle: "cycle", fan_in: "fan-in", no_test: "no test", duplication: "duplicated",
 };
@@ -33,7 +33,7 @@ export function HotspotsPanel({
 
   const columns: Column<HotspotItem>[] = [
     { header: "File", sortKey: "path", render: (f) => <span className="font-mono">{f.path}</span> },
-    { header: "Score", sortKey: "score", render: (f) => (f.hotspot_score === null ? "–" : f.hotspot_score.toFixed(1)) },
+    { header: "Score", sortKey: "score", render: (f) => (f.hotspot_score === null ? "–" : <ScoreBar value={f.hotspot_score} />) },
     { header: "Complexity", sortKey: "complexity", render: (f) => `${n(f.max_complexity)} / ${n(f.total_complexity)}` },
     { header: "Churn", sortKey: "churn", render: (f) => n(f.churn) },
     { header: "Authors", sortKey: "authors", render: (f) => n(f.authors) },

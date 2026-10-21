@@ -1,62 +1,87 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getRepoFile } from "../api";
-import { Button, Panel } from "../components/ui";
+import { Skeleton } from "../components/ui";
+import { highlightLines } from "./highlight";
 
 export interface ViewerTarget {
   path: string;
   start: number;
   end: number;
+  /** bump to re-run the flash when the same range is clicked again */
+  nonce?: number;
 }
 
 const MAX_LINES = 1500;
 
-/** Shows an indexed file with line numbers and the cited range highlighted; scrolls to it. */
-export function CodeViewer({ repoId, target, onClose }: { repoId: string; target: ViewerTarget; onClose: () => void }) {
-  const [lines, setLines] = useState<string[] | null>(null);
+/**
+ * Code viewer: dark, line numbers, syntax highlighting from our tokens. When `target` changes it smooth-scrolls to the range
+ * and flashes it (35% cyan settling to 10% with a 3px cyan bar, 900 ms): the link between a claim and its evidence.
+ */
+export default function CodeViewer({ repoId, target, onClose }: { repoId: string; target: ViewerTarget; onClose?: () => void }) {
+  const [code, setCode] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [flash, setFlash] = useState(true);
   const startRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    setLines(null);
+    setCode(null);
     setError(null);
     getRepoFile(repoId, target.path)
-      .then((f) => setLines(f.content.replace(/\n$/, "").split("\n")))
+      .then((f) => setCode(f.content.replace(/\n$/, "")))
       .catch((e) => setError(e instanceof Error ? e.message : "Could not load file"));
   }, [repoId, target.path]);
 
-  useEffect(() => {
-    startRef.current?.scrollIntoView({ block: "center" });
-  }, [lines, target.start]);
+  const lines = useMemo(() => (code === null ? null : highlightLines(code, target.path)), [code, target.path]);
 
-  // very long files: show a window around the highlighted range
-  const from = lines && lines.length > MAX_LINES ? Math.max(1, target.start - 200) : 1;
-  const to = lines ? (lines.length > MAX_LINES ? Math.min(lines.length, from + MAX_LINES - 1) : lines.length) : 0;
+  useEffect(() => {
+    if (!lines) return;
+    setFlash(true);
+    startRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+    const t = setTimeout(() => setFlash(false), 950);
+    return () => clearTimeout(t);
+  }, [lines, target.start, target.end, target.nonce]);
+
+  const total = lines?.length ?? 0;
+  const from = total > MAX_LINES ? Math.max(1, target.start - 200) : 1;
+  const to = total > MAX_LINES ? Math.min(total, from + MAX_LINES - 1) : total;
 
   return (
-    <Panel
-      title={`${target.path}  (lines ${target.start}–${target.end})`}
-      actions={<Button variant="secondary" onClick={onClose}>Close</Button>}
-    >
-      {error && <p className="text-danger">{error}</p>}
-      {!lines && !error && <p className="text-muted">Loading…</p>}
-      {lines && (
-        <pre className="max-h-canvas overflow-auto rounded-ui border border-border bg-bg py-gap font-mono text-small">
-          {lines.slice(from - 1, to).map((text, i) => {
+    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-card border border-border bg-code">
+      <div className="flex items-center justify-between gap-3 border-b border-line bg-bg-raised px-4 py-2.5">
+        <span className="min-w-0 truncate font-mono text-small text-text-2" title={target.path}>
+          {target.path} <span className="text-dim">:{target.start}–{target.end}</span>
+        </span>
+        {onClose && (
+          <button onClick={onClose} aria-label="Close code viewer" className="rounded-ui px-2 py-1 text-small text-muted hover:text-text">
+            Close
+          </button>
+        )}
+      </div>
+      <div className="min-h-0 flex-1 overflow-auto py-2 font-mono text-[13px] leading-6" role="region" aria-label={`Source of ${target.path}`} tabIndex={0}>
+        {error && <p className="px-4 text-error">{error}</p>}
+        {!lines && !error && (
+          <div className="flex flex-col gap-2 px-4">
+            <Skeleton className="h-4 w-2/3" /> <Skeleton className="h-4 w-1/2" /> <Skeleton className="h-4 w-3/4" />
+          </div>
+        )}
+        {lines &&
+          lines.slice(from - 1, to).map((spans, i) => {
             const n = from + i;
-            const inRange = n >= target.start && n <= target.end;
+            const hit = n >= target.start && n <= target.end;
             return (
               <div
                 key={n}
                 ref={n === target.start ? startRef : undefined}
-                className={`flex gap-gutter px-gap ${inRange ? "bg-subtle font-semibold" : ""}`}
+                className={`flex gap-4 px-4 ${hit ? (flash ? "line-hit" : "line-hit-settled") : ""}`}
               >
-                <span className="w-12 shrink-0 select-none text-right text-muted">{n}</span>
-                <span className="whitespace-pre">{text || " "}</span>
+                <span aria-hidden className="w-10 shrink-0 select-none text-right text-dim">{n}</span>
+                <span className="whitespace-pre">
+                  {spans.length === 0 ? " " : spans.map((s, j) => (s.type ? <span key={j} className={`tok-${s.type}`}>{s.text}</span> : s.text))}
+                </span>
               </div>
             );
           })}
-        </pre>
-      )}
-    </Panel>
+      </div>
+    </div>
   );
 }

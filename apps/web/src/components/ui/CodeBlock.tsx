@@ -15,17 +15,17 @@ export function CodeBlock({ code, startLine = 1, highlight = [], maxLines = 14 }
   const renderLine = (line: string) =>
     re
       ? line.split(re).map((part, i) =>
-          i % 2 === 1 ? <mark key={i} className="rounded-ui bg-subtle font-semibold text-fg">{part}</mark> : <Fragment key={i}>{part}</Fragment>)
+          i % 2 === 1 ? <mark key={i} className="rounded-sm bg-cyan-bg font-semibold text-cyan-soft">{part}</mark> : <Fragment key={i}>{part}</Fragment>)
       : line;
   return (
-    <pre className="overflow-x-auto rounded-ui border border-border bg-bg p-gap font-mono text-small">
+    <pre className="overflow-x-auto rounded-card border border-border bg-code p-3 font-mono text-[13px] leading-relaxed">
       {shown.map((line, i) => (
         <div key={i} className="flex gap-gutter">
-          <span className="w-10 shrink-0 select-none text-right text-muted">{startLine + i}</span>
+          <span className="w-10 shrink-0 select-none text-right text-dim">{startLine + i}</span>
           <span className="whitespace-pre">{renderLine(line) || " "}</span>
         </div>
       ))}
-      {lines.length > maxLines && <div className="text-muted">… {lines.length - maxLines} more lines</div>}
+      {lines.length > maxLines && <div className="text-dim">… {lines.length - maxLines} more lines</div>}
     </pre>
   );
 }

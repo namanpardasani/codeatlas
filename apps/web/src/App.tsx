@@ -1,114 +1,40 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  getFileDetail, getFiles, getMe, submitRepo, watchJob,
-  type FileDetail, type FileRow, type JobEvent, type Me,
-} from "./api";
-import { SubmitPanel } from "./features/SubmitPanel";
-import { AuthBar } from "./features/AuthBar";
-import { JobProgress } from "./features/JobProgress";
-import { FilesPanel } from "./features/FilesPanel";
-import { FileDetailPanel } from "./features/FileDetailPanel";
-import { GraphPanel } from "./features/GraphPanel";
-import { HotspotsPanel } from "./features/HotspotsPanel";
-import { SearchPanel } from "./features/SearchPanel";
-import { ChatPanel } from "./features/ChatPanel";
-import { ReanalyzePanel } from "./features/ReanalyzePanel";
-import { DocsPanel } from "./features/DocsPanel";
-import { CodeViewer, type ViewerTarget } from "./features/CodeViewer";
-import { FileMetricsPanel } from "./features/FileMetricsPanel";
+import { lazy, Suspense } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Skeleton } from "./components/ui";
+import Landing from "./pages/Landing";
+import NotFound from "./pages/NotFound";
+import Overview from "./pages/Overview";
+import Progress from "./pages/Progress";
+import RepoLayout from "./pages/RepoLayout";
+import SignIn from "./pages/SignIn";
+
+// the map, code viewer, chat and docs are heavy: they load only when their tab is opened
+const MapPage = lazy(() => import("./pages/MapPage"));
+const AskPage = lazy(() => import("./pages/AskPage"));
+const DocsPage = lazy(() => import("./pages/DocsPage"));
+const HotspotsPage = lazy(() => import("./pages/HotspotsPage"));
+const Styleguide = lazy(() => import("./pages/Styleguide"));
+
+const Fallback = () => <Skeleton className="h-[60vh] w-full rounded-panel" />;
+const lazyEl = (el: React.ReactNode) => <Suspense fallback={<Fallback />}>{el}</Suspense>;
 
 export default function App() {
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [job, setJob] = useState<JobEvent | null>(null);
-  const [repoId, setRepoId] = useState<string | null>(null);
-  const [files, setFiles] = useState<FileRow[]>([]);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [detail, setDetail] = useState<FileDetail | null>(null);
-  const [viewer, setViewer] = useState<ViewerTarget | null>(null);
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [me, setMe] = useState<Me | null>(null);
-  const stop = useRef<(() => void) | null>(null);
-
-  const loadMe = () => getMe().then(setMe).catch(() => setMe(null));
-  useEffect(() => {
-    void loadMe();
-    return () => stop.current?.();
-  }, []);
-
-  const blocked = me?.demoMode
-    ? "This is a read-only demo: analysis is disabled."
-    : me?.authRequired && !me.user
-      ? "Sign in with GitHub to analyse a repository."
-      : null;
-
-  async function submit(url: string) {
-    setError(null);
-    setJob(null);
-    setFiles([]);
-    setRepoId(null);
-    setSelected(null);
-    setDetail(null);
-    setViewer(null);
-    setBusy(true);
-    try {
-      const { repoId, jobId } = await submitRepo(url);
-      follow(repoId, jobId);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  /** Watch a job; when it finishes, reload everything that depends on the analysis. */
-  function follow(repo: string, jobId: string) {
-    setRepoId(repo);
-    stop.current?.();
-    stop.current = watchJob(jobId, (e) => {
-      setJob(e);
-      if (e.status === "done") {
-        getFiles(repo).then(setFiles).catch((err) => setError(String(err.message)));
-        setRefreshKey((k) => k + 1);
-      }
-    });
-  }
-
-  async function selectId(id: string) {
-    setSelected(id);
-    try {
-      setDetail(await getFileDetail(id));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not load file");
-    }
-  }
-
   return (
-    <main className="mx-auto flex max-w-5xl flex-col gap-section p-gutter">
-      <header>
-        <h1 className="text-display font-bold">CodeAtlas</h1>
-        <p className="text-muted">Paste a public GitHub repo to analyse its architecture.</p>
-        <AuthBar me={me} onChange={loadMe} />
-      </header>
-      <SubmitPanel busy={busy} error={error} onSubmit={submit} disabledReason={blocked} />
-      {job && <JobProgress job={job} />}
-      {repoId && (
-        <ReanalyzePanel
-          repoId={repoId}
-          busy={job !== null && job.status !== "done" && job.status !== "failed"}
-          refreshKey={refreshKey}
-          onStart={(jobId) => { setJob(null); follow(repoId, jobId); }}
-        />
-      )}
-      {repoId && <DocsPanel repoId={repoId} refreshKey={refreshKey} />}
-      {repoId && <ChatPanel repoId={repoId} onOpen={setViewer} />}
-      {repoId && viewer && <CodeViewer repoId={repoId} target={viewer} onClose={() => setViewer(null)} />}
-      {repoId && <SearchPanel repoId={repoId} onOpen={setViewer} />}
-      {repoId && <HotspotsPanel key={refreshKey} repoId={repoId} selectedId={selected} onSelect={selectId} />}
-      {selected && <FileMetricsPanel fileId={selected} />}
-      {repoId && <GraphPanel key={refreshKey} repoId={repoId} />}
-      {files.length > 0 && <FilesPanel files={files} selectedId={selected} onSelect={(f) => selectId(f.id)} />}
-      {detail && <FileDetailPanel detail={detail} />}
-    </main>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/analyze/:repoId/:jobId" element={<Progress />} />
+        <Route path="/repo/:repoId" element={<RepoLayout />}>
+          <Route path="overview" element={<Overview />} />
+          <Route path="map" element={lazyEl(<MapPage />)} />
+          <Route path="hotspots" element={lazyEl(<HotspotsPage />)} />
+          <Route path="ask" element={lazyEl(<AskPage />)} />
+          <Route path="docs" element={lazyEl(<DocsPage />)} />
+        </Route>
+        <Route path="/signin" element={<SignIn />} />
+        {import.meta.env.DEV && <Route path="/styleguide" element={lazyEl(<Styleguide />)} />}   {/* design review page: development builds only */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
   );
 }

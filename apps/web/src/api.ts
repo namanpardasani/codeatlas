@@ -210,11 +210,35 @@ export const getMe = () => request<Me>("/me");
 export const logout = () => request<{ ok: boolean }>("/auth/logout", { method: "POST" });
 
 export const submitRepo = (url: string) =>
-  request<{ repoId: string; jobId: string }>("/repos", {
+  request<{ repoId: string; jobId: string; existing?: boolean }>("/repos", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ url }),
   });
+
+export interface JobInfo {
+  id: string;
+  repo_id: string;
+  status: JobEvent["status"];
+  stage: string;
+  progress: number;
+  error: string | null;
+  commit_sha: string | null;
+  full_name: string;
+  files_total: number | null;
+  duration_ms: number | null;
+}
+export const getJob = (jobId: string) => request<JobInfo>(`/jobs/${jobId}`);
+
+export interface RepoSummary {
+  id: string;
+  full_name: string;
+  url: string;
+  commit_sha: string | null;
+  analyzed_at: string | null;
+  files: number;
+}
+export const getRepos = () => request<RepoSummary[]>("/repos");
 
 export const getFiles = (repoId: string) => request<FileRow[]>(`/repos/${repoId}/files`);
 export const getFileDetail = (fileId: string) => request<FileDetail>(`/files/${fileId}/symbols`);
