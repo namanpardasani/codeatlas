@@ -1,4 +1,4 @@
-import { animate, useReducedMotion } from "framer-motion";
+import { animate, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 /** Smoothly count from the previous value to `target` (400 ms). Instant when reduced motion is on. */

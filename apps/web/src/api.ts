@@ -412,3 +412,40 @@ export const getDocsTree = (repoId: string) => request<{ name: string; summary: 
 export const getDocPage = (repoId: string, type: DocPage["type"], path: string) =>
   request<DocPage>(`/repos/${repoId}/docs/page?type=${type}&path=${encodeURIComponent(path)}`);
 export const docsExportUrl = (repoId: string) => `/api/repos/${repoId}/docs/export.md`;
+
+// ---- Blast Radius ----------------------------------------------------------------------------------------------
+export interface BlastStep { node: [string, string, number?]; edge: string; reason: string }
+export interface BlastFile { path: string; file_id: string | number | null; score: number; distance: number; edges: string[]; reason: string; why: BlastStep[] }
+export interface BlastSymbol { path: string; name: string; file_id: string | number | null; score: number; distance: number; reason: string; why: BlastStep[] }
+export interface BlastResult {
+  id: string;
+  cached?: boolean;
+  input: { kind: "pr" | "commit" | "diff" | ""; ref: string };
+  base_sha: string;
+  head_sha: string;
+  pr?: { number: number; title: string; author: string; state: string };
+  change: {
+    stats: Record<string, number>;
+    files: { path: string; old_path: string | null; status: string; category: string; added: number; deleted: number;
+             module_changed: boolean; error: string | null; file_id: number | null;
+             symbols: { change: string; kind: string; name: string; note: string }[] }[];
+  };
+  impact: { files: BlastFile[]; symbols: BlastSymbol[]; total_files: number; total_symbols: number;
+            params: { decay: number; max_depth: number; combine: string } } | null;
+  tests: { summary: string; total: number; selected_count: number; ratio: number; full_suite: boolean; full_suite_reasons: string[];
+           framework: string; command: string; selected: { file: string; name: string; score: number; reason: string }[];
+           new_tests: { file: string; name: string }[] } | null;
+  risk: { score: number; label: "low" | "medium" | "high"; model: string; top_factors: string[];
+          factors: { feature: string; contribution: number; text: string }[];
+          missing_cochanges: { file: string; partner_of: string; confidence: number; support: number; text: string }[] } | null;
+  reviewers: { name: string; commits: number; files: string[]; reason: string }[];
+  timings_ms: Record<string, number>;
+}
+export interface BlastListItem { id: string; kind: string; ref: string; risk_score: number | null; risk_label: string | null; source: string; created_at: string; title: string | null }
+
+export const runBlast = (repoId: string, input: { pr_url?: string; commit_sha?: string; diff?: string }) =>
+  request<BlastResult>(`/repos/${repoId}/blast-radius`, {
+    method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(input),
+  });
+export const getBlastList = (repoId: string) => request<BlastListItem[]>(`/repos/${repoId}/blast-radius`);
+export const getBlast = (publicId: string) => request<BlastResult & { repo_id: string }>(`/blast/${encodeURIComponent(publicId)}`);

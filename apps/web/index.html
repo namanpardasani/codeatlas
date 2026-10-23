@@ -3,15 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="dark" />
-    <meta name="theme-color" content="#07090C" />
-    <title>CodeAtlas</title>
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#1d1b17" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f0e0c" media="(prefers-color-scheme: dark)" />
+    <meta name="description" content="CodeAtlas maps any public GitHub repository: dependency graph, import cycles, risky files, documentation and answers with cited code." />
+    <title>CodeAtlas: know what a change will break</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- theme before first paint (see public/theme-init.js) -->
+    <script src="/theme-init.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
-    />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..800,0..100,0..1;1,9..144,300..800,0..100,0..1&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" />
   </head>
   <body>
     <div id="root"></div>

@@ -1,26 +1,27 @@
 /**
- * Motion tokens: the only place durations and easings are defined.
- * Rules (see NOTES.md "Design system"): every animation has a job (direction, progress, claim -> evidence, risk).
- * CSS keyframes for loops, Framer Motion for enter/exit/layout. Transform and opacity only. Reduced motion = no loops, no enters.
+ * Motion tokens. Rules: every animation has a job (direction, progress, claim -> evidence, risk, guiding attention).
+ * CSS keyframes for small loops, motion (motion/react) for state-driven UI.
+ * Transform and opacity only (plus stroke-dashoffset for SVG). Reduced motion = no loops, no parallax, no enters.
  */
 export const ease = {
-  out: [0.2, 0.7, 0.2, 1] as [number, number, number, number],
+  out: [0.22, 1, 0.36, 1] as [number, number, number, number],
 };
 
-/** seconds (Framer Motion units) */
-export const dur = {
-  fast: 0.15,
-  base: 0.25,
-  enter: 0.7,
-  bar: 0.9,
+/** seconds */
+export const dur = { fast: 0.15, base: 0.25, enter: 0.6, bar: 0.9 };
+
+export const stagger = 0.06;
+
+/** springs: `ui` is crisp; `soft` has a touch of overshoot for things that pop in */
+export const springs = {
+  ui: { type: "spring", stiffness: 400, damping: 30 } as const,
+  soft: { type: "spring", stiffness: 180, damping: 18, mass: 0.9 } as const,
 };
 
-export const stagger = 0.08;
-
-/** loops live in CSS (index.css); these are their periods in seconds, documented here so they stay in 1.4-3.2 s */
+/** loops live in CSS (index.css); periods in seconds */
 export const loop = { pulse: 2.4, dash: 1.6, shimmer: 2.0, caret: 1.1 };
 
-/** Standard enter: rise 14px and fade. Pass `i` for staggered lists. */
+/** Standard enter: rise and fade. Pass `i` for staggered lists. */
 export const rise = (i = 0, distance = 14) => ({
   initial: { opacity: 0, y: distance },
   animate: { opacity: 1, y: 0 },

@@ -15,7 +15,7 @@ const MAX_LINES = 1500;
 
 /**
  * Code viewer: dark, line numbers, syntax highlighting from our tokens. When `target` changes it smooth-scrolls to the range
- * and flashes it (35% cyan settling to 10% with a 3px cyan bar, 900 ms): the link between a claim and its evidence.
+ * and swipes a highlighter across it (lands bright, settles, with an amber bar in the gutter): the link between a claim and its evidence.
  */
 export default function CodeViewer({ repoId, target, onClose }: { repoId: string; target: ViewerTarget; onClose?: () => void }) {
   const [code, setCode] = useState<string | null>(null);
@@ -46,19 +46,19 @@ export default function CodeViewer({ repoId, target, onClose }: { repoId: string
   const to = total > MAX_LINES ? Math.min(total, from + MAX_LINES - 1) : total;
 
   return (
-    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-card border border-border bg-code">
-      <div className="flex items-center justify-between gap-3 border-b border-line bg-bg-raised px-4 py-2.5">
-        <span className="min-w-0 truncate font-mono text-small text-text-2" title={target.path}>
-          {target.path} <span className="text-dim">:{target.start}–{target.end}</span>
+    <div className="flex h-full min-h-0 flex-col overflow-hidden rounded-sm border border-rule bg-paper-2">
+      <div className="flex items-center justify-between gap-3 border-b-2 border-ink bg-paper px-4 py-2.5">
+        <span className="min-w-0 truncate font-mono text-small text-ink" title={target.path}>
+          {target.path} <span className="text-pencil">:{target.start}–{target.end}</span>
         </span>
         {onClose && (
-          <button onClick={onClose} aria-label="Close code viewer" className="rounded-ui px-2 py-1 text-small text-muted hover:text-text">
+          <button onClick={onClose} aria-label="Close code viewer" className="rounded-ui px-2 py-1 font-mono text-[11px] uppercase tracking-[0.1em] text-pencil hover:text-ink">
             Close
           </button>
         )}
       </div>
       <div className="min-h-0 flex-1 overflow-auto py-2 font-mono text-[13px] leading-6" role="region" aria-label={`Source of ${target.path}`} tabIndex={0}>
-        {error && <p className="px-4 text-error">{error}</p>}
+        {error && <p className="px-4 text-danger-text">{error}</p>}
         {!lines && !error && (
           <div className="flex flex-col gap-2 px-4">
             <Skeleton className="h-4 w-2/3" /> <Skeleton className="h-4 w-1/2" /> <Skeleton className="h-4 w-3/4" />
@@ -72,9 +72,9 @@ export default function CodeViewer({ repoId, target, onClose }: { repoId: string
               <div
                 key={n}
                 ref={n === target.start ? startRef : undefined}
-                className={`flex gap-4 px-4 ${hit ? (flash ? "line-hit" : "line-hit-settled") : ""}`}
+                className={`flex gap-4 px-4 ${hit ? `isolate ${flash ? "line-hit" : "line-hit-settled"}` : ""}`}
               >
-                <span aria-hidden className="w-10 shrink-0 select-none text-right text-dim">{n}</span>
+                <span aria-hidden className="w-12 shrink-0 select-none border-r border-rule pr-3 text-right text-pencil">{n}</span>
                 <span className="whitespace-pre">
                   {spans.length === 0 ? " " : spans.map((s, j) => (s.type ? <span key={j} className={`tok-${s.type}`}>{s.text}</span> : s.text))}
                 </span>

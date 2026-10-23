@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { docsExportUrl, getDocPage, getDocsStatus, getDocsTree, type DocNode, type DocPage, type DocsStatus } from "../api";
-import { Button, EmptyState, ErrorState, MonoLabel, Skeleton } from "../components/ui";
+import { Arrow, Button, ButtonAnchor, EmptyState, ErrorState, PageHead, Skeleton } from "../components/ui";
 import { Markdown } from "../components/ui/Markdown";
 import { Dialog } from "../features/Dialog";
 import { useRepo } from "../hooks/RepoData";
@@ -24,9 +24,9 @@ function Tree({ nodes, sel, open, toggle, pick, depth = 0 }: { nodes: DocNode[];
         const selected = sel.type === n.type && sel.path === n.path;
         return (
           <li key={`${n.type}:${n.path}`} role="treeitem" aria-expanded={n.type === "folder" ? isOpen : undefined} aria-selected={selected}>
-            <div className={`flex items-center rounded-ui ${selected ? "bg-cyan-tint text-text" : "text-text-3 hover:bg-surface-2"}`} style={{ paddingLeft: `${0.25 + depth * 0.9}rem` }}>
+            <div className={`flex items-center ${selected ? "bg-hl-soft text-ink shadow-[inset_3px_0_0_var(--ink)]" : "text-ink-2 hover:bg-paper-2"}`} style={{ paddingLeft: `${0.25 + depth * 0.9}rem` }}>
               {n.type === "folder" ? (
-                <button className="flex size-7 items-center justify-center text-muted hover:text-text" onClick={() => toggle(n.path)} aria-label={`${isOpen ? "Collapse" : "Expand"} ${n.name}`}>
+                <button className="flex size-7 items-center justify-center text-pencil hover:text-ink" onClick={() => toggle(n.path)} aria-label={`${isOpen ? "Collapse" : "Expand"} ${n.name}`}>
                   <Chevron open={isOpen} />
                 </button>
               ) : <span className="size-7" />}
@@ -36,7 +36,7 @@ function Tree({ nodes, sel, open, toggle, pick, depth = 0 }: { nodes: DocNode[];
                 onClick={() => { pick({ type: n.type, path: n.path }); if (n.type === "folder" && !isOpen) toggle(n.path); }}
               >
                 {n.name}{n.type === "folder" ? "/" : ""}
-                {n.source === "extractive" && <span className="ml-1 text-dim" title="assembled without a model">·</span>}
+                {n.source === "extractive" && <span className="ml-1 text-pencil" title="assembled without a model">·</span>}
               </button>
             </div>
             {n.type === "folder" && isOpen && n.children && <Tree nodes={n.children} sel={sel} open={open} toggle={toggle} pick={pick} depth={depth + 1} />}
@@ -93,37 +93,36 @@ export default function DocsPage() {
       : <EmptyState message="Documentation has not been generated for this repository yet." />;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <MonoLabel>PLATE 05 ——— DOCUMENTATION</MonoLabel>
-          <p className="mt-1 text-small text-muted">
-            {status.llm} written by a model and checked against the code{status.extractive > 0 ? `, ${status.extractive} assembled from names and docstrings (marked ·)` : ""}.
-            {status.docs_status === "running" && " More pages are still being written."}
-          </p>
-        </div>
-        <a href={docsExportUrl(repoId)} download className="inline-flex min-h-11 items-center rounded-ui border border-border bg-surface px-5 text-body font-semibold hover:border-border-strong hover:bg-surface-2">
-          Export Markdown
-        </a>
-      </div>
+    <div className="flex flex-col gap-10">
+      <PageHead
+        sheet="Sheet 06 · Docs"
+        title="The guidebook"
+        actions={<ButtonAnchor variant="arrow" size="sm" href={docsExportUrl(repoId)} download>Export Markdown <Arrow dir="down" /></ButtonAnchor>}
+      >
+        {status.llm > 0
+          ? <>{status.llm} pages drafted by a model and checked against the code{status.extractive > 0 ? `, ${status.extractive} assembled from names and docstrings (marked ·)` : ""}.</>
+          : <>{status.extractive} pages, all assembled from names, docstrings and the import graph. No model wrote any of it.</>}
+        {status.docs_status === "running" && " More pages are still being written."}
+      </PageHead>
 
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[280px_minmax(0,1fr)]">
-        <nav aria-label="Modules" className="max-h-[70vh] overflow-y-auto rounded-card border border-border bg-surface p-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[260px_minmax(0,1fr)]">
+        <nav aria-label="Modules" className="max-h-[70vh] overflow-y-auto border-t-2 border-ink pt-2 lg:sticky lg:top-6">
+          <div className="mono-label px-1 py-2">Contents</div>
           <button
-            className={`mb-1 flex min-h-8 w-full items-center rounded-ui px-3 text-left font-semibold ${sel.type === "repo" ? "bg-cyan-tint text-text" : "text-text-3 hover:bg-surface-2"}`}
+            className={`mb-1 flex min-h-8 w-full items-center px-3 text-left font-display text-[16px] font-semibold ${sel.type === "repo" ? "bg-hl-soft text-ink shadow-[inset_3px_0_0_var(--ink)]" : "text-ink-2 hover:bg-paper-2"}`}
             onClick={() => setSel({ type: "repo", path: "" })}
           >
-            Overview
+            The whole repository
           </button>
           <Tree nodes={tree} sel={sel} open={open} toggle={toggle} pick={setSel} />
         </nav>
-        <article className="min-w-0 rounded-panel border border-border bg-surface p-6 md:p-8">
+        <article className="min-w-0 border-t-2 border-ink pt-6 lg:border-l lg:border-t-0 lg:border-l-rule lg:pl-10 lg:pt-1">
           {error && <ErrorState message={error} />}
-          {!page && !error && <div className="flex flex-col gap-3"><Skeleton className="h-6 w-1/2" /><Skeleton className="h-4" /><Skeleton className="h-4 w-5/6" /></div>}
+          {!page && !error && <div className="flex flex-col gap-3"><Skeleton className="h-8 w-1/2" /><Skeleton className="h-4" /><Skeleton className="h-4 w-5/6" /></div>}
           {page && (
             <>
               {sel.type === "file" && (
-                <div className="mb-4"><Button variant="secondary" onClick={() => setSource(true)}>View source</Button></div>
+                <div className="mb-5"><Button variant="secondary" size="sm" onClick={() => setSource(true)}>View source</Button></div>
               )}
               <Markdown onNavigate={navigate}>{page.markdown}</Markdown>
             </>

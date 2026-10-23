@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>A · Paper atlas on a dark table</title>
+<style>
+  @font-face { font-family: "Fraunces"; src: url(fonts/fraunces.woff2) format("woff2"); font-weight: 100 900; font-style: normal; }
+  @font-face { font-family: "Fraunces"; src: url(fonts/fraunces-italic.woff2) format("woff2"); font-weight: 100 900; font-style: italic; }
+  @font-face { font-family: "Plex Sans"; src: url(fonts/plex-sans-400.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Plex Sans"; src: url(fonts/plex-sans-600.woff2) format("woff2"); font-weight: 600; }
+  @font-face { font-family: "Plex Mono"; src: url(fonts/plex-mono-400.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Plex Mono"; src: url(fonts/plex-mono-500.woff2) format("woff2"); font-weight: 500; }
+
+  :root {
+    --table: #1c1b18; --table-2: #26241f; --table-ink: #efe9dc; --table-muted: #a8a294;
+    --paper: #f6f1e5; --paper-2: #ece5d3; --rule: #d9d0bb;
+    --ink: #1f1c16; --ink-2: #4b463c; --pencil: #6b6558;
+    --signal: #e5482b; --signal-ink: #b4321a; --verified: #2e7a56; --hl: #f2d24b;
+    --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--table); color: var(--table-ink); font: 16px/1.6 "Plex Sans", system-ui, sans-serif; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+  .mono { font-family: "Plex Mono", monospace; }
+
+  nav { display: flex; align-items: center; gap: 28px; padding: 22px 0; }
+  .brand { display: flex; align-items: center; gap: 10px; font: 600 21px/1 "Fraunces"; letter-spacing: -.01em; font-variation-settings: "SOFT" 50, "opsz" 48; }
+  nav a { color: var(--table-muted); text-decoration: none; font-size: 14px; }
+  nav .sp { flex: 1; }
+
+  .hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; padding: 56px 0 96px; align-items: start; }
+  .kicker { font: 500 12px/1 "Plex Mono"; letter-spacing: .14em; text-transform: uppercase; color: var(--table-muted); }
+  .kicker b { color: var(--signal); font-weight: 500; }
+  h1 { font: 640 clamp(48px, 7vw, 104px)/.9 "Fraunces"; letter-spacing: -.045em; margin: 22px 0 26px; font-variation-settings: "SOFT" 30, "opsz" 144; }
+  h1 em { font-style: italic; font-weight: 400; color: var(--signal); font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144; }
+  .lede { font-size: 19px; color: var(--table-muted); max-width: 30em; margin: 0 0 34px; }
+  .lede strong { color: var(--table-ink); font-weight: 600; }
+
+  .field { display: flex; gap: 0; max-width: 560px; background: var(--paper); border-radius: 4px; padding: 6px; box-shadow: 0 1px 0 #0006, 0 18px 40px -18px #000c; }
+  .field input { flex: 1; border: 0; background: transparent; font: 15px "Plex Mono"; color: var(--ink); padding: 0 12px; outline: none; }
+  .btn { font: 600 15px/1 "Plex Sans"; border: 2px solid var(--ink); border-radius: 6px; padding: 14px 20px; cursor: pointer; transition: transform .08s, box-shadow .08s; }
+  .btn-signal { background: var(--signal); color: #1a0b06; box-shadow: 0 4px 0 var(--ink); }
+  .btn-signal:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+  .btn-arrow { font: 500 13px/1 "Plex Mono"; letter-spacing: .08em; text-transform: uppercase; background: transparent; color: var(--table-ink); border: 1.5px solid #ffffff38; border-radius: 3px; padding: 12px 16px; }
+  .btn-arrow span { display: inline-block; transition: transform .2s; }
+  .btn-arrow:hover span { transform: translateX(4px); }
+  .tries { margin-top: 18px; font-size: 13.5px; color: var(--table-muted); }
+  .tries a { color: var(--table-ink); text-decoration: underline; text-decoration-color: #ffffff40; text-underline-offset: 3px; margin-right: 12px; font-family: "Plex Mono"; font-size: 13px; }
+
+  /* paper sheet */
+  .sheet { position: relative; background: var(--paper) var(--grain); color: var(--ink); border-radius: 2px;
+    box-shadow: 0 1px 1px #0000004d, 0 2px 0 -1px var(--paper-2), 0 28px 60px -28px #000, 0 10px 18px -12px #000a; }
+  .sheet.tilt-l { transform: rotate(-1.2deg); }
+  .sheet.tilt-r { transform: rotate(.8deg); }
+  .fold::after { content: ""; position: absolute; inset: 0 auto 0 50%; width: 1px; background: linear-gradient(#0000, #00000014 20%, #00000014 80%, #0000); }
+
+  .mapsheet { padding: 22px 22px 16px; }
+  .cartouche { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1.5px solid var(--ink); padding-bottom: 8px; margin-bottom: 8px; }
+  .cartouche b { font: 600 20px "Fraunces"; letter-spacing: -.02em; }
+  .cartouche span { font: 11px "Plex Mono"; color: var(--pencil); letter-spacing: .06em; text-transform: uppercase; }
+  .mapsheet svg { width: 100%; height: auto; display: block; }
+  .legend { display: flex; gap: 18px; font: 11px "Plex Mono"; color: var(--pencil); margin-top: 8px; }
+
+  .stamp { position: absolute; right: -18px; top: -26px; width: 104px; height: 104px; border: 2.5px solid var(--verified); border-radius: 50%; color: var(--verified);
+    display: grid; place-items: center; text-align: center; font: 600 10.5px/1.25 "Plex Mono"; letter-spacing: .12em; transform: rotate(14deg); opacity: .88; background: #f6f1e5cc; }
+  .stamp::before { content: ""; position: absolute; inset: 5px; border: 1px dashed var(--verified); border-radius: 50%; }
+  .note { position: absolute; left: -150px; top: 210px; width: 150px; font: italic 400 17px/1.25 "Fraunces"; color: var(--hl); transform: rotate(-4deg); font-variation-settings: "SOFT" 100, "WONK" 1; }
+  .note svg { display: block; margin: 6px 0 0 60px; }
+
+  .compass { width: 44px; height: 44px; }
+  .needle { transform-origin: 22px 22px; transition: transform .6s cubic-bezier(.3,1.6,.5,1); }
+
+  section.row { display: grid; grid-template-columns: 300px 1fr; gap: 56px; padding: 80px 0; border-top: 1px solid #ffffff14; }
+  .row h2 { font: 600 40px/1 "Fraunces"; letter-spacing: -.035em; margin: 10px 0 0; font-variation-settings: "opsz" 96; }
+  .cards { display: grid; grid-template-columns: 1.3fr 1fr; gap: 26px; align-items: start; }
+  .card { padding: 22px 24px; }
+  .card h3 { font: 600 22px/1.15 "Fraunces"; letter-spacing: -.02em; margin: 0 0 8px; }
+  .card p { margin: 0; color: var(--ink-2); font-size: 15px; }
+  .card .ix { font: 11px "Plex Mono"; color: var(--pencil); letter-spacing: .1em; }
+  .tape { position: absolute; top: -11px; left: 38%; width: 92px; height: 24px; background: #f2e6b8b3; transform: rotate(-3deg); box-shadow: 0 1px 2px #0002; }
+  .num { font: 600 64px/1 "Fraunces"; letter-spacing: -.04em; font-variation-settings: "opsz" 144; }
+  .num small { font: 13px "Plex Mono"; color: var(--pencil); letter-spacing: 0; margin-left: 6px; }
+  .bar { height: 10px; border: 1.5px solid var(--ink); margin: 10px 0 4px; position: relative; background: repeating-linear-gradient(90deg, #0000 0 9px, #00000012 9px 10px); }
+  .bar i { position: absolute; inset: 0 auto 0 0; background: var(--ink); }
+  .bar i.base { background: var(--pencil); opacity: .5; }
+
+  .spec { margin: 40px 0 80px; padding: 26px 28px; }
+  .spec h2 { font: 600 28px "Fraunces"; margin: 0 0 14px; letter-spacing: -.02em; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 18px; }
+  .sw { width: 128px; font: 11px/1.4 "Plex Mono"; color: var(--ink-2); }
+  .sw i { display: block; height: 44px; border: 1.5px solid var(--ink); margin-bottom: 4px; border-radius: 2px; }
+  .spec dl { display: grid; grid-template-columns: 170px 1fr; gap: 8px 20px; margin: 0; font-size: 14.5px; }
+  .spec dt { font: 500 12px "Plex Mono"; letter-spacing: .08em; text-transform: uppercase; color: var(--pencil); padding-top: 3px; }
+  .spec dd { margin: 0; color: var(--ink-2); }
+
+  @media (max-width: 860px) {
+    .hero, section.row, .cards { grid-template-columns: 1fr; }
+    .note { display: none; }
+    .stamp { right: 4px; top: -30px; width: 84px; height: 84px; font-size: 9px; }
+    .spec dl { grid-template-columns: 1fr; }
+    nav a.hide { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <span class="brand">
+      <svg class="compass" viewBox="0 0 44 44" aria-hidden="true">
+        <circle cx="22" cy="22" r="19" fill="none" stroke="#efe9dc" stroke-width="1.5"/>
+        <path d="M22 5v4M22 35v4M5 22h4M35 22h4" stroke="#efe9dc" stroke-width="1.5"/>
+        <g class="needle" id="needle"><path d="M22 9 26 22H18Z" fill="#e5482b"/><path d="M22 35 18 22h8Z" fill="#efe9dc"/></g>
+      </svg>
+      CodeAtlas
+    </span>
+    <a class="hide" href="#">Replay a real bug</a><a class="hide" href="#">How we measured</a><a class="hide" href="#">MCP</a>
+    <span class="sp"></span>
+    <button class="btn btn-arrow">Sign in <span>→</span></button>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <div class="kicker">Sheet 01 · <b>any public repository</b></div>
+      <h1>Know what a change <em>will break</em> before you merge it.</h1>
+      <p class="lede">CodeAtlas reads a GitHub repo, never runs it, and draws the map: who imports whom, where the risky files are, and <strong>which files your PR will drag along</strong>.</p>
+      <form class="field" onsubmit="return false">
+        <input value="github.com/psf/requests" aria-label="Repository URL" />
+        <button class="btn btn-signal">Draw the map</button>
+      </form>
+      <div class="tries">Or open one we already mapped: <a href="#">psf/requests</a><a href="#">chalk/chalk</a><a href="#">pallets/itsdangerous</a></div>
+    </div>
+
+    <div style="position:relative">
+      <div class="note">this one breaks things<svg width="60" height="40" viewBox="0 0 60 40"><path d="M2 4c20 2 36 12 50 30m0 0-2-10m2 10-9-3" fill="none" stroke="#f2d24b" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+      <div class="sheet tilt-r mapsheet fold">
+        <div class="stamp">CHECKED<br/>BY HAND<br/>70 PAIRS</div>
+        <div class="cartouche"><b>psf/requests</b><span>124 files · 106 imports · 1 cycle</span></div>
+        <svg viewBox="0 0 520 330" role="img" aria-label="Map of psf/requests">
+          <defs><pattern id="grat" width="52" height="52" patternUnits="userSpaceOnUse"><path d="M52 0H0V52" fill="none" stroke="#d9d0bb" stroke-width=".8"/></pattern></defs>
+          <rect width="520" height="330" fill="url(#grat)"/>
+          <!-- regions -->
+          <path d="M28 40c60-20 170-24 220 4s30 120-20 150-170 20-200-10S-12 60 28 40Z" fill="#e5482b0d" stroke="#6b6558" stroke-dasharray="3 4"/>
+          <text x="44" y="62" font-family="Plex Mono" font-size="10" fill="#6b6558" letter-spacing="1.5">SRC/REQUESTS</text>
+          <path d="M300 200c50-14 170-8 190 30s-20 80-90 84-130-14-130-50 0-56 30-64Z" fill="none" stroke="#6b6558" stroke-dasharray="3 4"/>
+          <text x="318" y="222" font-family="Plex Mono" font-size="10" fill="#6b6558" letter-spacing="1.5">DOCS</text>
+          <!-- edges -->
+          <g stroke="#1f1c16" stroke-width="1.2" fill="none" opacity=".55">
+            <path d="M120 120 196 86"/><path d="M120 120 90 170"/><path d="M120 120 180 170"/><path d="M196 86 250 120"/><path d="M180 170 250 120"/><path d="M90 170 180 170"/><path d="M250 120 330 90"/><path d="M180 170 230 230"/><path d="M370 260 420 250"/>
+          </g>
+          <path d="M120 120C150 140 160 150 180 170" stroke="#e5482b" stroke-width="2" stroke-dasharray="5 4" fill="none"/>
+          <!-- ripple rings around models.py -->
+          <circle cx="120" cy="120" r="34" fill="none" stroke="#e5482b" stroke-width="1" opacity=".5"/>
+          <circle cx="120" cy="120" r="62" fill="none" stroke="#e5482b" stroke-width="1" opacity=".25"/>
+          <!-- nodes -->
+          <g font-family="Plex Mono" font-size="11" fill="#1f1c16">
+            <circle cx="120" cy="120" r="9" fill="#e5482b" stroke="#1f1c16" stroke-width="1.5"/><text x="134" y="116">models.py</text>
+            <circle cx="196" cy="86" r="6" fill="#f6f1e5" stroke="#1f1c16" stroke-width="1.5"/><text x="206" y="82">sessions.py</text>
+            <circle cx="90" cy="170" r="6" fill="#f6f1e5" stroke="#1f1c16" stroke-width="1.5"/><text x="40" y="192">utils.py</text>
+            <circle cx="180" cy="170" r="7" fill="#1f1c16"/><text x="190" y="186">compat.py</text>
+            <circle cx="250" cy="120" r="5" fill="#f6f1e5" stroke="#1f1c16" stroke-width="1.5"/><text x="258" y="136">adapters.py</text>
+            <circle cx="330" cy="90" r="5" fill="#f6f1e5" stroke="#1f1c16" stroke-width="1.5"/><text x="340" y="94">api.py</text>
+            <circle cx="230" cy="230" r="5" fill="#f6f1e5" stroke="#1f1c16" stroke-width="1.5"/><text x="240" y="246">structures.py</text>
+            <circle cx="370" cy="260" r="4" fill="#f6f1e5" stroke="#6b6558" stroke-width="1.2"/><text x="380" y="282" fill="#6b6558">conf.py</text>
+          </g>
+          <!-- scale bar + north -->
+          <g transform="translate(400 28)" font-family="Plex Mono" font-size="9" fill="#6b6558">
+            <rect width="30" height="5" fill="#1f1c16"/><rect x="30" width="30" height="5" fill="none" stroke="#1f1c16"/><rect x="60" width="30" height="5" fill="#1f1c16"/>
+            <text y="18">0</text><text x="76" y="18">3 hops</text>
+          </g>
+        </svg>
+        <div class="legend"><span>● hotspot</span><span>◦ file</span><span>- - cycle</span><span>◯ blast ring</span></div>
+      </div>
+    </div>
+  </header>
+
+  <section class="row">
+    <div><div class="kicker">What it does</div><h2>Three questions it answers</h2></div>
+    <div class="cards">
+      <div class="sheet tilt-l card" style="padding-bottom:28px">
+        <div class="tape"></div>
+        <div class="ix">01 · BLAST RADIUS</div>
+        <h3>“If I change <span class="mono" style="font-size:.8em">models.py</span>, what else moves?”</h3>
+        <p>It follows calls, imports and files that historically change together, then ranks them with the path that explains each one.</p>
+      </div>
+      <div style="display:grid;gap:26px">
+        <div class="sheet card tilt-r"><div class="ix">02 · HOTSPOTS</div><h3>Which file would hurt most to touch?</h3><p>Complexity × churn × fan-in, with the reason written next to the score.</p></div>
+        <div class="sheet card"><div class="ix">03 · ASK</div><h3>How does this work?</h3><p>Answers quote the exact lines, or say “not found”.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="row">
+    <div><div class="kicker">Measured, not claimed</div><h2>We checked it against history</h2></div>
+    <div class="sheet card" style="max-width:620px">
+      <div class="ix">MRR ON 23 HAND-CONFIRMED BUG PAIRS</div>
+      <div class="num">0.831<small>vs 0.670 baseline</small></div>
+      <div class="bar"><i style="width:83.1%"></i></div><div class="bar"><i class="base" style="width:67%"></i></div>
+      <p style="margin-top:12px">Across all 477 pairs the gap shrinks to 0.757 vs 0.731, which is not significant. We print both.</p>
+    </div>
+  </section>
+
+  <div class="sheet spec">
+    <h2>Direction A · Paper atlas on a dark table</h2>
+    <div class="swatches">
+      <div class="sw"><i style="background:#1c1b18"></i>table #1c1b18</div>
+      <div class="sw"><i style="background:#f6f1e5"></i>paper #f6f1e5</div>
+      <div class="sw"><i style="background:#1f1c16"></i>ink #1f1c16</div>
+      <div class="sw"><i style="background:#6b6558"></i>pencil #6b6558</div>
+      <div class="sw"><i style="background:#e5482b"></i>signal #e5482b</div>
+      <div class="sw"><i style="background:#2e7a56"></i>verified #2e7a56</div>
+      <div class="sw"><i style="background:#f2d24b"></i>highlighter #f2d24b</div>
+    </div>
+    <dl>
+      <dt>Fonts</dt><dd>Fraunces (display, soft optical serif, wonky italic for the one accented phrase) · IBM Plex Sans (text) · IBM Plex Mono (paths, numbers, labels). All self-hosted.</dd>
+      <dt>Buttons</dt><dd>Chunky: vermilion block, 2px ink border, 4px hard ink shadow that collapses when pressed. Secondary is a mono uppercase arrow button on the table.</dd>
+      <dt>Cards</dt><dd>Paper sheets with grain, a deckle shadow on the table and varied rotation (−1.2° to 0.8°). Tape, fold lines, rubber stamps and pencil notes appear only where they say something.</dd>
+      <dt>Signature</dt><dd>The compass needle in the logo tracks your pointer, then spins and settles north while a repo is being analysed. On Blast Radius, rings spread across the map hop by hop.</dd>
+      <dt>Why it fits</dt><dd>The product is literally an atlas of a codebase. A dark table makes the paper (the evidence) the brightest thing on screen; one hot red ink means “this will break”.</dd>
+    </dl>
+  </div>
+</div>
+<script>
+  const n = document.getElementById("needle"), c = n.ownerSVGElement;
+  addEventListener("pointermove", (e) => { const r = c.getBoundingClientRect(); const a = Math.atan2(e.clientY - (r.top + r.height / 2), e.clientX - (r.left + r.width / 2)) * 180 / Math.PI + 90; n.style.transform = `rotate(${a}deg)`; });
+</script>
+</body>
+</html>

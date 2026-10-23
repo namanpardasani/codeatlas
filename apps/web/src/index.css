@@ -1,170 +1,385 @@
 @import "tailwindcss";
 
 /*
- * THEME TOKENS - the single place to restyle the app (CodeAtlas "atlas" design system).
+ * DESIGN SYSTEM v4: "a paper atlas on a dark table".
  *
- * Colour MEANS something:
- *   cyan  = structure, navigation, verified      amber = risk, cycles, hotspots
- *   error = errors only                          everything else = grayscale
+ * Two materials. The TABLE is the dark stage the app sits on (header, tabs, margins). PAPER is where the evidence
+ * lives: every page's content is a sheet of paper on that table. Day and Night only change the paper (cream vs. a
+ * dark "night edition" sheet) and darken the table a little; the table is always dark.
  *
- * Text contrast (WCAG AA, 4.5:1) - measured on bg / surface / surface-2:
- *   text, text-2, text-3, muted, dim, cyan*, amber*, error pass.
- *   faint (3.3-3.7:1) and ghost (~2:1) FAIL as text: use them only for borders, dashes, grid lines and decoration.
- *   `dim` (#73849A) is the AA-safe tone to use where the board says "faint" text.
+ * Colour has meaning, and there is very little of it:
+ *   signal   (cartographer's red ink) = "this will break / look here": primary action, risk, changed files, cycles
+ *   verified (survey green)           = checked against the code or history: verified citations, hits, done steps
+ *   caution  (ochre)                  = medium risk only (risk is a scale, so it needs one middle step)
+ *   hl       (highlighter)            = selection and the lines an answer cites
+ * Everything else is ink, pencil and paper.
  *
- * Legacy semantic names used by existing pages (fg, primary, danger, success, warning, info, subtle) are kept and
- * mapped onto the new palette, so pages recolour without markup changes.
+ * WCAG AA, measured (scratchpad contrast.py):
+ *   day   ink-2 9.3, pencil 6.1 / 5.5 / 5.0 on paper / paper-2 / paper-3, signal-ink 5.6, caution-ink 5.3,
+ *         verified-ink 5.9, table-muted 6.9 on table, button text on signal 4.9
+ *   night ink-2 9.6, pencil 5.7 / 6.2 / 5.0, signal-ink 7.0, caution-ink 9.6, verified-ink 8.6, table-muted 6.5
+ *   `faint` is decoration only (grid lines, hatching), never text.
+ *
+ * Material rules: grain and shadows belong to paper only. The table is flat. No gradients, glows or blur.
+ * Old token names (surface, text, accent, danger...) are kept as aliases at the bottom of @theme so feature code
+ * keeps working; new code uses the material names.
  */
+:root {
+  --table: #1d1b17;
+  --table-2: #29261f;
+  --table-3: #35312a;
+  --table-line: #3b372f;
+  --table-ink: #f1ebdd;
+  --table-muted: #aaa392;
+  --table-signal: #f2765a;      /* red ink as text on the table (6.2:1 / 5.4:1 on table-2) */
+
+  --paper: #f7f2e6;
+  --paper-2: #efe8d7;
+  --paper-3: #e6dcc6;
+  --rule: #dcd2bb;
+  --rule-strong: #b9ad91;
+  --ink: #1f1b14;
+  --ink-2: #463f33;
+  --pencil: #625a4c;
+  --faint: #b0a690;
+  --press: #1f1b14;            /* border + hard shadow of physical buttons */
+
+  --signal: #c9391c;           /* fills, rings, the primary button (white text 4.9:1) */
+  --signal-btn: #c9391c;
+  --signal-btn-hover: #b33219;
+  --signal-ink: #b3301a;       /* signal as text on paper */
+  --signal-soft: #f5dccf;
+  --signal-line: #e6a48f;
+  --verified: #2d7a55;
+  --verified-ink: #24694a;
+  --verified-soft: #dcebdf;
+  --caution: #c98a12;
+  --caution-ink: #8a5a00;
+  --caution-soft: #f3e3bd;
+  --hl: #f2d24b;
+  --hl-soft: #f7e7a1;
+  --focus: #c9391c;
+
+  /* categorical (language bar): ink-family + the meaning colours; labels always carry the name */
+  --chart-1: #1f1b14;
+  --chart-2: #c9391c;
+  --chart-3: #2d7a55;
+  --chart-4: #c98a12;
+  --chart-5: #5b6f86;
+  --chart-6: #b0a690;
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .32 0 0 0 0 .26 0 0 0 0 .14 0 0 0 .085 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  --sheet-shadow: 0 1px 1px rgb(0 0 0 / 0.35), 0 26px 50px -28px rgb(0 0 0 / 0.95), 0 8px 18px -12px rgb(0 0 0 / 0.6);
+  --lift-shadow: 0 1px 0 rgb(60 45 20 / 0.08), 0 12px 22px -16px rgb(60 45 20 / 0.55);
+
+  /* syntax colours tuned for cream paper */
+  --syn-keyword: #a12d17;
+  --syn-string: #2f6346;
+  --syn-comment: #766c5a;
+  --syn-number: #3d5a80;
+  --syn-function: #6b3fa0;
+  --syn-plain: #1f1b14;
+  --syn-punct: #5e5648;
+  --hit: rgba(242, 210, 75, 0.38);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --table: #0f0e0c;
+  --table-2: #1b1915;
+  --table-3: #26231e;
+  --table-line: #2c2923;
+  --table-ink: #ece5d5;
+  --table-muted: #9d9584;
+  --table-signal: #f2765a;
+
+  --paper: #23201b;
+  --paper-2: #1b1915;
+  --paper-3: #2f2b24;
+  --rule: #3a352c;
+  --rule-strong: #554e41;
+  --ink: #efe8d8;
+  --ink-2: #cfc6b3;
+  --pencil: #a29985;
+  --faint: #5d564a;
+  --press: #000000;
+
+  --signal: #f0603f;
+  --signal-btn: #c9391c;
+  --signal-btn-hover: #d9452a;
+  --signal-ink: #ff8a6b;
+  --signal-soft: #3d1e15;
+  --signal-line: #7a3524;
+  --verified: #4fb383;
+  --verified-ink: #6fcf9f;
+  --verified-soft: #16291f;
+  --caution: #d9a03a;
+  --caution-ink: #f0c060;
+  --caution-soft: #33270f;
+  --hl: #e8c547;
+  --hl-soft: #3a3214;
+  --focus: #f0603f;
+
+  --chart-1: #efe8d8;
+  --chart-2: #f0603f;
+  --chart-3: #4fb383;
+  --chart-4: #d9a03a;
+  --chart-5: #8fa5bf;
+  --chart-6: #5d564a;
+
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .95 0 0 0 0 .85 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  --sheet-shadow: 0 1px 1px rgb(0 0 0 / 0.6), 0 26px 50px -24px rgb(0 0 0 / 1), 0 0 0 1px rgb(255 255 255 / 0.04);
+  --lift-shadow: 0 1px 0 rgb(0 0 0 / 0.4), 0 12px 22px -14px rgb(0 0 0 / 0.9);
+
+  --syn-keyword: #ff8a6b;
+  --syn-string: #9fd3ae;
+  --syn-comment: #8e8574;
+  --syn-number: #a9c1de;
+  --syn-function: #d6b4f5;
+  --syn-plain: #efe8d8;
+  --syn-punct: #b6ad9a;
+  --hit: rgba(232, 197, 71, 0.18);
+  color-scheme: dark;
+}
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 @theme {
-  /* surfaces */
-  --color-bg: #07090c;
-  --color-bg-raised: #0a0e13;
-  --color-surface: #0d1117;
-  --color-surface-2: #111821;
-  --color-code: #05070a;
-  --color-line: #16202b;
-  --color-border: #1f2a36;
-  --color-border-strong: #263445;
+  --color-table: var(--table);
+  --color-table-2: var(--table-2);
+  --color-table-3: var(--table-3);
+  --color-table-line: var(--table-line);
+  --color-table-ink: var(--table-ink);
+  --color-table-muted: var(--table-muted);
+  --color-table-signal: var(--table-signal);
 
-  /* text */
-  --color-text: #e6edf3;
-  --color-text-2: #d4dce5;
-  --color-text-3: #a8b5c4;
-  --color-muted: #8b9bad;
-  --color-dim: #73849a;
-  --color-faint: #5b6b7d;
-  --color-ghost: #3b4a5c;
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-paper-3: var(--paper-3);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-pencil: var(--pencil);
+  --color-faint: var(--faint);
+  --color-press: var(--press);
 
-  /* cyan: structure / navigation / verified */
-  --color-cyan: #22d3ee;
-  --color-cyan-soft: #67e8f9;
-  --color-cyan-ink: #04232a;
-  --color-cyan-bg: #06343c;
-  --color-cyan-tint: #071a1f;
+  --color-signal: var(--signal);
+  --color-signal-btn: var(--signal-btn);
+  --color-signal-ink: var(--signal-ink);
+  --color-signal-soft: var(--signal-soft);
+  --color-signal-line: var(--signal-line);
+  --color-verified: var(--verified);
+  --color-verified-ink: var(--verified-ink);
+  --color-verified-soft: var(--verified-soft);
+  --color-caution: var(--caution);
+  --color-caution-ink: var(--caution-ink);
+  --color-caution-soft: var(--caution-soft);
+  --color-hl: var(--hl);
+  --color-hl-soft: var(--hl-soft);
 
-  /* amber: risk / cycles / hotspots */
-  --color-amber: #f5a524;
-  --color-amber-soft: #fbbf24;
-  --color-amber-bg: #140f06;
-  --color-amber-border: #4a3410;
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-chart-6: var(--chart-6);
 
-  --color-error: #f87171;
+  /* aliases for older feature code: everything maps onto paper-context meanings */
+  --color-bg: var(--paper);
+  --color-surface: var(--paper);
+  --color-surface-2: var(--paper-2);
+  --color-surface-3: var(--paper-3);
+  --color-code: var(--paper-2);
+  --color-border: var(--rule);
+  --color-border-strong: var(--rule-strong);
+  --color-line: var(--rule);
+  --color-text: var(--ink);
+  --color-text-2: var(--ink-2);
+  --color-muted: var(--pencil);
+  --color-accent: var(--signal);
+  --color-accent-fg: #fff8ee;
+  --color-accent-text: var(--signal-ink);
+  --color-accent-soft: var(--hl-soft);
+  --color-accent-border: var(--rule-strong);
+  --color-danger: var(--signal);
+  --color-danger-text: var(--signal-ink);
+  --color-danger-soft: var(--signal-soft);
+  --color-danger-border: var(--signal-line);
+  --color-warning: var(--caution);
+  --color-warning-text: var(--caution-ink);
+  --color-warning-soft: var(--caution-soft);
+  --color-warning-border: var(--caution);
+  --color-success: var(--verified);
+  --color-success-text: var(--verified-ink);
+  --color-success-soft: var(--verified-soft);
 
-  /* legacy names -> new palette */
-  --color-fg: var(--color-text);
-  --color-primary: var(--color-cyan);
-  --color-primary-fg: var(--color-cyan-ink);
-  --color-danger: var(--color-error);
-  --color-success: var(--color-cyan);
-  --color-warning: var(--color-amber);
-  --color-info: var(--color-cyan-soft);
-  --color-subtle: var(--color-surface-2);
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-sans: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* fonts */
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --text-micro: 0.6875rem;
+  --text-small: 0.8125rem;
+  --text-body: 0.9375rem;
 
-  /* type scale (hero and page title are utilities below because they need clamp / tracking) */
-  --text-small: 0.8125rem; /* 13px */
-  --text-body: 0.9375rem; /* 15px */
-  --text-title: 1.25rem; /* 20px section title */
-  --text-display: 2.75rem; /* 44px page title */
-  --text-micro: 0.6875rem; /* 11px mono labels */
+  --radius-sm: 2px;
+  --radius-ui: 4px;
+  --radius-sheet: 3px;
+  --radius-card: 3px;
+  --radius-panel: 3px;
 
-  /* spacing: Tailwind's 4px grid is the default; named gaps kept for existing pages */
-  --spacing-gap: 0.5rem;
-  --spacing-gutter: 1rem;
-  --spacing-section: 1.5rem;
-  --spacing-canvas: 32rem;
+  --shadow-sheet: var(--sheet-shadow);
+  --shadow-lift: var(--lift-shadow);
+  --shadow-press: 0 3px 0 var(--press);
+  --shadow-press-sm: 0 2px 0 var(--press);
+  /* old names */
+  --shadow-xs: 0 0 #0000;
+  --shadow-card: 0 0 #0000;
+  --shadow-pop: var(--lift-shadow);
+  --shadow-window: var(--sheet-shadow);
 
-  /* radii */
-  --radius-ui: 0.5rem; /* control 8 */
-  --radius-card: 0.875rem; /* 14 */
-  --radius-panel: 1.125rem; /* 18 */
-  --radius-shell: 1rem; /* input shell 16 */
-
-  /* the ONE deep shadow in the system: the landing URL input */
-  --shadow-deep: 0 20px 60px rgba(0, 0, 0, 0.45);
-
-  --ease-atlas: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @layer base {
-  html {
-    color-scheme: dark;
-  }
   body {
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    background-color: var(--table);
+    color: var(--table-ink);
     font-family: var(--font-sans);
     font-size: var(--text-body);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
-  /* visible keyboard focus on every interactive element */
+  /* keyboard focus: red ink ring, visible on both table and paper */
   :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
-    outline: 2px solid var(--color-cyan);
-    outline-offset: 2px;
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
   }
-  /* code must show exactly what is typed: no ligatures (they would render != as a single glyph) */
   code, pre, kbd, .font-mono {
     font-variant-ligatures: none;
   }
+  .font-display {
+    font-optical-sizing: auto;
+    font-variation-settings: "SOFT" 30, "WONK" 0;
+  }
   ::selection {
-    background: var(--color-cyan-bg);
-    color: var(--color-text);
+    background: var(--hl);
+    color: #1f1b14;
+  }
+  html.theme-switching *, html.theme-switching *::before, html.theme-switching *::after {
+    transition: none !important;
   }
 }
 
-/* ---- atlas utilities -------------------------------------------------------------------------------------------- */
-@utility text-hero {
+/* ---- type scale ---- */
+@utility text-display {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: clamp(44px, 6vw, 76px);
-  line-height: 0.98;
-  letter-spacing: -0.04em;
+  font-weight: 600;
+  font-size: clamp(44px, 6.4vw, 92px);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+  font-optical-sizing: auto;
+  font-variation-settings: "SOFT" 30;
+}
+@utility text-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(30px, 3.6vw, 44px);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  font-variation-settings: "SOFT" 30;
+}
+@utility text-heading {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 22px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variation-settings: "SOFT" 40;
 }
 @utility text-page {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 44px;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  font-weight: 600;
+  font-size: clamp(30px, 3.6vw, 44px);
+  line-height: 1;
+  letter-spacing: -0.035em;
 }
 @utility text-section {
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 20px;
-  line-height: 1.3;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
-/* MonoLabel: "PLATE 01", stage labels, legends */
+/* the accented phrase: soft, wonky italic */
+@utility text-wonk {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: "SOFT" 100, "WONK" 1;
+}
+/* small caption in mono caps */
 @utility mono-label {
   font-family: var(--font-mono);
   font-size: 11px;
+  font-weight: 500;
   line-height: 1.4;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
-  color: var(--color-muted);
-}
-/* 28px dot grid for the landing (dots at ~16% of the muted tone) */
-@utility bg-dot-grid {
-  background-image: radial-gradient(color-mix(in srgb, var(--color-muted) 16%, transparent) 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-/* 40px faint line grid for the map canvas */
-@utility bg-line-grid {
-  background-image:
-    linear-gradient(var(--color-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
-  background-size: 40px 40px;
+  letter-spacing: 0.12em;
+  color: var(--pencil);
 }
 
-/* ---- motion: loops live in CSS (transform/opacity only, except SVG dash flow which is capped to a few edges) ---- */
-@keyframes atlas-shimmer {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(100%); }
+/* ---- materials ---- */
+@utility paper {
+  background-color: var(--paper);
+  background-image: var(--grain);
+  color: var(--ink);
 }
+/* a sheet lying on the table */
+@utility sheet {
+  background-color: var(--paper);
+  background-image: var(--grain);
+  color: var(--ink);
+  border-radius: var(--radius-sheet);
+  box-shadow: var(--sheet-shadow);
+}
+/* map paper: faint graticule */
+@utility bg-graticule {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--rule) 70%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--rule) 70%, transparent) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+/* hatching for empty tracks and placeholders */
+@utility bg-hatch {
+  background-image: repeating-linear-gradient(-45deg, transparent 0 5px, color-mix(in srgb, var(--faint) 45%, transparent) 5px 6px);
+}
+
+/* slight rotation of a sheet (set --tilt inline); halved on phones so nothing pokes out of the 16px gutter */
+.tilt { transform: rotate(var(--tilt, 0deg)); }
+@media (max-width: 640px) { .tilt { transform: rotate(calc(var(--tilt, 0deg) / 2)); } }
+
+/* a strip of tape across the top edge of a sheet */
+.tape::before {
+  content: ""; position: absolute; top: -11px; left: var(--tape-x, 40%); width: 92px; height: 24px; z-index: 1;
+  background: color-mix(in srgb, #efe1a8 72%, transparent); transform: rotate(-3deg);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.18); pointer-events: none;
+}
+/* a fold down the middle (folded map) */
+.fold::after {
+  content: ""; position: absolute; inset: 0 auto 0 50%; width: 1px; pointer-events: none;
+  background: linear-gradient(transparent, color-mix(in srgb, var(--ink) 9%, transparent) 15%, color-mix(in srgb, var(--ink) 9%, transparent) 85%, transparent);
+}
+/* torn bottom edge (404) */
+.torn {
+  clip-path: polygon(0 0, 100% 0, 100% 94%, 96% 97%, 92% 94.5%, 87% 98%, 82% 95%, 77% 97.5%, 71% 94%, 66% 98%, 60% 95.5%, 55% 97%, 49% 94%, 44% 98%, 38% 95%, 33% 97.5%, 27% 94.5%, 21% 98%, 16% 95%, 10% 97%, 5% 94%, 0 97%);
+}
+
+/* landing headline split: line masks leave room for descenders and the italic overhang */
+[data-split] .split-line-mask { padding: 0.06em 0.12em 0.18em 0; margin: -0.06em -0.12em -0.18em 0; }
+
+/* ---- motion: few loops, each with a job ---- */
 @keyframes atlas-pulse-ring {
   0% { transform: scale(1); opacity: 0.55; }
   100% { transform: scale(2.4); opacity: 0; }
@@ -183,22 +398,30 @@
 @keyframes atlas-dash {
   to { stroke-dashoffset: -24; }
 }
-
-@layer utilities {
-  .anim-pulse-ring { animation: atlas-pulse-ring 2.4s var(--ease-atlas) infinite; transform-origin: center; transform-box: fill-box; }
-  .anim-soft-pulse { animation: atlas-soft-pulse 1.6s ease-in-out infinite; }
-  .anim-caret { animation: atlas-caret 1.1s steps(1) infinite; }
-  .anim-spin { animation: atlas-spin 1.4s linear infinite; }
-  .anim-dash { stroke-dasharray: 6 6; animation: atlas-dash 1.6s linear infinite; }
-  .anim-dash-slow { stroke-dasharray: 6 6; animation: atlas-dash 3.2s linear infinite; }
+/* compass needle hunting for north while a repo is analysed */
+@keyframes atlas-hunt {
+  0% { transform: rotate(0deg); }
+  30% { transform: rotate(250deg); }
+  55% { transform: rotate(160deg); }
+  75% { transform: rotate(215deg); }
+  100% { transform: rotate(360deg); }
 }
 
-/* shimmer skeleton: a gradient that slides across (transform only) */
-.skeleton { position: relative; overflow: hidden; background: var(--color-surface-2); border-radius: var(--radius-ui); }
-.skeleton::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-text) 6%, transparent), transparent);
-  animation: atlas-shimmer 2s linear infinite;
+@layer utilities {
+  .anim-pulse-ring { animation: atlas-pulse-ring 2.4s var(--ease-out) infinite; transform-origin: center; transform-box: fill-box; }
+  .anim-soft-pulse { animation: atlas-soft-pulse 1.6s ease-in-out infinite; }
+  .anim-caret { animation: atlas-caret 1.1s steps(1) infinite; }
+  .anim-spin { animation: atlas-spin 1s linear infinite; }
+  .anim-dash { stroke-dasharray: 6 6; animation: atlas-dash 1.6s linear infinite; }
+  .anim-hunt { animation: atlas-hunt 2.6s cubic-bezier(0.45, 0, 0.2, 1) infinite; }
+}
+
+/* placeholder while loading: hatched paper that breathes (no shimmer sweep) */
+.skeleton {
+  background-color: var(--paper-2);
+  background-image: repeating-linear-gradient(-45deg, transparent 0 6px, color-mix(in srgb, var(--faint) 30%, transparent) 6px 7px);
+  border-radius: var(--radius-ui);
+  animation: atlas-soft-pulse 1.8s ease-in-out infinite;
 }
 
 /* Reduced motion (OS setting) and the dev-only toggle: no loops, no enters, instant state changes. */
@@ -209,21 +432,28 @@ html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="
   animation: none !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important;
 }
 
-/* ---- syntax highlighting theme (built from tokens; Prism token types) ---- */
-.tok-keyword, .tok-builtin, .tok-tag, .tok-atrule, .tok-selector { color: var(--color-cyan-soft); }
-.tok-string, .tok-char, .tok-regex, .tok-attr-value, .tok-template-string { color: color-mix(in srgb, var(--color-amber-soft) 80%, var(--color-text-3)); }
-.tok-comment, .tok-prolog, .tok-doctype, .tok-cdata { color: var(--color-dim); font-style: italic; }
-.tok-number, .tok-boolean, .tok-constant, .tok-symbol { color: var(--color-text-2); }
-.tok-function, .tok-class-name, .tok-attr-name, .tok-property { color: var(--color-text); }
-.tok-punctuation, .tok-operator { color: var(--color-text-3); }
-@keyframes atlas-flash {
-  0% { background-color: color-mix(in srgb, var(--color-cyan) 35%, transparent); }
-  100% { background-color: color-mix(in srgb, var(--color-cyan) 10%, transparent); }
-}
-.line-hit { animation: atlas-flash 0.9s var(--ease-atlas) both; box-shadow: inset 3px 0 0 var(--color-cyan); }
-.line-hit-settled { background-color: color-mix(in srgb, var(--color-cyan) 10%, transparent); box-shadow: inset 3px 0 0 var(--color-cyan); }
+/* ---- syntax highlighting (Prism token types) ---- */
+.tok-keyword, .tok-builtin, .tok-tag, .tok-atrule, .tok-selector { color: var(--syn-keyword); }
+.tok-string, .tok-char, .tok-regex, .tok-attr-value, .tok-template-string { color: var(--syn-string); }
+.tok-comment, .tok-prolog, .tok-doctype, .tok-cdata { color: var(--syn-comment); font-style: italic; }
+.tok-number, .tok-boolean, .tok-constant, .tok-symbol { color: var(--syn-number); }
+.tok-function, .tok-class-name, .tok-attr-name, .tok-property { color: var(--syn-function); }
+.tok-punctuation, .tok-operator { color: var(--syn-punct); }
 
-/* map entry: nodes fade/scale in (staggered by distance from the centre via inline animation-delay), edges fade in after */
+/* cited lines: highlighter stroke + an ink bar in the gutter; flashes once when it lands */
+@keyframes atlas-flash {
+  0% { background-color: color-mix(in srgb, var(--hl) 70%, transparent); }
+  100% { background-color: var(--hit); }
+}
+.line-hit, .line-hit-settled { background-color: var(--hit); box-shadow: inset 3px 0 0 var(--ink); }
+.line-hit { animation: atlas-flash 0.9s var(--ease-out) both; }
+.marker {
+  color: inherit;
+  background: linear-gradient(transparent 40%, var(--hl-soft) 40%, var(--hl-soft) 92%, transparent 92%);
+  padding: 0 2px;
+}
+
+/* map entry: nodes ink in from the centre outwards (delay set inline), edges after */
 @keyframes atlas-node-in {
   from { opacity: 0; transform: scale(0.96); }
   to { opacity: 1; transform: scale(1); }
@@ -232,17 +462,31 @@ html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="
   from { opacity: 0; }
   to { opacity: 1; }
 }
-.atlas-node { animation: atlas-node-in 0.5s var(--ease-atlas) backwards; }
-.atlas-edge { animation: atlas-edge-in 0.6s var(--ease-atlas) backwards; }
+.atlas-node { animation: atlas-node-in 0.5s var(--ease-out) backwards; }
+.atlas-edge { animation: atlas-edge-in 0.6s var(--ease-out) backwards; }
 
-/* React Flow gives pointer-events:none to nodes that are neither selectable nor draggable; ours handle their own click/hover. */
 .react-flow__node-atlas { pointer-events: all !important; }
 .react-flow__node-region { pointer-events: none !important; }
+/* labels sit over lines: a paper-coloured halo keeps them readable (like real map lettering) */
+.map-halo {
+  text-shadow: 0 0 2px var(--paper), 0 0 2px var(--paper), 0 0 4px var(--paper);
+}
+.react-flow { --xy-background-color: transparent; }
 
-/* map level of detail: when zoomed far out, drop what cannot be read and costs the most to paint */
 [data-lod="low"] .atlas-label { display: none; }
 [data-lod="low"] .anim-pulse-ring { display: none; }
 [data-lod="low"] .atlas-edge path { marker-end: none !important; }
 [data-lod="low"] .atlas-node { transition: none; }
-/* big graphs, zoomed out: only cycle and selected edges are drawn (the rest is an unreadable hairball and the main paint cost) */
 [data-lod="low"] .atlas-edge[data-kind="plain"] { display: none; }
+
+/* Blast Radius ripple: a node inks in when the ripple reaches it (delay = hops x 0.7 s, set inline) */
+@keyframes atlas-ripple-in {
+  from { opacity: 0; transform: scale(0.3); }
+  to { opacity: 1; transform: scale(1); }
+}
+.ripple-in { animation: atlas-ripple-in 0.5s var(--ease-out) backwards; transform-box: fill-box; transform-origin: center; }
+@keyframes atlas-ring-out {
+  from { transform: scale(0.2); opacity: 0.9; }
+  to { transform: scale(1); opacity: 0.35; }
+}
+.ring-out { animation: atlas-ring-out 0.9s var(--ease-out) backwards; transform-box: fill-box; transform-origin: center; }

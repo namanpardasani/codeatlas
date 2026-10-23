@@ -1,15 +1,21 @@
-import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { SplitText } from "gsap/SplitText";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getRepos, logout, submitRepo, type RepoSummary } from "../api";
-import { Button, Logo, ScaleBar } from "../components/ui";
-import { LiveMapIllustration } from "../features/LiveMapIllustration";
+import { Arrow, Button, ButtonAnchor, Figure, Icon, Logo, MarginNote, Sheet, Stamp, ThemeToggle } from "../components/ui";
 import proof from "../data/proof.json";
+import { EVAL, EXAMPLE } from "../data/example";
+import { AtlasSheet } from "../features/landing/AtlasSheet";
+import { Colophon, GITHUB } from "../features/landing/Footer";
 import { useMe } from "../hooks/useMe";
-import { rise } from "../ui/motion";
+import { useMotionOff } from "../hooks/useMotionOff";
 
-const EXAMPLES = ["sindresorhus/p-limit", "pallets/itsdangerous", "chalk/chalk"];
-const GITHUB = "https://github.com/namanpardasani/codeatlas";
+gsap.registerPlugin(ScrollTrigger, SplitText);
+
+const FALLBACK_EXAMPLES = ["psf/requests", "pallets/itsdangerous", "chalk/chalk"];
+const MCP_CMD = 'claude mcp add codeatlas -- "$PWD/bin/codeatlas-mcp.sh"';
 
 /** Accepts `owner/repo` or a pasted github.com URL and returns a canonical https URL, or null. */
 export function toRepoUrl(input: string): string | null {
@@ -17,74 +23,91 @@ export function toRepoUrl(input: string): string | null {
   return m ? `https://github.com/${m[1]}/${m[2]}` : null;
 }
 
-const fmt = (v: number | null | undefined, digits = 3) => (v === null || v === undefined ? "—" : v.toFixed(digits));
+const short = (p: string) => p.replace(/^src\/requests\//, "");
 
-function Icon({ kind }: { kind: "map" | "hot" | "cite" | "mcp" }) {
-  const common = { width: 28, height: 28, viewBox: "0 0 28 28", fill: "none", strokeWidth: 1.6, strokeLinecap: "round" as const, "aria-hidden": true };
-  if (kind === "map")
-    return (
-      <svg {...common} stroke="var(--color-cyan)">
-        <circle cx="6" cy="8" r="2.5" />
-        <circle cx="22" cy="6" r="2.5" />
-        <circle cx="14" cy="21" r="2.5" />
-        <path d="M8 9 L12 19 M20 8 L16 19 M8.5 8 L19.5 6" />
-      </svg>
-    );
-  if (kind === "hot")
-    return (
-      <svg {...common} stroke="var(--color-amber)">
-        <path d="M5 22 V14 M11 22 V8 M17 22 V16 M23 22 V5" />
-      </svg>
-    );
-  if (kind === "cite")
-    return (
-      <svg {...common} stroke="var(--color-cyan)">
-        <path d="M6 5 H17 L22 10 V23 H6 Z M17 5 V10 H22 M10 15 H18 M10 19 H15" />
-      </svg>
-    );
+/**
+ * Landing motion (gsap, this page only). Three animations, each with a job, all skipped with reduced motion:
+ *   1. the headline sets line by line (reading order, once)
+ *   2. the hero map inks in the blast hop by hop (shows what the product does before you read about it)
+ *   3. the worked example scrubs with scroll: each hop of the ledger lights up as its ring reaches it
+ */
+function useLandingMotion(root: React.RefObject<HTMLElement | null>, off: boolean) {
+  useLayoutEffect(() => {
+    if (off || !root.current) return;
+    const ctx = gsap.context(() => {
+      const mm = gsap.matchMedia();
+      mm.add("(prefers-reduced-motion: no-preference)", () => {
+        const h1 = root.current!.querySelector("[data-split]");
+        if (h1) {
+          // masks get room for descenders (index.css); the split is undone when the lines have landed, so the final
+          // text is the original markup (same wrapping, selectable, no extra spans for screen readers)
+          const split = SplitText.create(h1, { type: "lines", mask: "lines", linesClass: "split-line" });
+          gsap.from(split.lines, { yPercent: 110, duration: 0.9, ease: "power4.out", stagger: 0.09, delay: 0.1, onComplete: () => split.revert() });
+        }
+        const hero = root.current!.querySelector("[data-hero-map]");
+        if (hero) {
+          gsap.from(hero.querySelectorAll("[data-hop='0']"), { opacity: 0, scale: 0.4, transformOrigin: "center", duration: 0.5, delay: 0.7, ease: "back.out(2)" });
+          gsap.from(hero.querySelectorAll("[data-hop='1']"), { opacity: 0, duration: 0.5, delay: 1.3 });
+          gsap.from(hero.querySelectorAll("[data-hop='2']"), { opacity: 0, duration: 0.5, delay: 1.9 });
+        }
+        const ex = root.current!.querySelector("[data-example]");
+        if (ex) {
+          const tl = gsap.timeline({ scrollTrigger: { trigger: ex, start: "top 70%", end: "bottom 60%", scrub: 0.6 } });
+          ex.querySelectorAll("[data-row]").forEach((row) => {
+            tl.from(row, { opacity: 0.18, x: -10, duration: 1, ease: "none" });
+          });
+        }
+      });
+    }, root);
+    return () => ctx.revert();
+  }, [root, off]);
+}
+
+function CopyCommand({ cmd }: { cmd: string }) {
+  const [copied, setCopied] = useState(false);
   return (
-    <svg {...common} stroke="var(--color-cyan)">
-      <rect x="4" y="6" width="20" height="16" rx="3" />
-      <path d="M9 12 L12 14.5 L9 17 M14.5 17 H19" />
-    </svg>
+    <button
+      type="button"
+      onClick={() => navigator.clipboard?.writeText(cmd).then(() => { setCopied(true); setTimeout(() => setCopied(false), 1600); })}
+      className="font-mono text-[11px] uppercase tracking-[0.12em] text-table-muted hover:text-table-ink"
+      aria-label="Copy command"
+    >
+      {copied ? "copied" : "copy"}
+    </button>
   );
 }
 
-const FEATURES = [
-  { icon: "map" as const, title: "Dependency map", text: "Every import resolved, folders drawn as regions, circular dependencies traced." },
-  { icon: "hot" as const, title: "Hotspots", text: "The files riskiest to change, ranked with the reasons written out." },
-  { icon: "cite" as const, title: "Answers with receipts", text: "Each citation is checked against the code. What can't be verified is removed." },
-  { icon: "mcp" as const, title: "MCP server", text: "Give Claude Code and other agents the same map, read-only." },
-];
-
 export default function Landing() {
   const navigate = useNavigate();
+  const off = useMotionOff();
   const { me, reload } = useMe();
   const [value, setValue] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [repos, setRepos] = useState<RepoSummary[]>([]);
+  const input = useRef<HTMLInputElement | null>(null);
+  const root = useRef<HTMLDivElement | null>(null);
+  useLandingMotion(root, off);
+
   useEffect(() => {
     getRepos().then(setRepos).catch(() => setRepos([]));
   }, []);
-  // example chips: repositories that are really analysed here; the defaults only when the list is unavailable
-  const examples = repos.length ? repos.slice(0, 3).map((r) => r.full_name) : EXAMPLES;
 
-  const blocked = me?.demoMode
-    ? "This is a read-only demo: analysis is disabled."
-    : me?.authRequired && !me.user
-      ? "Sign in with GitHub to map a repository."
-      : null;
+  const samples = repos.filter((r) => !r.full_name.startsWith("octocat/"));
+  const examples = samples.length ? samples.slice(0, 3).map((r) => r.full_name) : FALLBACK_EXAMPLES;
+  const blocked = me?.demoMode ? "This is a read-only demo: open one of the repositories already mapped." : me?.authRequired && !me.user ? "Sign in with GitHub to map a repository." : null;
+  const known = repos.some((r) => toRepoUrl(value) === `https://github.com/${r.full_name}`);
+  const requests = repos.find((r) => r.full_name === EXAMPLE.repo);
+  const re = proof.reindex as { incremental_s: number | null; full_cold_s: number | null; changed: number | null } | null;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const url = toRepoUrl(value);
-    if (!url) return setError("Enter a public repository like owner/repo.");
+    if (!url) return setError("That doesn't look like a GitHub repository. Try owner/repo.");
     setError(null);
     setBusy(true);
     try {
       const { repoId, jobId, existing } = await submitRepo(url);
-      // an already-analysed repo in the read-only demo opens directly (there is no job to watch)
       navigate(existing ? `/repo/${repoId}/overview` : `/analyze/${repoId}/${jobId}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -92,186 +115,307 @@ export default function Landing() {
     }
   }
 
-  const items = proof.items as { key: string; label: string; before: number | null; after: number | null }[];
-  const re = proof.reindex as { incremental_s: number | null; full_cold_s: number | null; files: number | null; changed: number | null } | null;
+  const navLink = "text-[14px] text-table-muted transition-colors hover:text-table-ink";
 
   return (
-    <div className="bg-dot-grid min-h-screen">
-      <header className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-8 gap-y-3 px-6 py-5">
-        <Link to="/" aria-label="CodeAtlas home" className="rounded-ui">
-          <Logo />
-        </Link>
-        <nav aria-label="Primary" className="ml-2 flex flex-wrap items-center gap-x-6 gap-y-2 text-small text-text-3">
-          <a className="hover:text-text" href="#how">How it works</a>
-          <a className="hover:text-text" href="#proof">Eval results</a>
-          <a className="hover:text-text" href="#features">MCP server</a>
-          <a className="hover:text-text" href={GITHUB} rel="noreferrer">GitHub</a>
+    <div ref={root} className="min-h-screen overflow-x-clip bg-table text-table-ink">
+      <header className="mx-auto flex max-w-[1240px] items-center gap-7 px-4 py-5 sm:px-6">
+        <Link to="/" aria-label="CodeAtlas home" className="rounded-ui"><Logo needle="track" /></Link>
+        <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
+          <Link className={navLink} to="/replay">Replay a real bug</Link>
+          <a className={navLink} href="#measured">How we measured</a>
+          <a className={navLink} href="#mcp">MCP</a>
+          <a className={navLink} href={GITHUB}>Source</a>
         </nav>
-        <div className="ml-auto flex items-center gap-3">
+        <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle />
           {me?.user ? (
-            <>
-              <span className="text-small text-text-3">{me.user.login}</span>
-              <Button variant="secondary" onClick={() => logout().then(reload)}>Sign out</Button>
-            </>
+            <Button variant="arrow" size="sm" onClick={() => logout().then(reload)} className="text-table-ink">Sign out</Button>
           ) : me?.loginAvailable ? (
-            <a href="/api/auth/github" className="inline-flex min-h-11 items-center rounded-ui border border-border bg-surface px-5 text-body font-semibold hover:border-border-strong hover:bg-surface-2">
-              Sign in with GitHub
-            </a>
+            <ButtonAnchor variant="arrow" size="sm" href="/api/auth/github" className="text-table-ink">Sign in <Arrow /></ButtonAnchor>
           ) : null}
         </div>
       </header>
 
       <main>
-        <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-10 lg:grid-cols-[1.1fr_1fr]">
+        {/* ---------- hero: words left, the map right ---------- */}
+        <section className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] items-start gap-x-14 gap-y-16 px-4 pb-24 pt-10 sm:px-6 md:pt-16 lg:grid-cols-[1.08fr_0.92fr]">
           <div>
-            <motion.div {...rise(0)} className="mono-label mb-6 flex items-center gap-3">
-              <span>PLATE 01</span>
-              <span aria-hidden className="h-px w-10 bg-border-strong" />
-              <span>STATIC ANALYSIS FIRST · AI SECOND</span>
-            </motion.div>
-            <motion.h1 {...rise(1)} className="text-hero">
-              Any codebase, <span className="text-cyan">mapped</span> in a minute.
-            </motion.h1>
-            <motion.p {...rise(2)} className="mt-6 max-w-[520px] text-[17px] text-text-3">
-              Paste a public GitHub repository. CodeAtlas reads it, draws the dependency map, ranks the files that are riskiest to change, and
-              answers questions with citations you can check.
-            </motion.p>
-            <motion.form {...rise(3)} onSubmit={submit} className="mt-8" aria-label="Map a repository">
-              <div className="flex flex-wrap items-center gap-3 rounded-shell border border-border-strong bg-surface p-2 pl-5 shadow-deep sm:flex-nowrap">
-                <label htmlFor="repo" className="sr-only">
-                  GitHub repository, owner/repo
-                </label>
-                <span aria-hidden className="font-mono text-body text-dim">github.com/</span>
+            <p className="mono-label text-table-muted">Sheet 01 · <span className="text-table-signal">for any public GitHub repository</span></p>
+            <h1 data-split className="text-display mt-6 text-balance">
+              Know what a change <span className="text-wonk text-signal">will break</span> before you merge it.
+            </h1>
+            <p className="mt-7 max-w-[34em] text-[18.5px] leading-relaxed text-table-muted">
+              CodeAtlas reads a repository, never runs it, and draws the map: who imports whom, where the risky files are,
+              and <strong className="font-semibold text-table-ink">which files your pull request will drag along</strong>, with the reason for each.
+            </p>
+
+            <form onSubmit={submit} aria-label="Map a repository" className="mt-9 max-w-[580px]">
+              <div className="paper flex flex-col gap-2 rounded-ui p-1.5 shadow-sheet sm:flex-row sm:items-center">
+                <label htmlFor="repo" className="sr-only">GitHub repository, owner/repo or URL</label>
                 <input
                   id="repo"
+                  ref={input}
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
-                  placeholder="owner/repo"
+                  placeholder="github.com/owner/repo"
                   autoComplete="off"
                   spellCheck={false}
-                  className="min-w-0 flex-1 bg-transparent py-3 font-mono text-body text-text outline-none placeholder:text-dim focus-visible:outline-none"
+                  className="min-h-11 min-w-0 flex-1 bg-transparent px-3 font-mono text-[15px] text-ink outline-none placeholder:text-pencil focus-visible:outline-none"
                 />
-                <Button type="submit" disabled={busy || !value.trim() || Boolean(blocked)} className="min-h-12 w-full px-6 text-[15px] sm:w-auto">
-                  {busy ? "Starting…" : "Map it →"}
+                <Button type="submit" size="lg" disabled={busy || (Boolean(blocked) && !known)}>
+                  {busy ? "Unfolding…" : "Draw the map"}
                 </Button>
               </div>
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <span className="mono-label mr-1">Try</span>
-                {examples.map((ex) => (
-                  <button
-                    key={ex}
-                    type="button"
-                    onClick={() => setValue(ex)}
-                    className="min-h-9 rounded-md border border-border bg-surface px-3 font-mono text-small text-text-3 transition-colors duration-150 hover:border-cyan hover:text-cyan-soft"
-                  >
-                    {ex}
-                  </button>
-                ))}
-              </div>
-              <p className="mt-4 text-small text-muted">Public GitHub repositories only. Private repositories are not supported.</p>
-              {blocked && <p className="mt-2 text-small text-text-3">{blocked}</p>}
-              {error && (
-                <p role="alert" className="mt-2 text-small text-error">
-                  {error}
-                </p>
-              )}
-            </motion.form>
+              {error && <p role="alert" className="mt-3 text-[14px] text-table-signal">{error}</p>}
+              {blocked && <p className="mt-3 text-[14px] text-table-muted">{blocked}</p>}
+              <p className="mt-4 text-[14px] text-table-muted">
+                Or open one already mapped:{" "}
+                {examples.map((ex, i) => {
+                  const r = samples.find((s) => s.full_name === ex);
+                  const cls = "font-mono text-[13px] text-table-ink underline decoration-table-line decoration-1 underline-offset-4 hover:decoration-signal";
+                  return (
+                    <span key={ex}>
+                      {i > 0 && ", "}
+                      {r ? <Link className={cls} to={`/repo/${r.id}/overview`}>{ex}</Link> : <button type="button" className={cls} onClick={() => { setValue(ex); input.current?.focus(); }}>{ex}</button>}
+                    </span>
+                  );
+                })}
+              </p>
+            </form>
           </div>
 
-          <motion.div {...rise(2, 20)} className="overflow-hidden rounded-panel border border-border bg-surface" aria-label="Illustration of a dependency map">
-            <div className="flex items-center justify-between border-b border-line bg-bg-raised px-4 py-2.5">
-              <span className="font-mono text-small text-text-3">owner/repo · N files</span>
-              <span className="font-mono text-small text-cyan-soft">
-                live map<span className="anim-caret ml-0.5 inline-block w-1.5 bg-cyan align-middle" style={{ height: "0.95em" }} />
-              </span>
+          <div className="relative mx-auto w-full max-w-[560px] lg:mt-6">
+            <Sheet tilt={0.9} fold className="px-5 pb-4 pt-5" data-hero-map>
+              <div className="absolute -right-4 -top-12 z-10 sm:-right-10">
+                <Stamp tone="verified" size={92} rotate={13} backed label="Checked by hand: 70 bug pairs">checked<br />by hand<br />70 pairs</Stamp>
+              </div>
+              <div className="flex items-baseline justify-between gap-3 border-b-[1.5px] border-ink pb-2">
+                <span className="font-display text-[20px] font-semibold tracking-[-0.02em]">psf/requests</span>
+                <span className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-pencil">commit {EXAMPLE.commit}</span>
+              </div>
+              <AtlasSheet />
+              <div className="flex flex-wrap gap-x-4 gap-y-1 border-t border-rule pt-2 font-mono text-[10.5px] text-pencil">
+                <span><span className="text-signal">●</span> changed</span>
+                <span><span className="text-signal">◯</span> in the blast</span>
+                <span>- - import cycle</span>
+                <span>◌ rings = hops</span>
+              </div>
+            </Sheet>
+            <div className="mt-5 pl-10 sm:pl-16">
+              <MarginNote tone="hl" arrow="up-right" rotate={-3} className="max-w-[300px]">models.py: changed 17 times recently, and sits in an import cycle</MarginNote>
             </div>
-            <div className="bg-line-grid aspect-[420/260] bg-bg">
-              <LiveMapIllustration />
-            </div>
-            <div className="flex items-center justify-between border-t border-line bg-bg-raised px-4 py-2.5">
-              <ScaleBar />
-              <span className="mono-label">illustration</span>
-            </div>
-          </motion.div>
+          </div>
         </section>
 
-        {repos.length > 0 && (
-          <section className="mx-auto max-w-7xl px-6 pb-16" aria-label="Already mapped repositories">
-            <h2 className="sr-only">Already mapped repositories</h2>
-            <div className="mono-label mb-4" aria-hidden>PLATE 02 ——— ALREADY MAPPED · OPEN ONE</div>
-            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {repos.map((r) => (
-                <li key={r.id}>
-                  <Link
-                    to={`/repo/${r.id}/overview`}
-                    className="block rounded-card border border-border bg-surface p-4 transition-colors duration-200 hover:border-cyan"
-                  >
-                    <span className="block truncate font-mono text-body text-text">{r.full_name}</span>
-                    <span className="mt-1 block font-mono text-micro text-muted">
-                      {r.files} files{r.commit_sha ? ` · ${r.commit_sha.slice(0, 7)}` : ""}
-                    </span>
-                  </Link>
+        <p className="mx-auto max-w-[1240px] border-y border-table-line px-4 py-3 font-mono text-[12px] uppercase tracking-[0.12em] text-table-muted sm:px-6">
+          Code is read, never run <span className="px-2 text-table-line">/</span> public repositories only <span className="px-2 text-table-line">/</span> free and open source
+        </p>
+
+        {/* ---------- the worked example ---------- */}
+        <section id="example" className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+          <div className="lg:sticky lg:top-10 lg:self-start">
+            <p className="mono-label text-table-muted">A real change, start to finish</p>
+            <h2 className="mt-4 font-display text-[clamp(32px,4vw,46px)] font-semibold leading-[1.02] tracking-[-0.035em]">
+              One commit to <span className="font-mono text-[0.62em] tracking-normal">models.py</span>. Here is what it reached.
+            </h2>
+            <p className="mt-5 text-[16px] leading-relaxed text-table-muted">
+              Commit <span className="font-mono text-table-ink">{EXAMPLE.commit}</span> in psf/requests changed three files. In {(EXAMPLE.ms / 1000).toFixed(1)} seconds,
+              using only static analysis and git history, Blast Radius traced {EXAMPLE.reached} files beyond the change ({EXAMPLE.inBlast} of them strongly), picked the tests to run and
+              priced the risk. The three that explain it best:
+            </p>
+            {requests && (
+              <Link to={`/repo/${requests.id}/blast?result=${EXAMPLE.resultId}`} className="group mt-7 inline-flex items-center gap-3 font-mono text-[12px] uppercase tracking-[0.1em] text-table-ink underline decoration-signal decoration-2 underline-offset-[6px]">
+                Open this exact result <Arrow />
+              </Link>
+            )}
+          </div>
+
+          <Sheet className="px-5 py-7 sm:px-9" data-example>
+            <ol className="flex flex-col">
+              <li data-row className="grid grid-cols-[56px_minmax(0,1fr)] gap-4 border-b border-rule pb-5">
+                <span className="font-display text-[34px] font-semibold leading-none text-signal-ink">0</span>
+                <div>
+                  <div className="mono-label">Hop 0 · the change itself</div>
+                  <ul className="mt-2 flex flex-col gap-1.5">
+                    {EXAMPLE.changed.map((c) => (
+                      <li key={c.path} className="flex flex-wrap items-baseline gap-x-3">
+                        <span className="font-mono text-[14px] font-medium text-ink">{short(c.path)}</span>
+                        <span className="text-[14px] text-ink-2">{c.what}</span>
+                        <span className="font-mono text-[12px] text-pencil">+{c.plus} −{c.minus}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </li>
+              {[1, 2].map((h) => (
+                <li key={h} data-row className="grid grid-cols-[56px_minmax(0,1fr)] gap-4 border-b border-rule py-5">
+                  <span className="font-display text-[34px] font-semibold leading-none text-ink">{h}</span>
+                  <div>
+                    <div className="mono-label">Hop {h} · {h === 1 ? "files that move with it" : "code that calls it"}</div>
+                    <ul className="mt-2 flex flex-col gap-1.5">
+                      {EXAMPLE.hops.filter((x) => x.hop === h).map((x) => (
+                        <li key={x.path} className="flex flex-wrap items-baseline gap-x-3">
+                          <span className="font-mono text-[14px] font-medium text-ink">{short(x.path)}</span>
+                          <span className="text-[14px] text-ink-2">{x.why}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </li>
               ))}
-            </ul>
+              <li data-row className="grid grid-cols-[56px_minmax(0,1fr)] gap-4 border-b border-rule py-5">
+                <span aria-hidden className="pt-1 text-verified-ink"><Icon name="check" size={26} /></span>
+                <div>
+                  <div className="mono-label">Tests to run</div>
+                  <p className="mt-1.5 text-[15px] text-ink"><span className="font-mono">{EXAMPLE.tests}</span>. Not the whole suite.</p>
+                </div>
+              </li>
+              <li data-row className="relative grid grid-cols-[56px_minmax(0,1fr)] gap-4 pt-5">
+                <span className="font-display text-[34px] font-semibold leading-none text-caution-ink">!</span>
+                <div className="pr-0 sm:pr-40">
+                  <div className="mono-label">Risk</div>
+                  <ul className="mt-1.5 flex flex-col gap-1 text-[14.5px] text-ink-2">
+                    {EXAMPLE.risk.top.map((t) => <li key={t}>— {t}</li>)}
+                  </ul>
+                </div>
+                <div className="col-span-2 mt-2 justify-self-end sm:absolute sm:-bottom-3 sm:right-0 sm:mt-0">
+                  <Stamp tone="caution" shape="rect" rotate={-7} land label={`Risk ${EXAMPLE.risk.score} of 100, ${EXAMPLE.risk.label}`}>risk {EXAMPLE.risk.score} · {EXAMPLE.risk.label}</Stamp>
+                </div>
+              </li>
+            </ol>
+          </Sheet>
+        </section>
+
+        {/* ---------- what it answers: three different objects, not three identical cards ---------- */}
+        <section className="mx-auto max-w-[1240px] px-4 py-20 sm:px-6">
+          <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-10 lg:grid-cols-[300px_minmax(0,1fr)]">
+            <div>
+              <p className="mono-label text-table-muted">What else is in the atlas</p>
+              <h2 className="mt-4 font-display text-[40px] font-semibold leading-none tracking-[-0.035em]">Questions it answers on day one</h2>
+            </div>
+            <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-8 md:grid-cols-[1.25fr_1fr]">
+              <Sheet tilt={-1.1} tape tapeAt="30%" className="p-7">
+                <div className="mono-label">Map</div>
+                <h3 className="mt-2 font-display text-[26px] font-semibold leading-tight tracking-[-0.02em]">“Where does everything live, and what imports what?”</h3>
+                <p className="mt-3 text-[15px] leading-relaxed text-ink-2">Every file on one zoomable plate, grouped by folder. Import cycles are drawn in red, with one path around the loop so you can see it, not just be told about it.</p>
+              </Sheet>
+              <div className="flex flex-col gap-8">
+                <Sheet tilt={0.7} className="p-6">
+                  <div className="mono-label">Hotspots</div>
+                  <h3 className="mt-2 font-display text-[21px] font-semibold leading-tight">“Which file hurts most to touch?”</h3>
+                  <p className="mt-2 text-[14.5px] text-ink-2">Complexity, churn, fan-in and missing tests, with the reason written next to each score.</p>
+                </Sheet>
+                <Sheet className="p-6">
+                  <div className="mono-label">Ask</div>
+                  <h3 className="mt-2 font-display text-[21px] font-semibold leading-tight">“How are redirects followed?”</h3>
+                  <p className="mt-2 text-[14.5px] text-ink-2">Answers quote the exact lines. Claims that can&apos;t be checked against the code are cut, and “not found” is an allowed answer.</p>
+                </Sheet>
+              </div>
+            </div>
+          </div>
+          <div className="mt-12 flex justify-end">
+            <MarginNote tone="hl" rotate={-2} className="max-w-sm text-right">also: generated docs for every file and folder, and an MCP server so your agent gets the same map</MarginNote>
+          </div>
+        </section>
+
+        {/* ---------- measured, honestly ---------- */}
+        <section id="measured" className="scroll-mt-8 border-t border-table-line">
+          <div className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] items-start gap-10 px-4 py-24 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+            <div>
+              <p className="mono-label text-table-muted">Measured, not claimed</p>
+              <h2 className="mt-4 font-display text-[40px] font-semibold leading-none tracking-[-0.035em]">We tested it on bugs that really happened</h2>
+              <p className="mt-5 text-[15.5px] leading-relaxed text-table-muted">
+                We mined commits that introduced bugs (SZZ), ran Blast Radius on each one with only the history before it, and checked whether it ranked the file that was later fixed.
+                Where it doesn&apos;t win, we say so.
+              </p>
+              <Link to="/replay" className="group mt-6 inline-flex items-center gap-3 font-mono text-[12px] uppercase tracking-[0.1em] text-table-ink underline decoration-signal decoration-2 underline-offset-[6px]">
+                Replay three real bugs, one a miss <Arrow />
+              </Link>
+            </div>
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-8 md:grid-cols-[1.2fr_1fr]">
+              <Sheet className="p-7">
+                <div className="absolute -right-4 -top-8 sm:-right-6">
+                  <Stamp tone="verified" size={92} rotate={10} land backed label={`${EVAL.validated.pairs} pairs confirmed by hand out of ${EVAL.validated.checked} checked`}>{EVAL.validated.pairs} of {EVAL.validated.checked}<br />confirmed</Stamp>
+                </div>
+                <Figure label={`MRR · ${EVAL.validated.pairs} hand-confirmed bug pairs`} value={EVAL.validated.mrr.toFixed(3)} />
+                <div className="mt-5 flex flex-col gap-2">
+                  <div className="flex items-center gap-3"><span className="w-28 font-mono text-[11.5px] text-pencil">Blast Radius</span><span className="h-3 bg-ink" style={{ width: `${EVAL.validated.mrr * 60}%` }} /></div>
+                  <div className="flex items-center gap-3"><span className="w-28 font-mono text-[11.5px] text-pencil">changed files</span><span className="bg-hatch h-3 border border-rule-strong" style={{ width: `${EVAL.validated.baseline * 60}%` }} /><span className="font-mono text-[11.5px] text-pencil">{EVAL.validated.baseline.toFixed(3)}</span></div>
+                </div>
+                <p className="mt-5 border-t border-rule pt-4 text-[14.5px] leading-relaxed text-ink-2">
+                  On all {EVAL.all.pairs} mined pairs (noisier labels) the gap shrinks to {EVAL.all.mrr} vs {EVAL.all.baseline}, which is <em>not</em> significant. We print both.
+                </p>
+              </Sheet>
+              <Sheet tilt={-0.6} className="p-7">
+                <div className="mono-label">The less flattering numbers</div>
+                <dl className="mt-4 flex flex-col gap-4 text-[14.5px]">
+                  <div><dt className="font-display text-[26px] font-semibold leading-none">{EVAL.beyond.recall10} <span className="font-mono text-[12px] font-normal text-pencil">vs {EVAL.beyond.folder} same-folder guess</span></dt><dd className="mt-1 text-ink-2">recall@10 for files the commit didn&apos;t touch ({EVAL.beyond.pairs} pairs). No better than the simple heuristic, yet.</dd></div>
+                  <div><dt className="font-display text-[26px] font-semibold leading-none">{EVAL.tests.median}% <span className="font-mono text-[12px] font-normal text-pencil">of the suite</span></dt><dd className="mt-1 text-ink-2">still catches the fix&apos;s test file in {EVAL.tests.catch}% of cases.</dd></div>
+                  <div><dt className="font-display text-[26px] font-semibold leading-none">{EVAL.riskAuc.v1} <span className="font-mono text-[12px] font-normal text-pencil">vs {EVAL.riskAuc.size} for lines changed</span></dt><dd className="mt-1 text-ink-2">risk score AUC. Diff size alone is still a slightly better bug predictor.</dd></div>
+                </dl>
+              </Sheet>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- the index of mapped repositories ---------- */}
+        {samples.length > 0 && (
+          <section className="mx-auto max-w-[1240px] px-4 pb-24 sm:px-6" aria-labelledby="index-title">
+            <Sheet className="px-5 py-7 sm:px-10">
+              <div className="flex flex-wrap items-baseline justify-between gap-3 border-b-2 border-ink pb-3">
+                <h2 id="index-title" className="font-display text-[28px] font-semibold tracking-[-0.03em]">Index of mapped repositories</h2>
+                <span className="mono-label">open any, no waiting</span>
+              </div>
+              <ul>
+                {samples.map((r) => (
+                  <li key={r.id}>
+                    <Link to={`/repo/${r.id}/overview`} className="group flex items-baseline gap-3 border-b border-rule py-3 transition-colors hover:bg-paper-2">
+                      <span className="font-display text-[19px] font-semibold text-ink group-hover:text-signal-ink">{r.full_name}</span>
+                      <span aria-hidden className="mb-1 min-w-6 flex-1 border-b border-dotted border-rule-strong" />
+                      <span className="shrink-0 font-mono text-[12.5px] text-pencil">{r.files} files{r.commit_sha ? ` · ${r.commit_sha.slice(0, 7)}` : ""}</span>
+                      <span aria-hidden className="shrink-0 text-ink transition-transform group-hover:translate-x-1">→</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              {re?.incremental_s != null && (
+                <p className="mt-4 text-[13.5px] text-pencil">Re-mapping after a {re.changed}-file change takes {re.incremental_s.toFixed(2)} s instead of {re.full_cold_s?.toFixed(0)} s for a cold run.</p>
+              )}
+            </Sheet>
           </section>
         )}
 
-        <section id="features" className="mx-auto max-w-7xl px-6 pb-20" aria-label="Features">
-          <h2 className="sr-only">What you get</h2>
-          <div id="how" className="mono-label mb-4" aria-hidden>PLATE 03 ——— WHAT YOU GET</div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((f, i) => (
-              <motion.div
-                key={f.title}
-                initial={{ opacity: 0, y: 14 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.6, delay: i * 0.08, ease: [0.2, 0.7, 0.2, 1] }}
-                whileHover={{ y: -4 }}
-                className="group rounded-card border border-border bg-surface p-5 transition-colors duration-200 hover:border-cyan"
-              >
-                <Icon kind={f.icon} />
-                <h3 className="mt-4 font-display text-[18px] font-semibold text-text">{f.title}</h3>
-                <p className="mt-2 text-small leading-relaxed text-text-3">{f.text}</p>
-              </motion.div>
-            ))}
-          </div>
-        </section>
-
-        <section id="proof" className="border-t border-line bg-bg-raised" aria-label="Measured results">
-          <div className="mx-auto max-w-7xl px-6 py-14">
-            <div className="grid gap-8 lg:grid-cols-[1fr_2fr] lg:items-center">
-              <div>
-                <div className="mono-label mb-3">PLATE 04 ——— EVALUATION</div>
-                <h2 className="text-section">Measured, not claimed.</h2>
-                <p className="mt-2 max-w-sm text-small text-muted">
-                  From stored evaluation runs. The 50 questions were written by the AI that built the system, so read these as indicative.{" "}
-                  <a className="underline hover:text-text" href={`${GITHUB}/blob/main/docs/EVAL.md`}>
-                    Method and caveats
-                  </a>
-                </p>
+        {/* ---------- MCP: on the table, like a terminal on the desk ---------- */}
+        <section id="mcp" className="scroll-mt-8 border-t border-table-line">
+          <div className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1fr_1.1fr]">
+            <div>
+              <p className="mono-label text-table-muted">For coding agents</p>
+              <h2 className="mt-4 font-display text-[40px] font-semibold leading-none tracking-[-0.035em]">Give your agent the same map</h2>
+              <p className="mt-5 max-w-lg text-[16px] leading-relaxed text-table-muted">
+                The MCP server lets Claude Code ask for the architecture, a file&apos;s dependencies, the hotspots, a code search, a blast radius or the tests to run:{" "}
+                <span className="font-mono text-[13.5px] text-table-ink">get_architecture, get_dependencies, get_hotspots, search_code, find_symbol, explain_file, get_blast_radius, suggest_tests, check_change_risk</span>.
+                Read-only, scoped to the repos you allow.
+              </p>
+              <ButtonAnchor variant="arrow" className="mt-7 text-table-ink" href={`${GITHUB}/blob/main/docs/MCP.md`}>MCP setup guide <Arrow /></ButtonAnchor>
+            </div>
+            <div className="rounded-ui border border-table-line bg-table-2">
+              <div className="flex items-center justify-between border-b border-table-line px-4 py-2">
+                <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-table-muted">terminal</span>
+                <CopyCommand cmd={MCP_CMD} />
               </div>
-              <dl className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {items.map((it) => (
-                  <div key={it.key} className="rounded-card border border-border bg-surface p-4">
-                    <dt className="text-[12px] text-muted">{it.label}</dt>
-                    <dd className="mt-1 font-mono text-[17px] text-cyan-soft">
-                      {fmt(it.before)} → {fmt(it.after)}
-                    </dd>
-                  </div>
-                ))}
-                <div className="rounded-card border border-border bg-surface p-4">
-                  <dt className="text-[12px] text-muted">re-index after a {re?.changed ?? "—"}-file change</dt>
-                  <dd className="mt-1 font-mono text-[17px] text-cyan-soft">
-                    {fmt(re?.incremental_s, 2)} s <span className="text-dim">vs</span> {fmt(re?.full_cold_s, 1)} s
-                  </dd>
-                </div>
-              </dl>
+              <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-7 text-table-ink">
+                <span className="text-table-muted">$ </span>{MCP_CMD}{"\n"}
+                <span className="text-verified">✓</span> Added MCP server codeatlas{"\n\n"}
+                <span className="text-table-muted">&gt; </span>what does commit 6f66281a in psf/requests put at risk?{"\n"}
+                <span className="text-table-signal">get_blast_radius</span>(repo: "psf/requests", commit_sha: "6f66281a"){"\n"}
+                <span className="text-table-muted">  sessions.py · __init__.py · compat.py · 4 tests to run</span>
+              </pre>
             </div>
           </div>
         </section>
       </main>
+      <Colophon />
     </div>
   );
 }

@@ -20,7 +20,8 @@ export interface AtlasNodeData extends Record<string, unknown> {
   folder?: boolean;
 }
 
-const FILL = { central: "bg-cyan border-cyan", hotspot: "bg-amber border-amber", plain: "bg-bg border-muted" } as const;
+// central = solid ink, hotspot = red ink with an ink edge, other = paper with an ink edge (like a printed map symbol)
+const FILL = { central: "bg-ink border-ink", hotspot: "bg-signal border-ink", plain: "bg-paper border-ink" } as const;
 
 /** Custom node: a circle sized by dependents plus a mono label. Memoised; hover dimming comes from context, not from new props. */
 export const AtlasNode = memo(function AtlasNode({ id, data }: NodeProps) {
@@ -30,7 +31,7 @@ export const AtlasNode = memo(function AtlasNode({ id, data }: NodeProps) {
   const dim = active !== null && !isNear(id);
   const selected = selectedId === id;
   const size = d.r * 2;
-  const ring = d.kind === "hotspot" ? "border-amber" : "border-cyan";
+  const ring = d.kind === "hotspot" ? "border-signal" : "border-ink";
   return (
     <div
       role="button"
@@ -51,14 +52,14 @@ export const AtlasNode = memo(function AtlasNode({ id, data }: NodeProps) {
         {d.pulse && <span aria-hidden className={`anim-pulse-ring absolute inset-0 rounded-full border-[1.5px] ${ring}`} />}
         <span
           aria-hidden
-          className={`absolute inset-0 rounded-full border-[1.5px] ${FILL[d.kind]} ${selected ? "ring-2 ring-cyan ring-offset-2 ring-offset-bg" : ""}`}
+          className={`absolute inset-0 rounded-full border-[1.5px] ${FILL[d.kind]} ${selected ? "ring-2 ring-signal ring-offset-2 ring-offset-paper" : ""}`}
         />
         <Handle type="target" position={Position.Top} isConnectable={false} style={{ left: d.r, top: d.r, opacity: 0, width: 1, height: 1, minWidth: 0, minHeight: 0, border: 0 }} />
         <Handle type="source" position={Position.Bottom} isConnectable={false} style={{ left: d.r, top: d.r, right: "auto", bottom: "auto", opacity: 0, width: 1, height: 1, minWidth: 0, minHeight: 0, border: 0 }} />
       </span>
-      <span className={`atlas-label whitespace-nowrap font-mono text-[11px] leading-none ${selected ? "text-text" : "text-text-3"}`}>
+      <span className={`atlas-label map-halo whitespace-nowrap font-mono text-[11px] leading-none ${selected ? "font-semibold text-signal-ink" : "text-ink"}`}>
         {d.label}
-        {d.sub && <span className="ml-1.5 text-dim">{d.sub}</span>}
+        {d.sub && <span className="ml-1.5 text-pencil">{d.sub}</span>}
       </span>
     </div>
   );
@@ -69,12 +70,15 @@ export interface RegionData extends Record<string, unknown> {
   w: number;
   h: number;
 }
-/** Folder region: soft rounded dashed outline behind its nodes, with a dim mono caption. Never intercepts the pointer. */
+/** Folder region: a dashed survey boundary around its files, lettered in mono caps. Test/docs folders get a faint wash. Never intercepts the pointer. */
 export const RegionNode = memo(function RegionNode({ data }: NodeProps) {
   const d = data as RegionData;
+  const aux = /(^|\/)(tests?|__tests__|specs?|docs?|examples?)(\/|$)/i.test(d.label.replace(/ \/ /g, "/"));
   return (
-    <div aria-hidden className="pointer-events-none relative rounded-[26px] border-[3px] border-dashed border-border-strong bg-surface/30" style={{ width: d.w, height: d.h }}>
-      <span className="absolute left-5 top-3 font-mono text-[15px] font-medium uppercase tracking-[0.14em] text-dim">{d.label}</span>
+    <div aria-hidden className="pointer-events-none relative" style={{ width: d.w, height: d.h }}>
+      {/* border and corner counter-scale with zoom (like the label) so the region outline stays visible on a zoomed-out map */}
+      <div className={`absolute -inset-3 border-dashed ${aux ? "border-rule-strong bg-paper-3/40" : "border-pencil/70"}`} style={{ borderWidth: "calc(1.2px * var(--label-scale, 1))", borderRadius: "calc(18px * var(--label-scale, 1))" }} />
+      <span className={`absolute -top-3 left-1 origin-top-left bg-paper px-1.5 font-mono text-[11px] font-medium uppercase tracking-[0.14em] ${aux ? "text-pencil" : "text-ink-2"}`} style={{ transform: "scale(var(--label-scale, 1))" }}>{d.label}</span>
     </div>
   );
 });
@@ -89,9 +93,10 @@ export interface AtlasEdgeData extends Record<string, unknown> {
   count?: number;
 }
 
-const STROKE = { plain: "var(--color-faint)", cycle: "var(--color-amber)", selected: "var(--color-cyan)" } as const;
+// imports are thin ink lines; cycles are red dashed; the selected file's imports are heavy ink, flowing along the import
+const STROKE = { plain: "color-mix(in srgb, var(--ink) 38%, transparent)", cycle: "var(--signal)", selected: "var(--ink)" } as const;
 
-/** Custom curved edge. Gray by default; cycle edges amber dashed; the selected file's edges cyan dashed, flowing along the import. */
+/** Custom curved edge. Thin neutral by default; cycle edges red dashed; the selected file's edges accent dashed, flowing along the import. */
 export const AtlasEdge = memo(function AtlasEdge({ id, sourceX, sourceY, targetX, targetY, sourcePosition, targetPosition, data, markerEnd }: EdgeProps) {
   const d = data as AtlasEdgeData;
   const { hoverId, selectedId } = useContext(MapCtx);
@@ -105,7 +110,7 @@ export const AtlasEdge = memo(function AtlasEdge({ id, sourceX, sourceY, targetX
         id={id}
         path={path}
         markerEnd={markerEnd}
-        style={{ stroke: STROKE[d.kind], strokeWidth: d.kind === "plain" ? 1.1 : 1.6, strokeDasharray: dashed ? "6 6" : undefined }}
+        style={{ stroke: STROKE[d.kind], strokeWidth: d.kind === "plain" ? 1.1 : 2, strokeDasharray: dashed ? "6 5" : undefined }}
         className={dashed && d.animated ? "anim-dash" : ""}
       />
     </g>

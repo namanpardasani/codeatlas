@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, Fragment } from "react";
 import { useSearchParams } from "react-router-dom";
 import { streamChat, type ChatChunkInfo, type ChatCitation, type ChatEvent } from "../api";
-import { Button, Skeleton } from "../components/ui";
+import { Button, PageHead, Segmented, Skeleton } from "../components/ui";
 import { SearchPanel } from "../features/SearchPanel";
 import type { ViewerTarget } from "../features/CodeViewer";
 import { useRepo } from "../hooks/RepoData";
@@ -32,7 +32,7 @@ const errorText = (e: NonNullable<Turn["error"]>) => {
 
 const CheckIcon = () => (
   <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden className="shrink-0">
-    <path d="M2.5 7.5 L5.8 10.5 L11.5 3.8" fill="none" stroke="var(--color-cyan)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M2.5 7.5 L5.8 10.5 L11.5 3.8" fill="none" stroke="var(--verified-ink)" strokeWidth="2" strokeLinecap="square" />
   </svg>
 );
 
@@ -60,7 +60,7 @@ function AnswerText({ text, citations, active, onOpen, caret }: { text: string; 
   }
   parts.push(text.slice(last));
   return (
-    <p className="whitespace-pre-wrap text-[15.5px] leading-[1.7] text-text-2">
+    <p className="whitespace-pre-wrap text-[15.5px] leading-[1.75] text-ink-2">
       {parts.map((p, i) => {
         if (typeof p === "string") return <Fragment key={i}>{p}</Fragment>;
         const c = find(p.ref);
@@ -72,15 +72,15 @@ function AnswerText({ text, citations, active, onOpen, caret }: { text: string; 
             onClick={() => onOpen(c)}
             title={`${c.path}:${c.start_line}-${c.end_line}${c.inferred ? " (matched automatically: the model did not cite this)" : ""}`}
             aria-label={`Citation ${order.get(chipKey(c))}: ${c.path} lines ${c.start_line} to ${c.end_line}`}
-            className={`mx-0.5 inline-flex size-[22px] translate-y-[-1px] items-center justify-center rounded-md border font-mono text-[11px] transition-colors duration-150 ${
-              on ? "border-cyan bg-cyan-bg text-cyan-soft" : c.inferred ? "border-dashed border-border-strong text-muted hover:text-text" : "border-border bg-surface-2 text-text-3 hover:border-cyan hover:text-cyan-soft"
+            className={`mx-0.5 inline-flex h-[20px] min-w-[20px] translate-y-[-2px] items-center justify-center rounded-sm border px-1 font-mono text-[10.5px] font-medium transition-colors duration-100 ${
+              on ? "border-ink bg-hl text-[#1f1b14]" : c.inferred ? "border-dashed border-rule-strong text-pencil hover:text-ink" : "border-ink text-ink hover:bg-hl-soft"
             }`}
           >
             {order.get(chipKey(c))}
           </button>
         );
       })}
-      {caret && <span aria-hidden className="anim-caret ml-0.5 inline-block h-[1.05em] w-[7px] translate-y-[3px] bg-cyan" />}
+      {caret && <span aria-hidden className="anim-caret ml-0.5 inline-block h-[1.05em] w-[7px] translate-y-[3px] bg-ink" />}
     </p>
   );
 }
@@ -139,108 +139,118 @@ export default function AskPage() {
   const activeKey = viewer ? `${viewer.path}:${viewer.start}-${viewer.end}` : null;
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-      <section className="flex min-h-[70vh] flex-col rounded-panel border border-border bg-surface lg:h-[76vh]" aria-label="Ask">
-        <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3">
-          <div className="mono-label">PLATE 04 ——— {mode === "ask" ? "ASK THIS REPO" : "SEARCH THE CODE"}</div>
-          <div className="flex items-center gap-2" role="group" aria-label="Mode">
-            <Button variant={mode === "ask" ? "primary" : "ghost"} className="!min-h-9 px-3" onClick={() => setMode("ask")}>Ask</Button>
-            <Button variant={mode === "search" ? "primary" : "ghost"} className="!min-h-9 px-3" onClick={() => setMode("search")}>Search</Button>
-            {mode === "ask" && turns.length > 0 && !busy && (
-              <Button variant="ghost" className="!min-h-9 px-3" onClick={() => { session.current = undefined; setTurns([]); }}>New chat</Button>
-            )}
-          </div>
-        </div>
+    <div className="flex flex-col gap-8">
+      <PageHead
+        sheet="Sheet 05 · Ask"
+        title="Ask the code"
+        actions={<Segmented label="Mode" value={mode} onChange={setMode} options={[{ id: "ask", label: "Ask" }, { id: "search", label: "Search code" }]} />}
+      >
+        Every claim in an answer points at the lines it came from. Anything that can&apos;t be checked against the code is cut, and “not found” is an allowed answer.
+      </PageHead>
 
-        {mode === "search" ? (
-          <div className="min-h-0 flex-1 overflow-y-auto p-5">
-            <SearchPanel repoId={repoId} onOpen={(t) => setViewer({ ...t, nonce: ++nonce.current })} />
-          </div>
-        ) : (
-          <>
-            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5" aria-live="polite">
-              {turns.length === 0 && (
-                <p className="max-w-md text-small text-muted">
-                  Ask how something works. Every claim in the answer links to the lines it came from, and anything that cannot be checked against the code is removed.
-                </p>
-              )}
-              <div className="flex flex-col gap-8">
-                {turns.map((t, i) => {
-                  const verified = t.citations.filter((c) => !c.inferred).length;
-                  return (
-                    <div key={i} className="flex flex-col gap-4">
-                      <div className="flex justify-end">
-                        <p className="max-w-[85%] rounded-card bg-surface-2 px-4 py-2.5 text-body text-text">{t.question}</p>
-                      </div>
-
-                      {!t.done && t.stage && <p className="anim-soft-pulse font-mono text-small text-muted">{t.stage}{t.retrieved ? ` (${t.retrieved} excerpts)` : ""}</p>}
-
-                      {t.status === "error" && t.error && <p role="alert" className="text-error">{errorText(t.error)}</p>}
-
-                      {t.status === "not_found" && (
-                        <div className="flex flex-col gap-2">
-                          <p className="text-text-2">{t.text}</p>
-                          <p className="text-small text-muted">Try naming a file or function, or ask about one specific behaviour.</p>
-                          {t.closest.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-2 text-small text-muted">
-                              Closest code (probably not an answer):
-                              {t.closest.map((c) => (
-                                <button key={c.label} className="rounded-md border border-border px-2 py-0.5 font-mono text-[11.5px] text-text-3 hover:border-cyan" onClick={() => open(c)}>
-                                  {c.path}:{c.start_line}
-                                </button>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {t.status !== "error" && t.status !== "not_found" && (t.text || !t.done) && (
-                        <AnswerText text={t.text} citations={t.citations} active={activeKey} onOpen={open} caret={!t.done && !!t.text} />
-                      )}
-
-                      {t.status === "partial" && (
-                        <p className="text-small text-amber-soft">
-                          Partly verified.{" "}
-                          {t.removed.length > 0 && `${t.removed.length} unsupported statement(s) were removed. `}
-                          {t.issues.includes("citations_inferred") && "Chips with a dashed outline were matched automatically from code names the answer mentions. "}
-                          {t.issues.includes("uncited_claim") && "Some statements have no citation."}
-                        </p>
-                      )}
-
-                      {t.citations.length > 0 && (
-                        <div className="flex flex-col gap-2">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className="mono-label mr-1">SOURCES</span>
-                            {[...new Map(t.citations.map((c) => [chipKey(c), c])).values()].map((c, n) => {
-                              const on = activeKey === chipKey(c);
-                              return (
-                                <button
-                                  key={chipKey(c)}
-                                  onClick={() => open(c)}
-                                  className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-1 font-mono text-[11.5px] transition-colors duration-150 ${on ? "border-cyan bg-cyan-bg text-cyan-soft" : "border-border bg-surface-2 text-text-3 hover:border-cyan"}`}
-                                >
-                                  <span className="text-dim">{n + 1}</span>
-                                  {c.path.split("/").slice(-2).join("/")}:{c.start_line}–{c.end_line}
-                                </button>
-                              );
-                            })}
-                          </div>
-                          <p className="flex items-center gap-2 text-small text-text-3">
-                            <CheckIcon />
-                            {verified} of {t.citations.length} citations verified against the code
-                            {verified < t.citations.length && <span className="text-muted"> · {t.citations.length - verified} matched automatically</span>}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-              <div ref={bottom} />
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+        <section className="flex min-h-[60vh] flex-col border-t-2 border-ink lg:h-[72vh]" aria-label={mode === "ask" ? "Ask" : "Search"}>
+          {mode === "search" ? (
+            <div className="min-h-0 flex-1 overflow-y-auto pt-4">
+              <SearchPanel repoId={repoId} onOpen={(t) => setViewer({ ...t, nonce: ++nonce.current })} />
             </div>
+          ) : (
+            <>
+              <div className="min-h-0 flex-1 overflow-y-auto py-6 pr-1" aria-live="polite">
+                {turns.length === 0 && (
+                  <div className="flex flex-col gap-4">
+                    <p className="text-wonk text-[22px] leading-snug text-ink-2">Not sure where to start? Try one of these.</p>
+                    <ol className="flex flex-col">
+                      {["Where is the main entry point?", "How are errors handled?", "What does the most central file do?"].map((q, i) => (
+                        <li key={q} className="border-b border-rule">
+                          <button type="button" onClick={() => setQuestion(q)} className="group flex w-full items-baseline gap-3 py-2.5 text-left">
+                            <span className="font-mono text-[11px] text-pencil">{String(i + 1).padStart(2, "0")}</span>
+                            <span className="font-display text-[18px] text-ink underline-offset-4 group-hover:underline group-hover:decoration-signal">{q}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                )}
+                <div className="flex flex-col gap-10">
+                  {turns.map((t, i) => {
+                    const verified = t.citations.filter((c) => !c.inferred).length;
+                    return (
+                      <div key={i} className="flex flex-col gap-4">
+                        <div className="flex items-baseline gap-3">
+                          <span className="mono-label shrink-0">Q.</span>
+                          <p className="font-display text-[21px] font-semibold leading-snug tracking-[-0.01em] text-ink">{t.question}</p>
+                        </div>
 
-            <form onSubmit={ask} className="border-t border-line p-4">
-              <div className="flex items-center gap-2 rounded-shell border border-border-strong bg-bg p-1.5 pl-4 focus-within:border-cyan">
+                        {!t.done && t.stage && <p className="anim-soft-pulse pl-8 font-mono text-small text-pencil">{t.stage}{t.retrieved ? ` (${t.retrieved} excerpts)` : ""}</p>}
+                        {t.status === "error" && t.error && <p role="alert" className="pl-8 text-signal-ink">{errorText(t.error)}</p>}
+
+                        {t.status === "not_found" && (
+                          <div className="flex flex-col gap-2 pl-8">
+                            <p className="text-ink-2">{t.text}</p>
+                            <p className="text-small text-pencil">Try naming a file or function, or ask about one specific behaviour.</p>
+                            {t.closest.length > 0 && (
+                              <div className="flex flex-wrap items-center gap-2 text-small text-pencil">
+                                Closest code (probably not an answer):
+                                {t.closest.map((c) => (
+                                  <button key={c.label} className="rounded-sm border border-rule-strong px-2 py-0.5 font-mono text-[11.5px] text-ink-2 hover:border-ink" onClick={() => open(c)}>
+                                    {c.path}:{c.start_line}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {t.status !== "error" && t.status !== "not_found" && (t.text || !t.done) && (
+                          <div className="flex items-baseline gap-3">
+                            <span className="mono-label shrink-0">A.</span>
+                            <AnswerText text={t.text} citations={t.citations} active={activeKey} onOpen={open} caret={!t.done && !!t.text} />
+                          </div>
+                        )}
+
+                        {t.status === "partial" && (
+                          <p className="ml-8 border-l-[3px] border-caution bg-caution-soft/60 px-3 py-2 text-small text-ink-2">
+                            Partly verified.{" "}
+                            {t.removed.length > 0 && `${t.removed.length} unsupported statement(s) were removed. `}
+                            {t.issues.includes("citations_inferred") && "Dashed citations were matched automatically from code names the answer mentions. "}
+                            {t.issues.includes("uncited_claim") && "Some statements have no citation."}
+                          </p>
+                        )}
+
+                        {t.citations.length > 0 && (
+                          <div className="flex flex-col gap-2 pl-8">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="mono-label mr-1">Sources</span>
+                              {[...new Map(t.citations.map((c) => [chipKey(c), c])).values()].map((c, n) => {
+                                const on = activeKey === chipKey(c);
+                                return (
+                                  <button
+                                    key={chipKey(c)}
+                                    onClick={() => open(c)}
+                                    className={`inline-flex items-center gap-1.5 rounded-sm border px-2 py-1 font-mono text-[11.5px] transition-colors duration-100 ${on ? "border-ink bg-hl text-[#1f1b14]" : "border-rule-strong text-ink-2 hover:border-ink"}`}
+                                  >
+                                    <span className={on ? "" : "text-pencil"}>{n + 1}</span>
+                                    {c.path.split("/").slice(-2).join("/")}:{c.start_line}–{c.end_line}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <p className="flex items-center gap-2 text-small text-pencil">
+                              <CheckIcon />
+                              {verified} of {t.citations.length} citations verified against the code
+                              {verified < t.citations.length && <span> · {t.citations.length - verified} matched automatically</span>}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+                <div ref={bottom} />
+              </div>
+
+              <form onSubmit={ask} className="flex items-end gap-3 border-t border-rule pt-4">
                 <label htmlFor="q" className="sr-only">Your question</label>
                 <input
                   id="q"
@@ -249,28 +259,29 @@ export default function AskPage() {
                   placeholder={turns.length ? "Ask a follow-up…" : "e.g. How are redirects followed?"}
                   maxLength={1000}
                   autoComplete="off"
-                  className="min-w-0 flex-1 bg-transparent py-2.5 text-body text-text outline-none placeholder:text-dim"
+                  className="min-h-11 min-w-0 flex-1 border-0 border-b-2 border-ink bg-transparent px-1 text-[16px] text-ink outline-none placeholder:text-pencil focus-visible:border-signal focus-visible:outline-none"
                 />
-                <Button type="submit" disabled={busy || !question.trim()} aria-label="Send question" className="!min-h-10 px-4">
-                  {busy ? "Thinking…" : "Send →"}
-                </Button>
-              </div>
-            </form>
-          </>
-        )}
-      </section>
+                {turns.length > 0 && !busy && (
+                  <Button variant="ghost" size="sm" onClick={() => { session.current = undefined; setTurns([]); }}>New</Button>
+                )}
+                <Button type="submit" disabled={busy || !question.trim()}>{busy ? "Thinking…" : "Ask"}</Button>
+              </form>
+            </>
+          )}
+        </section>
 
-      <section className="min-h-[50vh] lg:h-[76vh]" aria-label="Code viewer">
-        {viewer ? (
-          <Suspense fallback={<Skeleton className="h-full w-full rounded-card" />}>
-            <CodeViewer repoId={repoId} target={viewer} onClose={() => setViewer(null)} />
-          </Suspense>
-        ) : (
-          <div className="flex h-full min-h-[50vh] items-center justify-center rounded-card border border-dashed border-border-strong bg-code p-8 text-center">
-            <p className="max-w-xs text-small text-muted">Click a numbered citation to see the exact lines it points to.</p>
-          </div>
-        )}
-      </section>
+        <section className="min-h-[50vh] lg:h-[72vh]" aria-label="Code viewer">
+          {viewer ? (
+            <Suspense fallback={<Skeleton className="h-full w-full" />}>
+              <CodeViewer repoId={repoId} target={viewer} onClose={() => setViewer(null)} />
+            </Suspense>
+          ) : (
+            <div className="flex h-full min-h-[50vh] flex-col items-center justify-center gap-2 border-[1.5px] border-dashed border-rule-strong bg-paper-2 p-8 text-center">
+              <p className="text-wonk max-w-xs text-[18px] leading-snug text-pencil">Click a numbered citation and the exact lines it points to open here.</p>
+            </div>
+          )}
+        </section>
+      </div>
     </div>
   );
 }

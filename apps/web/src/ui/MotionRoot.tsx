@@ -1,4 +1,4 @@
-import { MotionConfig } from "framer-motion";
+import { MotionConfig } from "motion/react";
 import { useEffect, useState, type ReactNode } from "react";
 
 const KEY = "codeatlas.motion";
@@ -30,7 +30,7 @@ export function MotionRoot({ children }: { children: ReactNode }) {
       {import.meta.env.DEV && (
         <button
           onClick={() => setOff((v) => !v)}
-          className="fixed bottom-3 left-3 z-50 rounded-ui border border-border bg-surface px-2 py-1 font-mono text-micro text-muted hover:text-text"
+          className="fixed bottom-3 left-3 z-50 rounded-ui border border-border bg-surface px-2 py-1 font-mono text-[11.5px] text-muted shadow-card hover:text-text"
           aria-pressed={off}
           title="Dev only: disable all motion (stable screenshots)"
         >
