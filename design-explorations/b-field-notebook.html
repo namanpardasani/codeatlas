@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>B · Field notebook</title>
+<style>
+  @font-face { font-family: "Young Serif"; src: url(fonts/young-serif.woff2) format("woff2"); }
+  @font-face { font-family: "Atkinson"; src: url(fonts/atkinson-400.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Atkinson"; src: url(fonts/atkinson-700.woff2) format("woff2"); font-weight: 700; }
+  @font-face { font-family: "Caveat"; src: url(fonts/caveat.woff2) format("woff2"); font-weight: 400 700; }
+  @font-face { font-family: "Martian Mono"; src: url(fonts/martian-mono.woff2) format("woff2"); }
+
+  :root { --page: #fbfaf4; --dots: #d8d4c6; --ink: #1d2733; --ink-2: #4a5462; --graphite: #646c78;
+          --signal: #ff6a13; --signal-ink: #b9480a; --verified: #2f8a47; --pen: #2445b8; --hl: #ffe45c; --margin: #e8a29a; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: var(--ink); font: 17px/1.6 "Atkinson", system-ui; background: #cfc9b8; }
+  .book { max-width: 1280px; margin: 28px auto; background: var(--page); min-height: 100vh; position: relative;
+          background-image: radial-gradient(var(--dots) 1.2px, transparent 1.3px); background-size: 24px 24px; background-position: 12px 12px;
+          box-shadow: 0 30px 60px -30px #0007, inset 14px 0 18px -14px #0002; border-radius: 4px 12px 12px 4px; }
+  .book::before { content: ""; position: absolute; left: 112px; top: 0; bottom: 0; width: 2px; background: var(--margin); opacity: .7; }
+  .holes { position: absolute; left: 32px; top: 80px; display: grid; gap: 140px; }
+  .holes i { width: 22px; height: 22px; border-radius: 50%; background: #cfc9b8; box-shadow: inset 2px 2px 4px #0003; }
+  .inner { padding: 36px 64px 80px 160px; }
+  .mono { font-family: "Martian Mono", monospace; font-size: .82em; }
+  .hand { font-family: "Caveat", cursive; color: var(--pen); }
+
+  nav { display: flex; align-items: baseline; gap: 26px; }
+  .brand { font: 26px "Young Serif"; }
+  .brand::after { content: "  vol. 3"; font: 20px "Caveat"; color: var(--graphite); }
+  nav a { color: var(--ink-2); font-size: 15px; }
+  nav .sp { flex: 1; }
+
+  .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 60px; margin-top: 64px; }
+  .date { font: 22px "Caveat"; color: var(--graphite); }
+  h1 { font: 400 clamp(44px, 6vw, 84px)/1 "Young Serif"; letter-spacing: -.02em; margin: 8px 0 24px; }
+  .mark { background: linear-gradient(transparent 55%, var(--hl) 55%, var(--hl) 90%, transparent 90%); padding: 0 .08em; }
+  .lede { font-size: 19px; color: var(--ink-2); max-width: 31em; }
+  .stampbtn { font: 700 16px "Atkinson"; letter-spacing: .04em; text-transform: uppercase; color: var(--signal-ink); background: transparent; border: 3px solid var(--signal-ink);
+              padding: 13px 22px; border-radius: 4px; transform: rotate(-1.5deg); box-shadow: inset 0 0 0 2px #fbfaf4, inset 0 0 0 4px var(--signal-ink); cursor: pointer; }
+  .stampbtn.fill { background: var(--signal); color: #1b0c02; border-color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
+  .field { display: flex; gap: 14px; align-items: center; margin-top: 28px; }
+  .field input { font: 15px "Martian Mono"; border: 0; border-bottom: 2px solid var(--ink); background: transparent; padding: 10px 2px; width: 320px; color: var(--ink); }
+  .arrowlink { font: 13px "Martian Mono"; color: var(--ink); text-decoration: none; border-bottom: 1px solid; }
+
+  .index { background: #fff; position: relative; padding: 26px 26px 22px; box-shadow: 0 2px 0 #0001, 0 14px 30px -18px #0006; transform: rotate(1.4deg);
+           background-image: linear-gradient(#0000 47px, #e5484d 47px, #e5484d 49px, #0000 49px), repeating-linear-gradient(#0000 0 27px, #b9cde6 27px 28px); }
+  .index h3 { font: 26px "Young Serif"; margin: 0 0 18px; }
+  .index li { font-size: 16px; line-height: 28px; list-style: none; }
+  .index ol { margin: 0; padding: 0; }
+  .clip { position: absolute; top: -18px; right: 40px; width: 22px; height: 64px; border: 3px solid #8f969f; border-radius: 12px; }
+  .tick { color: var(--verified); font: 700 22px "Caveat"; margin-right: 8px; }
+  .x { color: var(--signal-ink); font: 700 22px "Caveat"; margin-right: 8px; }
+
+  h2 { font: 400 40px "Young Serif"; margin: 100px 0 6px; }
+  .sub { font: 22px "Caveat"; color: var(--graphite); margin: 0 0 28px; }
+  .notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+  .note { padding: 20px; background: #fff8; border: 1.5px solid var(--ink); border-radius: 3px; position: relative; }
+  .note:nth-child(2) { transform: rotate(-1deg); background: #fff4c2; border: 0; box-shadow: 0 10px 20px -14px #0006; }
+  .note:nth-child(3) { border-style: dashed; }
+  .note h4 { font: 24px "Young Serif"; margin: 0 0 8px; }
+  .note p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+  .scribble { position: absolute; right: -36px; top: -30px; font: 24px "Caveat"; color: var(--pen); transform: rotate(8deg); }
+
+  .spec { margin-top: 90px; border-top: 2px solid var(--ink); padding-top: 22px; }
+  .sw { display: inline-block; width: 120px; margin: 0 8px 12px 0; font: 11px "Martian Mono"; color: var(--ink-2); }
+  .sw i { display: block; height: 40px; border: 1.5px solid var(--ink); margin-bottom: 4px; }
+  dl { display: grid; grid-template-columns: 160px 1fr; gap: 8px 20px; font-size: 15.5px; }
+  dt { font: 24px "Caveat"; color: var(--pen); line-height: 1; }
+  dd { margin: 0; color: var(--ink-2); }
+  @media (max-width: 860px) {
+    .inner { padding: 24px 20px 60px 52px; } .book::before { left: 36px; } .holes { left: 8px; } .holes i { width: 16px; height: 16px; }
+    .hero, .notes, dl { grid-template-columns: 1fr; } .field { flex-wrap: wrap; } .field input { width: 100%; } nav a { display: none; } .scribble { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="book">
+  <div class="holes"><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="inner">
+    <nav><span class="brand">CodeAtlas</span><a href="#">replays</a><a href="#">method</a><a href="#">mcp</a><span class="sp"></span><a class="arrowlink" href="#">sign in →</a></nav>
+
+    <div class="hero">
+      <div>
+        <div class="date">23 Oct · field notes on someone else's code</div>
+        <h1>See what a change <span class="mark">will break</span>, before the merge.</h1>
+        <p class="lede">Paste a public repo. CodeAtlas reads it (never runs it), maps who imports whom, marks the risky files and writes down which files your PR will drag along, with the reason.</p>
+        <form class="field" onsubmit="return false"><input value="github.com/psf/requests" aria-label="Repository URL" /><button class="stampbtn fill">Map it</button></form>
+        <p class="hand" style="font-size:22px;margin-top:14px">already mapped: requests, chalk, itsdangerous ↗</p>
+      </div>
+      <div class="index">
+        <div class="clip"></div>
+        <h3>psf/requests @ 6f66281a</h3>
+        <ol>
+          <li><span class="x">!</span><span class="mono">sessions.py</span> calls Request.prepare</li>
+          <li><span class="x">!</span><span class="mono">__init__.py</span> changed with it in 35% of commits</li>
+          <li><span class="tick">✓</span>4 of 346 tests cover it (1%)</li>
+          <li><span class="tick">✓</span>risk 57 · medium</li>
+          <li class="hand" style="font-size:22px">→ ask the last 3 people who touched it</li>
+        </ol>
+      </div>
+    </div>
+
+    <h2>What's in the notebook</h2>
+    <p class="sub">three questions, answered with evidence</p>
+    <div class="notes">
+      <div class="note"><h4>Blast radius</h4><p>Ranks the files a change will touch: calls, imports, and files that change together in history.</p></div>
+      <div class="note"><span class="scribble">the good one</span><h4>Replay a bug</h4><p>Run it on a real commit that caused a bug and see if it named the file that got fixed later.</p></div>
+      <div class="note"><h4>Ask with citations</h4><p>Answers quote exact lines, or say they couldn't find it.</p></div>
+    </div>
+
+    <div class="spec">
+      <h2 style="margin-top:0">Direction B · Field notebook</h2>
+      <div>
+        <span class="sw"><i style="background:#fbfaf4"></i>page #fbfaf4</span><span class="sw"><i style="background:#1d2733"></i>ink #1d2733</span>
+        <span class="sw"><i style="background:#ff6a13"></i>signal #ff6a13</span><span class="sw"><i style="background:#2f8a47"></i>verified #2f8a47</span>
+        <span class="sw"><i style="background:#2445b8"></i>pen #2445b8</span><span class="sw"><i style="background:#ffe45c"></i>highlighter #ffe45c</span>
+      </div>
+      <dl>
+        <dt>fonts</dt><dd>Young Serif (display) · Atkinson Hyperlegible (text) · Martian Mono (code) · Caveat for margin notes only.</dd>
+        <dt>buttons</dt><dd>Rubber-stamp: double-ruled border, slight rotation; primary is filled orange with a hard ink offset.</dd>
+        <dt>cards</dt><dd>Index cards (ruled lines and red header rule), sticky notes, dashed "todo" boxes; paper clips and tape.</dd>
+        <dt>signature</dt><dd>A highlighter sweeps across the key phrase as you scroll; ticks and crosses are drawn by pen as results arrive.</dd>
+        <dt>why</dt><dd>Reading a new codebase is fieldwork. Warm and personal, but the handwriting can feel twee and hurts density on data-heavy screens.</dd>
+      </dl>
+    </div>
+  </div>
+</div>
+</body>
+</html>

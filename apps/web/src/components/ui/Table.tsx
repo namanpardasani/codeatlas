@@ -13,7 +13,10 @@ export interface SortState {
   dir: "asc" | "desc";
 }
 
-/** Data-driven table so pages never hand-style cells. Clickable rows are keyboard operable (Enter / Space). */
+/**
+ * A ledger: mono caps header over a heavy ink rule, thin rules between rows, a highlighter wash on the selected row
+ * with an ink mark in the margin. Data-driven so pages never hand-style cells. Clickable rows are keyboard operable.
+ */
 export function Table<T>({
   columns,
   rows,
@@ -33,7 +36,7 @@ export function Table<T>({
   onSort?: (key: string) => void;
   empty?: string;
 }) {
-  if (rows.length === 0) return <p className="text-muted">{empty}</p>;
+  if (rows.length === 0) return <p className="text-wonk text-pencil">{empty}</p>;
   const key = (row: T) => (e: KeyboardEvent) => {
     if (onRowClick && (e.key === "Enter" || e.key === " ")) {
       e.preventDefault();
@@ -44,13 +47,13 @@ export function Table<T>({
     <div className="overflow-x-auto">
       <table className="w-full border-collapse text-left">
         <thead>
-          <tr className="border-b border-line text-[12px] text-muted">
+          <tr className="border-b-2 border-ink">
             {columns.map((c) => (
-              <th key={c.header} className={`px-3 py-2 font-medium ${c.className ?? ""}`} aria-sort={sort && sort.key === c.sortKey ? (sort.dir === "asc" ? "ascending" : "descending") : undefined}>
+              <th key={c.header} className={`mono-label px-3 py-2 font-medium ${c.className ?? ""}`} aria-sort={sort && sort.key === c.sortKey ? (sort.dir === "asc" ? "ascending" : "descending") : undefined}>
                 {c.sortKey && onSort ? (
-                  <button className="font-medium hover:text-text" onClick={() => onSort(c.sortKey!)}>
+                  <button className={`uppercase tracking-[inherit] hover:text-ink ${sort?.key === c.sortKey ? "text-ink" : ""}`} onClick={() => onSort(c.sortKey!)}>
                     {c.header}
-                    {sort?.key === c.sortKey && (sort.dir === "asc" ? " ▲" : " ▼")}
+                    {sort?.key === c.sortKey && <span aria-hidden>{sort.dir === "asc" ? " ↑" : " ↓"}</span>}
                   </button>
                 ) : (
                   c.header
@@ -60,23 +63,25 @@ export function Table<T>({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row) => (
-            <tr
-              key={rowKey(row)}
-              onClick={onRowClick ? () => onRowClick(row) : undefined}
-              onKeyDown={onRowClick ? key(row) : undefined}
-              tabIndex={onRowClick ? 0 : undefined}
-              className={`border-b border-line transition-colors duration-150 hover:bg-surface-2 ${onRowClick ? "cursor-pointer" : ""} ${
-                isSelected?.(row) ? "bg-surface-2" : ""
-              }`}
-            >
-              {columns.map((c) => (
-                <td key={c.header} className={`px-3 py-3 align-middle ${c.className ?? ""}`}>
-                  {c.render(row)}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {rows.map((row) => {
+            const sel = isSelected?.(row) ?? false;
+            return (
+              <tr
+                key={rowKey(row)}
+                onClick={onRowClick ? () => onRowClick(row) : undefined}
+                onKeyDown={onRowClick ? key(row) : undefined}
+                tabIndex={onRowClick ? 0 : undefined}
+                aria-selected={onRowClick ? sel : undefined}
+                className={`border-b border-rule transition-colors duration-100 ${onRowClick ? "cursor-pointer hover:bg-paper-2" : ""} ${sel ? "bg-hl-soft shadow-[inset_3px_0_0_var(--ink)] hover:bg-hl-soft" : ""}`}
+              >
+                {columns.map((c) => (
+                  <td key={c.header} className={`px-3 py-2.5 align-middle text-ink-2 ${c.className ?? ""}`}>
+                    {c.render(row)}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

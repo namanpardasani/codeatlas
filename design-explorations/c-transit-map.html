@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>C · Transit map (my pick for a bold idea)</title>
+<style>
+  @font-face { font-family: "Archivo"; src: url(fonts/archivo.woff2) format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; }
+  @font-face { font-family: "Space Mono"; src: url(fonts/space-mono-400.woff2) format("woff2"); font-weight: 400; }
+  @font-face { font-family: "Space Mono"; src: url(fonts/space-mono-700.woff2) format("woff2"); font-weight: 700; }
+  :root { --bg: #f4f2ec; --ink: #111111; --ink-2: #3d3d3a; --mute: #6a6964; --line: #111; --signal: #ff3b1f; --verified: #00875a; --sign: #111; --signyel: #ffcc00; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 "Archivo", system-ui; font-stretch: 100%; }
+  .wrap { max-width: 1280px; margin: 0 auto; padding: 0 28px; }
+  .mono { font-family: "Space Mono", monospace; }
+  .sign { display: flex; align-items: center; gap: 14px; background: var(--sign); color: #fff; padding: 12px 20px; margin: 0 -28px; }
+  .roundel { width: 34px; height: 34px; border-radius: 50%; border: 6px solid var(--signal); display: grid; place-items: center; position: relative; }
+  .roundel::after { content: ""; position: absolute; left: -10px; right: -10px; height: 10px; background: #fff; }
+  .brand { font: 800 20px "Archivo"; font-stretch: 75%; letter-spacing: .02em; text-transform: uppercase; }
+  .sign a { color: #ddd; font: 13px "Space Mono"; text-decoration: none; }
+  .sign .sp { flex: 1; }
+  .hero { display: grid; grid-template-columns: .9fr 1.1fr; gap: 40px; padding: 70px 0 40px; }
+  h1 { font: 850 clamp(56px, 8.2vw, 128px)/.86 "Archivo"; font-stretch: 68%; text-transform: uppercase; letter-spacing: -.01em; margin: 0 0 26px; }
+  h1 .r { color: var(--signal); }
+  .lede { font-size: 19px; color: var(--ink-2); max-width: 28em; }
+  .board { display: flex; border: 3px solid var(--ink); background: #fff; margin-top: 30px; max-width: 540px; }
+  .board input { flex: 1; border: 0; font: 15px "Space Mono"; padding: 0 14px; background: transparent; }
+  .go { font: 800 17px "Archivo"; font-stretch: 80%; text-transform: uppercase; letter-spacing: .04em; background: var(--signyel); color: #111; border: 0; border-left: 3px solid var(--ink); padding: 16px 22px; cursor: pointer; }
+  .go:hover { background: var(--ink); color: var(--signyel); }
+  .ghost { font: 700 13px "Space Mono"; text-transform: uppercase; letter-spacing: .06em; color: var(--ink); background: none; border: 0; border-bottom: 3px solid var(--ink); padding: 6px 0; margin-top: 22px; }
+  .metro svg { width: 100%; height: auto; }
+  .station text { font: 700 12px "Space Mono"; }
+  .alert { display: flex; gap: 14px; align-items: flex-start; background: var(--signyel); border: 3px solid var(--ink); padding: 14px 18px; max-width: 560px; font-size: 15px; }
+  .alert b { font: 850 15px "Archivo"; font-stretch: 75%; text-transform: uppercase; display: block; }
+  .tag { display: inline-flex; align-items: center; gap: 6px; font: 700 12px "Space Mono"; border: 2px solid var(--ink); padding: 2px 8px; border-radius: 999px; background: #fff; }
+  .tag i { width: 10px; height: 10px; border-radius: 50%; background: var(--signal); }
+  .lines { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 3px solid var(--ink); margin-top: 60px; }
+  .lines > div { padding: 26px 22px 30px; border-right: 3px solid var(--ink); }
+  .lines > div:last-child { border-right: 0; }
+  .lines h3 { font: 850 30px/1 "Archivo"; font-stretch: 70%; text-transform: uppercase; margin: 14px 0 8px; }
+  .lines p { margin: 0; color: var(--ink-2); }
+  .ln { display: inline-grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; color: #fff; font: 800 18px "Archivo"; }
+  .spec { margin: 70px 0; border: 3px solid var(--ink); padding: 24px 26px; background: #fff; }
+  .spec h2 { font: 850 34px "Archivo"; font-stretch: 70%; text-transform: uppercase; margin: 0 0 12px; }
+  .sw { display: inline-block; width: 120px; margin: 0 8px 12px 0; font: 11px "Space Mono"; }
+  .sw i { display: block; height: 40px; border: 2px solid var(--ink); margin-bottom: 4px; }
+  dl { display: grid; grid-template-columns: 150px 1fr; gap: 8px 20px; }
+  dt { font: 700 12px "Space Mono"; text-transform: uppercase; padding-top: 4px; }
+  dd { margin: 0; color: var(--ink-2); }
+  @media (max-width: 860px) { .hero, .lines, dl { grid-template-columns: 1fr; } .lines > div { border-right: 0; border-bottom: 3px solid var(--ink); } .sign a { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sign"><span class="roundel"></span><span class="brand">CodeAtlas</span><span class="sp"></span><a href="#">REPLAYS</a><a href="#">METHOD</a><a href="#">MCP</a></div>
+  <div class="hero">
+    <div>
+      <span class="tag"><i></i> SERVICE CHANGE · models.py</span>
+      <h1 style="margin-top:18px">Every PR is a <span class="r">service change.</span></h1>
+      <p class="lede">CodeAtlas draws your repo as a network: files are stations, imports and calls are lines. Change one stop and it shows which others go down with it.</p>
+      <form class="board" onsubmit="return false"><input value="github.com/psf/requests" aria-label="Repository URL" /><button class="go">Map it →</button></form>
+      <button class="ghost">See a real bug replayed</button>
+    </div>
+    <div class="metro">
+      <svg viewBox="0 0 640 420" role="img" aria-label="Transit-style map of psf/requests">
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="10">
+          <path d="M40 90H220L300 170H600" stroke="#111"/>
+          <path d="M120 360V250L220 150H360L440 70H600" stroke="#ff3b1f"/>
+          <path d="M40 300H260L340 220V120" stroke="#00875a"/>
+        </g>
+        <g class="station" fill="#fff" stroke="#111" stroke-width="4">
+          <circle cx="220" cy="90" r="9"/><circle cx="300" cy="170" r="9"/><circle cx="600" cy="170" r="9"/>
+          <circle cx="220" cy="150" r="13" stroke="#ff3b1f" stroke-width="5"/><circle cx="360" cy="150" r="9"/><circle cx="440" cy="70" r="9"/><circle cx="120" cy="360" r="9"/>
+          <circle cx="260" cy="300" r="9"/><circle cx="340" cy="120" r="9"/><circle cx="40" cy="300" r="9"/>
+        </g>
+        <g class="station" fill="#111">
+          <text x="150" y="76">sessions</text><text x="312" y="196">adapters</text><text x="560" y="200">api</text>
+          <text x="140" y="140" fill="#ff3b1f">MODELS</text><text x="370" y="142">utils</text><text x="450" y="60">compat</text>
+          <text x="134" y="372">auth</text><text x="230" y="326">test_requests</text><text x="350" y="112">hooks</text>
+        </g>
+        <g transform="translate(470 300)"><rect width="150" height="88" fill="#ffcc00" stroke="#111" stroke-width="3"/><text x="12" y="26" font-family="Archivo" font-weight="850" font-size="16">MINOR DELAYS</text><text x="12" y="50" font-family="Space Mono" font-size="11">3 stations affected</text><text x="12" y="70" font-family="Space Mono" font-size="11">risk 57 / 100</text></g>
+      </svg>
+      <div class="alert"><span style="font-size:26px;line-height:1">⚠</span><div><b>Changing models.py?</b>sessions.py calls PreparedRequest.prepare() on line 541, and __init__.py changed with it in 35% of commits. Run 4 of 346 tests.</div></div>
+    </div>
+  </div>
+  <div class="lines">
+    <div><span class="ln" style="background:#ff3b1f">B</span><h3>Blast line</h3><p>What a change will break, ranked, with the route that explains each stop.</p></div>
+    <div><span class="ln" style="background:#111">H</span><h3>Hotspot line</h3><p>Stations with the most traffic and the most delays: complex, churned, depended on.</p></div>
+    <div><span class="ln" style="background:#00875a">A</span><h3>Ask line</h3><p>Questions answered with the exact lines quoted, or “not found”.</p></div>
+  </div>
+  <div class="spec">
+    <h2>Direction C · Transit map</h2>
+    <span class="sw"><i style="background:#f4f2ec"></i>bg #f4f2ec</span><span class="sw"><i style="background:#111"></i>ink #111111</span><span class="sw"><i style="background:#ff3b1f"></i>signal #ff3b1f</span><span class="sw"><i style="background:#00875a"></i>verified #00875a</span><span class="sw"><i style="background:#ffcc00"></i>sign yellow #ffcc00</span>
+    <dl>
+      <dt>Fonts</dt><dd>Archivo (variable width: condensed 850 for display, normal for text) · Space Mono.</dd>
+      <dt>Buttons</dt><dd>Signboard slabs: 3px ink border, sign-yellow fill, inverts on hover. Secondary is a mono underline.</dd>
+      <dt>Cards</dt><dd>Mostly none: content sits in ruled panels and signboards. Status as service alerts.</dd>
+      <dt>Signature</dt><dd>Hover a station and a train runs along every line that leaves it; Blast Radius plays as a “service change” spreading stop by stop.</dd>
+      <dt>Why</dt><dd>Dependencies are routes; breaking changes are disruptions. Loud and memorable, but the 45° layout needs a new graph layout engine and hurts at 500+ files.</dd>
+    </dl>
+  </div>
+</div>
+</body>
+</html>

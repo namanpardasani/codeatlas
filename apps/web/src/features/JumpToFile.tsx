@@ -41,7 +41,7 @@ export function JumpToFile({ open, files, onPick, onClose }: { open: boolean; fi
           if (e.key === "ArrowUp") (e.preventDefault(), setI((v) => Math.max(0, v - 1)));
           if (e.key === "Enter" && hits[i]) onPick(hits[i]!);
         }}
-        className="w-full rounded-shell border border-border-strong bg-bg px-4 py-3 font-mono text-body text-text outline-none placeholder:text-dim focus-visible:border-cyan"
+        className="w-full border-0 border-b-2 border-ink bg-transparent px-1 py-3 font-mono text-[16px] text-ink outline-none placeholder:text-pencil focus-visible:border-signal focus-visible:outline-none"
       />
       <ul id="jump-list" role="listbox" className="mt-3 max-h-80 overflow-y-auto">
         {hits.map((f, idx) => (
@@ -49,14 +49,14 @@ export function JumpToFile({ open, files, onPick, onClose }: { open: boolean; fi
             <button
               onClick={() => onPick(f)}
               onMouseEnter={() => setI(idx)}
-              className={`flex w-full items-center justify-between rounded-ui px-3 py-2 text-left font-mono text-small ${idx === i ? "bg-cyan-bg text-text" : "text-text-3"}`}
+              className={`flex w-full items-center justify-between px-3 py-2 text-left font-mono text-small ${idx === i ? "bg-hl-soft text-ink shadow-[inset_3px_0_0_var(--ink)]" : "text-ink-2"}`}
             >
               <span className="truncate">{f.path}</span>
-              <span className="ml-3 shrink-0 text-dim">{f.lines} lines</span>
+              <span className="ml-3 shrink-0 text-pencil">{f.lines} lines</span>
             </button>
           </li>
         ))}
-        {hits.length === 0 && <li className="px-3 py-2 text-small text-muted">No file matches “{q}”.</li>}
+        {hits.length === 0 && <li className="text-wonk px-3 py-2 text-pencil">No file matches “{q}”.</li>}
       </ul>
     </Dialog>
   );

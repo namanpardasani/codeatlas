@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { useCallback, useEffect, useState } from "react";
 import { Navigate, Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { reanalyze } from "../api";
@@ -6,11 +6,12 @@ import { AppHeader } from "../components/ui";
 import { ConnectMcp } from "../features/ConnectMcp";
 import { JumpToFile } from "../features/JumpToFile";
 import { ago, RepoProvider, useRepo } from "../hooks/RepoData";
-import { pageTransition } from "../ui/motion";
+
 
 const TABS = [
   { id: "overview", label: "Overview" },
   { id: "map", label: "Map" },
+  { id: "blast", label: "Blast Radius" },
   { id: "hotspots", label: "Hotspots" },
   { id: "ask", label: "Ask" },
   { id: "docs", label: "Docs" },
@@ -49,7 +50,7 @@ function Shell() {
   if (files && files.length === 0 && runs && runs.length === 0) return <Navigate to="/404" replace />;
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-table pb-10">
       <AppHeader
         repo={name ?? undefined}
         badge={last ? `${last.commit_sha?.slice(0, 7) ?? "—"} · analyzed ${ago(last.finished_at ?? last.created_at)}` : undefined}
@@ -61,18 +62,28 @@ function Shell() {
         right={
           <button
             onClick={() => setJump(true)}
-            className="hidden min-h-11 items-center gap-3 rounded-ui border border-border bg-surface px-4 text-small text-muted hover:border-border-strong hover:text-text-2 md:inline-flex"
+            className="hidden min-h-8 w-56 items-center gap-2 border-b border-table-line px-1 font-mono text-[12px] text-table-muted transition-colors hover:border-table-muted hover:text-table-ink md:inline-flex"
           >
-            Jump to file… <kbd className="rounded border border-border-strong px-1.5 font-mono text-micro text-text-3">⌘K</kbd>
+            jump to file… <kbd className="ml-auto font-mono text-[11px] text-table-muted">⌘K</kbd>
           </button>
         }
       />
-      <AnimatePresence mode="wait">
-        <motion.main key={tab} {...pageTransition} className="mx-auto max-w-7xl px-6 py-8">
-          <h1 className="sr-only">{name ?? "Repository"}: {TABS.find((t) => t.id === tab)?.label ?? tab}</h1>
-          <Outlet />
-        </motion.main>
-      </AnimatePresence>
+      {/* the page is one sheet of paper; the open folder tab above is cut from it */}
+      <div className="mx-auto max-w-[1360px] px-2 sm:px-6">
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={tab}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="sheet min-h-[70vh] rounded-tl-none px-4 py-7 sm:px-8 sm:py-9"
+          >
+            <span className="sr-only">{name ?? "Repository"}: {TABS.find((t) => t.id === tab)?.label ?? tab}</span>
+            <Outlet />
+          </motion.main>
+        </AnimatePresence>
+      </div>
       <ConnectMcp open={mcp} onClose={() => setMcp(false)} />
       <JumpToFile
         open={jump}

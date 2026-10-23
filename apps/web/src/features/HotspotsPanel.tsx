@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { getHotspots, type HotspotItem, type HotspotsResponse } from "../api";
 import { Badge, Panel, ScoreBar, Table, type Column, type SortState, type Tone } from "../components/ui";
 
-const severityTone: Record<string, Tone> = { high: "amber", medium: "amber", low: "neutral" };
+// only high severity is red: the risk colour stays meaningful when it is rare
+const severityTone: Record<string, Tone> = { high: "amber", medium: "neutral", low: "neutral" };
 const FACTOR_LABEL: Record<string, string> = {
   complexity: "complex", churn: "churn", cycle: "cycle", fan_in: "fan-in", no_test: "no test", duplication: "duplicated",
 };
@@ -32,7 +33,7 @@ export function HotspotsPanel({
     setSort((s) => (s.key === key ? { key, dir: s.dir === "desc" ? "asc" : "desc" } : { key, dir: key === "path" ? "asc" : "desc" }));
 
   const columns: Column<HotspotItem>[] = [
-    { header: "File", sortKey: "path", render: (f) => <span className="font-mono">{f.path}</span> },
+    { header: "File", sortKey: "path", render: (f) => <span className="font-mono text-small text-ink">{f.path}</span> },
     { header: "Score", sortKey: "score", render: (f) => (f.hotspot_score === null ? "–" : <ScoreBar value={f.hotspot_score} />) },
     { header: "Complexity", sortKey: "complexity", render: (f) => `${n(f.max_complexity)} / ${n(f.total_complexity)}` },
     { header: "Churn", sortKey: "churn", render: (f) => n(f.churn) },
@@ -42,7 +43,7 @@ export function HotspotsPanel({
     {
       header: "Signals",
       render: (f) => (
-        <span className="flex flex-wrap gap-gap">
+        <span className="flex flex-wrap gap-2">
           {f.hotspot_reasons.length > 0
             ? f.hotspot_reasons.map((r) => (
                 <span key={r.factor} title={r.text}>
@@ -59,11 +60,26 @@ export function HotspotsPanel({
   ];
 
   const h = data?.history;
+  const top = data?.items[0] && data.items[0].hotspot_score !== null ? data.items[0] : null;
   return (
-    <Panel title="Hotspots">
-      {error && <p className="text-danger">{error}</p>}
+    <Panel title="All files by risk" description="Sort by any column. Signals say why a file scores high; hover one for the exact reason.">
+      {error && <p className="text-signal-ink">{error}</p>}
+      {top && sort.key === "score" && sort.dir === "desc" && (
+        <p className="mb-6 max-w-4xl font-display text-[clamp(19px,2vw,24px)] leading-snug text-ink-2 [font-variation-settings:'SOFT'_60]">
+          The softest ground is <span className="font-mono text-[0.8em] font-medium text-ink">{top.path}</span>
+          {top.max_complexity !== null && <>: its worst function has a complexity of <b className="font-semibold text-ink">{top.max_complexity}</b></>}
+          {top.commits_total ? <>, {top.commits_total} commits by {top.authors ?? "?"} people touched it</> : null}
+          {top.fan_in ? <>, and {top.fan_in} files import it</> : null}
+          {top.has_test === false ? <>. No test file was found for it.</> : "."}
+        </p>
+      )}
+      {data && h?.available && data.items.length > 0 && data.items.every((f) => !f.churn) && (
+        <p className="text-wonk mb-3 text-[16px] text-pencil">
+          Nothing changed in the {h.window_days} days before the newest commit, so churn is 0 everywhere; a “churn” signal here means a file changed often across the fetched history.
+        </p>
+      )}
       {data && (
-        <div className="mb-gutter flex flex-col gap-gap text-muted">
+        <div className="mb-4 flex flex-col gap-2 text-small text-pencil">
           {!data.scored && (
             <p>
               <Badge tone="warning">no scoring formula yet</Badge> Score and reasons stay empty until the

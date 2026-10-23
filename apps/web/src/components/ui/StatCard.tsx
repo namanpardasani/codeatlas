@@ -1,13 +1,20 @@
 import type { ReactNode } from "react";
-import { Card } from "./Card";
 
-/** Overview tile: 12px muted label over a 32px display value. `risk` turns it amber (e.g. cycles > 0). */
-export function StatCard({ label, value, hint, risk = false }: { label: string; value: ReactNode; hint?: string; risk?: boolean }) {
+/**
+ * A figure: a big serif number with a mono caption under it, no box. `risk` writes the number in red ink and
+ * underlines it (colour is never the only signal).
+ */
+export function Figure({ label, value, hint, risk = false, className = "" }: { label: string; value: ReactNode; hint?: string; risk?: boolean; className?: string }) {
   return (
-    <Card variant={risk ? "risk" : "default"} className="flex h-full flex-col gap-1">
-      <span className="text-[12px] text-muted">{label}</span>
-      <span className={`font-display text-[32px] font-bold leading-none tracking-tight ${risk ? "text-amber-soft" : "text-text"}`}>{value}</span>
-      {hint && <span className="text-[12px] text-dim">{hint}</span>}
-    </Card>
+    <div className={`flex flex-col ${className}`}>
+      <span className={`font-display text-[44px] font-semibold leading-none tracking-[-0.04em] tabular-nums [font-variation-settings:'SOFT'_30] ${risk ? "text-signal-ink underline decoration-signal decoration-2 underline-offset-[6px]" : "text-ink"}`}>{value}</span>
+      <span className="mono-label mt-2">{label}</span>
+      {hint && <span className="mt-0.5 text-[12.5px] leading-snug text-pencil">{hint}</span>}
+    </div>
   );
+}
+
+/** Older name: kept so existing imports work. */
+export function StatCard(props: { label: string; value: ReactNode; hint?: string; risk?: boolean; icon?: string }) {
+  return <Figure label={props.label} value={props.value} hint={props.hint} risk={props.risk} />;
 }

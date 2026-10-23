@@ -1,29 +1,28 @@
 import type { ReactNode } from "react";
 
-/** A titled section: the standard container for page content (18px radius). */
-export function Panel({
-  title,
-  actions,
-  children,
-  variant = "default",
-  label,
-}: {
+/**
+ * A titled section on paper. Not a box: a heavy ink rule, a serif title and the content under it, like a section of
+ * a printed report. `risk` turns the rule red.
+ */
+export function Panel({ title, actions, children, variant = "default", label, description, className = "" }: {
   title: string;
   actions?: ReactNode;
   children: ReactNode;
   variant?: "default" | "risk";
-  /** optional mono caption above the title, e.g. "PLATE 02" */
+  /** optional small caption above the title */
   label?: string;
+  description?: string;
+  className?: string;
 }) {
-  const tone = variant === "risk" ? "border-amber-border bg-amber-bg" : "border-border bg-surface";
   return (
-    <section className={`rounded-panel border p-6 ${tone}`}>
-      <div className="mb-4 flex items-start justify-between gap-gap">
-        <div>
+    <section className={`border-t-2 pt-3 ${variant === "risk" ? "border-signal" : "border-ink"} ${className}`}>
+      <div className="mb-4 flex items-start justify-between gap-3">
+        <div className="min-w-0">
           {label && <div className="mono-label mb-1">{label}</div>}
-          <h2 className="text-section text-text">{title}</h2>
+          <h2 className="text-section text-ink">{title}</h2>
+          {description && <p className="mt-1 text-small text-pencil">{description}</p>}
         </div>
-        {actions}
+        {actions && <div className="shrink-0">{actions}</div>}
       </div>
       {children}
     </section>

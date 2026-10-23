@@ -1,8 +1,8 @@
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getFiles, getJob, reanalyze, watchJob, type JobEvent } from "../api";
-import { Button, Logo, MonoLabel, ProgressBar } from "../components/ui";
+import { Button, ButtonLink, Compass, Figure, Logo, ProgressBar, Sheet, ThemeToggle } from "../components/ui";
 import { useCountUp } from "../hooks/useCountUp";
 import { useMe } from "../hooks/useMe";
 import { dur, ease } from "../ui/motion";
@@ -31,16 +31,16 @@ interface LogLine {
 
 const clock = () => new Date().toLocaleTimeString([], { hour12: false });
 
-function Check({ draw = false }: { draw?: boolean }) {
+/** A tick drawn in green ink (drawn once, when the last stage finishes). */
+function Tick({ draw = false }: { draw?: boolean }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+    <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden className="text-verified-ink">
       <motion.path
-        d="M2.5 7.5 L5.8 10.5 L11.5 3.8"
+        d="M3 9.5 L7.2 13.5 L15 4.5"
         fill="none"
-        stroke="var(--color-cyan)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="square"
         initial={draw ? { pathLength: 0 } : false}
         animate={{ pathLength: 1 }}
         transition={{ duration: 0.45, ease: ease.out }}
@@ -51,12 +51,7 @@ function Check({ draw = false }: { draw?: boolean }) {
 
 function Counter({ label, value }: { label: string; value: number | null }) {
   const shown = useCountUp(value);
-  return (
-    <div className="rounded-card border border-border bg-surface p-4">
-      <div className="text-[12px] text-muted">{label}</div>
-      <div className="mt-1 font-display text-[28px] font-bold leading-none tabular-nums text-text">{shown === null ? "—" : shown.toLocaleString()}</div>
-    </div>
-  );
+  return <Figure label={label} value={shown === null ? "—" : shown.toLocaleString()} />;
 }
 
 export default function Progress() {
@@ -146,95 +141,92 @@ export default function Progress() {
   }
 
   return (
-    <div className="min-h-screen bg-bg">
-      <header className="mx-auto flex max-w-6xl items-center gap-4 px-6 py-5">
-        <Link to="/" aria-label="CodeAtlas home" className="rounded-ui"><Logo /></Link>
-        {repoName && <span className="font-mono text-small text-text-2">/ {repoName}</span>}
+    <div className="min-h-screen bg-table text-table-ink">
+      <header className="mx-auto flex max-w-6xl items-center gap-3 px-4 py-5 sm:px-6">
+        <Link to="/" aria-label="CodeAtlas home" className="rounded-ui"><Logo needle={running && !failed ? "hunt" : "still"} /></Link>
+        {repoName && <><span aria-hidden className="text-table-muted">/</span><span className="font-display text-[19px] italic">{repoName}</span></>}
+        <ThemeToggle className="ml-auto" />
       </header>
 
-      <main className="mx-auto grid max-w-6xl gap-8 px-6 pb-16 pt-6 lg:grid-cols-[1.4fr_1fr]">
-        <section aria-live="polite">
-          <MonoLabel>{failed ? "MAPPING · STOPPED" : done ? "MAPPING · COMPLETE" : `MAPPING · STAGE ${Math.min(idx + 1, STAGES.length)} OF ${STAGES.length}`}</MonoLabel>
-          <h1 className="mt-3 text-page">{failed ? "The map could not be finished" : done ? "Map ready" : current.title}</h1>
-          <p className="mt-2 text-text-3">
-            {failed ? ev?.error ?? "Something went wrong." : done ? "Taking you to the overview." : "You can leave; we'll keep going."}
-          </p>
-
-          <div className="mt-8 flex items-center gap-4">
-            <div className="flex-1"><ProgressBar value={done ? 100 : ev?.progress ?? 0} failed={failed} running={!done && !failed} /></div>
-            <span className="w-12 text-right font-mono text-small text-text-3">{done ? 100 : ev?.progress ?? 0}%</span>
+      <main className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] items-start gap-8 px-4 pb-16 pt-6 sm:px-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <Sheet as="section" aria-live="polite" className="px-5 py-8 sm:px-9">
+          <div className="flex items-start justify-between gap-6">
+            <div>
+              <p className={`mono-label ${failed ? "text-signal-ink" : done ? "text-verified-ink" : ""}`}>
+                {failed ? "Survey stopped" : done ? "Survey complete" : `Surveying · step ${Math.min(idx + 1, STAGES.length)} of ${STAGES.length}`}
+              </p>
+              <h1 className="text-title mt-3 text-ink">{failed ? "The analysis could not be finished" : done ? "Your map is drawn" : current.title}</h1>
+              <p className="mt-3 max-w-md text-ink-2">
+                {failed ? ev?.error ?? "Something went wrong." : done ? "Taking you to the overview." : "Usually under a minute. You can close this page; the survey keeps going."}
+              </p>
+            </div>
+            <Compass size={76} mode={running && !failed ? "hunt" : "still"} className="hidden shrink-0 text-ink sm:block" title={running && !failed ? "Compass searching" : "Compass"} />
           </div>
 
-          <ol className="mt-8 overflow-hidden rounded-panel border border-border bg-surface">
+          <div className="mt-8 flex items-center gap-4">
+            <div className="flex-1"><ProgressBar value={done ? 100 : ev?.progress ?? 0} failed={failed} label="Analysis progress" /></div>
+            <span className="w-12 text-right font-mono text-small text-ink">{done ? 100 : ev?.progress ?? 0}%</span>
+          </div>
+
+          <ol className="mt-8 border-t-2 border-ink">
             {STAGES.map((s, i) => {
               const state = failed && i === idx ? "failed" : i < idx ? "done" : i === idx && !done ? "active" : "queued";
+              const secs = durations[s.id] !== undefined ? durations[s.id]! / 1000 : null;
               return (
-                <li
-                  key={s.id}
-                  className={`flex items-center gap-4 border-b border-line px-5 py-4 last:border-b-0 ${state === "active" ? "bg-cyan-tint" : ""}`}
-                >
-                  <span className="flex size-6 shrink-0 items-center justify-center">
-                    {state === "done" && (
-                      <span className="flex size-6 items-center justify-center rounded-full bg-cyan-bg"><Check draw={done && i === STAGES.length - 1} /></span>
-                    )}
-                    {state === "active" && <span aria-hidden className="anim-spin size-5 rounded-full border-2 border-cyan-bg border-t-cyan" />}
-                    {state === "queued" && <span aria-hidden className="size-5 rounded-full border border-dashed border-faint" />}
-                    {state === "failed" && <span aria-hidden className="size-5 rounded-full border-2 border-error" />}
+                <li key={s.id} className={`grid grid-cols-[28px_minmax(0,1fr)_auto] items-center gap-3 border-b border-rule px-1 py-3 ${state === "active" ? "bg-hl-soft/70" : ""}`}>
+                  <span className="flex justify-center">
+                    {state === "done" && <Tick draw={done && i === STAGES.length - 1} />}
+                    {state === "active" && <span aria-hidden className="anim-soft-pulse size-2.5 rounded-full bg-signal" />}
+                    {state === "queued" && <span aria-hidden className="font-mono text-[11px] text-pencil">{String(i + 1).padStart(2, "0")}</span>}
+                    {state === "failed" && <span aria-hidden className="font-mono text-signal-ink">✕</span>}
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <div className={`text-body ${state === "queued" ? "text-dim" : state === "failed" ? "text-error" : "text-text"}`}>{s.name}</div>
+                  <div className="min-w-0">
+                    <div className={`text-[15px] ${state === "queued" ? "text-pencil" : state === "failed" ? "text-signal-ink" : "font-medium text-ink"}`}>{s.name}</div>
                     {state === "active" && s.id === "parse" && parsed !== null && filesTotal && (
-                      <div className="font-mono text-small text-cyan-soft">~{parsed} / {filesTotal} files</div>
+                      <div className="font-mono text-small text-ink-2">about {parsed} of {filesTotal} files</div>
                     )}
-                    {state === "failed" && <div className="text-small text-error">{ev?.error}</div>}
+                    {state === "failed" && <div className="text-small text-signal-ink">{ev?.error}</div>}
                   </div>
-                  {state === "done" && durations[s.id] !== undefined && <span className="font-mono text-small text-muted">{(durations[s.id]! / 1000).toFixed(1)}s</span>}
-                  {state === "active" && <span className="anim-soft-pulse font-mono text-small text-cyan-soft">running</span>}
+                  <span className="font-mono text-small text-pencil">
+                    {state === "done" && secs !== null ? (secs < 0.1 ? "<0.1 s" : `${secs.toFixed(1)} s`) : state === "active" ? <span className="text-ink">working</span> : ""}
+                  </span>
                 </li>
               );
             })}
           </ol>
 
           <div className="mt-6 flex items-center gap-4">
-            {done && <Link className="text-cyan underline" to={`/repo/${repoId}/overview`}>Go now</Link>}
+            {done && <ButtonLink to={`/repo/${repoId}/overview`}>Open the overview</ButtonLink>}
             {failed && <Button onClick={retry}>Try again</Button>}
           </div>
-        </section>
+        </Sheet>
 
-        <aside className="flex flex-col gap-4">
-          <div className="grid grid-cols-3 gap-3">
-            <Counter label="Files" value={counts?.files ?? filesTotal} />
-            <Counter label="Symbols" value={counts?.symbols ?? null} />
-            <Counter label="Imports" value={counts?.imports ?? null} />
-          </div>
-
-          <div className="overflow-hidden rounded-card border border-border bg-code">
-            <div className="flex items-center gap-1.5 border-b border-line bg-bg-raised px-4 py-2.5">
-              <span aria-hidden className="size-2.5 rounded-full bg-border-strong" />
-              <span aria-hidden className="size-2.5 rounded-full bg-border-strong" />
-              <span aria-hidden className="size-2.5 rounded-full bg-border-strong" />
-              <span className="ml-2 font-mono text-micro text-muted">worker log</span>
+        <aside className="flex flex-col gap-8 lg:pt-6">
+          <Sheet tilt={-0.8} className="p-6">
+            <div className="mono-label">Found so far</div>
+            <div className="mt-4 grid grid-cols-3 gap-4">
+              <Counter label="Files" value={counts?.files ?? filesTotal} />
+              <Counter label="Symbols" value={counts?.symbols ?? null} />
+              <Counter label="Imports" value={counts?.imports ?? null} />
             </div>
-            <div className="h-56 overflow-y-auto p-4 font-mono text-[12.5px] leading-relaxed" role="log" aria-label="worker log">
+          </Sheet>
+
+          <div className="rounded-ui border border-table-line bg-table-2">
+            <div className="border-b border-table-line px-4 py-2 font-mono text-[11px] uppercase tracking-[0.12em] text-table-muted">worker log</div>
+            <div className="h-52 overflow-y-auto p-4 font-mono text-[12.5px] leading-relaxed" role="log" aria-label="worker log">
               <AnimatePresence initial={false}>
                 {log.map((l, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: dur.base, ease: ease.out }}
-                    className={l.warn ? "text-amber-soft" : "text-text-3"}
-                  >
-                    <span className="text-dim">{l.t}</span> {l.text}
+                  <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: dur.base }} className={l.warn ? "text-table-signal" : "text-table-ink"}>
+                    <span className="text-table-muted">{l.t}</span> {l.text}
                   </motion.div>
                 ))}
               </AnimatePresence>
-              {log.length === 0 && <span className="text-dim">waiting for the worker…</span>}
+              {log.length === 0 && <span className="text-table-muted">waiting for the worker…</span>}
             </div>
           </div>
 
-          <p className="text-small text-muted">
-            Code is read, never run.{me?.limits ? ` Repositories larger than ${me.limits.maxRepoMb} MB are refused.` : ""} Public repositories only.
+          <p className="text-wonk text-[15px] leading-snug text-table-muted">
+            Code is read, never run.{me?.limits ? ` Repositories over ${me.limits.maxRepoMb} MB are refused.` : ""} Public repositories only.
           </p>
         </aside>
       </main>

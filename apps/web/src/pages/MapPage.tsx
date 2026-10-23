@@ -1,11 +1,11 @@
 import {
-  Background, BackgroundVariant, ReactFlow, ReactFlowProvider, useReactFlow, useViewport, type Edge, type Node,
+  ReactFlow, ReactFlowProvider, useReactFlow, useViewport, type Edge, type Node,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { getFileGraph, getFolderGraph, type FileGraphDetail, type FolderGraphNode, type GraphResponse } from "../api";
-import { Button, Card, ErrorState, Legend, MonoLabel, NorthMark, ScaleBar, Skeleton } from "../components/ui";
+import { Button, ButtonLink, Card, Compass, ErrorState, Legend, MonoLabel, PageHead, Segmented, Skeleton } from "../components/ui";
 import { atlasLayout, radiusFor, shortestLoop } from "../features/atlasLayout";
 import {
   AtlasEdge, AtlasNode, MapCtx, MapDefs, RegionNode,
@@ -20,35 +20,11 @@ const MAX_ANIMATED = 60;      // flowing dashes only on cycle / selected edges, 
 
 type View = "files" | "folders";
 
-/** A, B, C… across the top and 1, 2, 3… down the left, computed from the pan/zoom so they stay on the map's own grid. */
-function MapGridLetters({ cell = 320 }: { cell?: number }) {
-  const { x, y, zoom } = useViewport();
-  const step = cell * zoom;
-  if (step < 40) return null;
-  const el = document.querySelector(".react-flow") as HTMLElement | null;
-  const W = el?.clientWidth ?? 1200, H = el?.clientHeight ?? 700;
-  const cols = Array.from({ length: Math.ceil(W / step) + 2 }, (_, i) => Math.floor(-x / step) + i);
-  const rows = Array.from({ length: Math.ceil(H / step) + 2 }, (_, i) => Math.floor(-y / step) + i);
-  const letter = (i: number) => String.fromCharCode(65 + ((i % 26) + 26) % 26);
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 z-10 select-none overflow-hidden font-mono text-micro text-dim">
-      {cols.map((c) => {
-        const px = x + (c + 0.5) * step;
-        return c >= 0 && px > 24 && px < W - 8 ? <span key={`c${c}`} className="absolute top-1.5" style={{ left: px }}>{letter(c)}</span> : null;
-      })}
-      {rows.map((r) => {
-        const py = y + (r + 0.5) * step;
-        return r >= 0 && py > 24 && py < H - 8 ? <span key={`r${r}`} className="absolute left-2" style={{ top: py }}>{r + 1}</span> : null;
-      })}
-    </div>
-  );
-}
-
 function Controls() {
   const rf = useReactFlow();
-  const b = "flex size-9 items-center justify-center rounded-ui border border-border bg-surface text-text-2 hover:border-border-strong hover:text-text";
+  const b = "flex size-9 items-center justify-center font-mono text-[16px] text-ink transition-colors duration-100 hover:bg-paper-2";
   return (
-    <div className="absolute right-3 top-9 z-20 flex flex-col gap-1.5">
+    <div className="absolute right-3 top-3 z-20 flex flex-col divide-y divide-ink border-[1.5px] border-ink bg-paper">
       <button className={b} aria-label="Zoom in" onClick={() => rf.zoomIn({ duration: 250 })}>+</button>
       <button className={b} aria-label="Zoom out" onClick={() => rf.zoomOut({ duration: 250 })}>−</button>
       <button className={b} aria-label="Fit map to screen" onClick={() => rf.fitView({ duration: 400, padding: 0.12 })}>
@@ -58,16 +34,42 @@ function Controls() {
   );
 }
 
+/** The compass rose in the corner of the plate. Clicking it puts north back up: fits the whole map in view. */
+function NorthUp() {
+  const rf = useReactFlow();
+  return (
+    <button
+      onClick={() => rf.fitView({ duration: 500, padding: 0.12 })}
+      aria-label="Fit the whole map in view"
+      title="North up: fit the whole map"
+      className="absolute left-3 top-3 z-20 rounded-full text-ink transition-transform duration-300 hover:rotate-[20deg]"
+    >
+      <Compass size={54} />
+    </button>
+  );
+}
+
 /** Below this zoom the map is a overview: labels, arrowheads and pulse rings are not legible anyway and are the costly part. */
 const LOD_ZOOM = 0.45;
 
+/**
+ * Level of detail + label scale, written as attributes on the canvas element (CSS does the work), so panning and zooming
+ * never re-render the nodes. Reads the live viewport, which also covers fitView and the camera flights.
+ */
+function LodSync({ count }: { count: number }) {
+  const { zoom } = useViewport();
+  useEffect(() => {
+    const el = document.querySelector("[aria-label='Map canvas']") as HTMLElement | null;
+    if (!el) return;
+    el.dataset.lod = count > 250 && zoom < LOD_ZOOM ? "low" : "high";   // small maps always keep full detail
+    // folder names counter-scale with zoom (up to 3x) so they stay readable when zoomed out, like real map labels
+    el.style.setProperty("--label-scale", String(Math.min(3, Math.max(1, 1 / zoom))));
+  }, [zoom, count]);
+  return null;
+}
+
 function Canvas({ nodes, edges, onPane, flyTo }: { nodes: Node[]; edges: Edge[]; onPane: () => void; flyTo: string | null }) {
   const rf = useReactFlow();
-  // level of detail via a data attribute on the canvas (CSS does the hiding), so panning never re-renders the nodes
-  const setLod = (zoom: number) => {
-    const el = document.querySelector("[aria-label='Map canvas']") as HTMLElement | null;
-    if (el) el.dataset.lod = nodes.length > 250 && zoom < LOD_ZOOM ? "low" : "high";   // small maps always keep full detail
-  };
   useEffect(() => {
     if (flyTo) rf.fitView({ nodes: [{ id: flyTo }], duration: 500, maxZoom: 1.1, padding: 0.8 });
   }, [flyTo, rf]);
@@ -90,12 +92,10 @@ function Canvas({ nodes, edges, onPane, flyTo }: { nodes: Node[]; edges: Edge[];
         onlyRenderVisibleElements={nodes.length > 250}
         proOptions={{ hideAttribution: true }}
         onPaneClick={onPane}
-        onInit={(inst) => setLod(inst.getZoom())}
-        onMove={(_, vp) => setLod(vp.zoom)}
         aria-label="Dependency map"
       >
-        <Background variant={BackgroundVariant.Lines} gap={40} color="var(--color-line)" lineWidth={1} />
-        <MapGridLetters />
+        <NorthUp />
+        <LodSync count={nodes.length} />
         <Controls />
       </ReactFlow>
     </>
@@ -103,7 +103,7 @@ function Canvas({ nodes, edges, onPane, flyTo }: { nodes: Node[]; edges: Edge[];
 }
 
 export default function MapPage() {
-  const { repoId, graph, hotspots, files } = useRepo();
+  const { repoId, graph, hotspots, files, name } = useRepo();
   const [params, setParams] = useSearchParams();
   const [folders, setFolders] = useState<GraphResponse<FolderGraphNode> | null>(null);
   const [view, setView] = useState<View | null>(null);
@@ -152,11 +152,11 @@ export default function MapPage() {
       const order = [...lnodes].sort((a, b) => Math.hypot(lay.pos[a.id]!.x - center.x, lay.pos[a.id]!.y - center.y) - Math.hypot(lay.pos[b.id]!.x - center.x, lay.pos[b.id]!.y - center.y));
       const delay = new Map(order.map((n, i) => [n.id, Math.min(0.6, (i / Math.max(1, order.length)) * 0.6)]));
       const nodes: Node[] = folders.nodes.map((n, i) => ({
-        id: n.id, type: "atlas", position: lay.pos[n.id]!, draggable: false, zIndex: 1,
+        id: n.id, type: "atlas", position: lay.pos[n.id]!, draggable: false, zIndex: 2,
         data: { label: n.id, sub: `${n.files} files`, kind: n.files_in_cycles > 0 ? "hotspot" : rank.includes(n.id) ? "central" : "plain", r: lnodes[i]!.r, pulse: n.files_in_cycles > 0 || rank[0] === n.id, delay: delay.get(n.id) ?? 0, folder: true } satisfies AtlasNodeData,
       }));
       const edges: Edge[] = folders.edges.map((e, i) => ({
-        id: `f${i}`, source: e.source, target: e.target, type: "atlas", markerEnd: "url(#ah-plain)",
+        id: `f${i}`, source: e.source, target: e.target, type: "atlas", zIndex: 1, markerEnd: "url(#ah-plain)",
         data: { kind: "plain", animated: false, a: e.source, b: e.target, delay: 0.5, count: e.count } satisfies AtlasEdgeData,
       }));
       return { nodes, edges, regions: [] as { cluster: string; label: string }[], cycleNodes: new Set<string>(), total: folders.total_nodes, shown: folders.nodes.length, truncated: false, lay };
@@ -181,13 +181,13 @@ export default function MapPage() {
       data: { label: r.cluster === "(root)" ? "ROOT" : r.cluster.replace(/\//g, " / "), w: r.w, h: r.h } satisfies RegionData,
     }));
     const fileNodes: Node[] = visible.map((n, i) => ({
-      id: n.id, type: "atlas", position: lay.pos[n.id]!, draggable: false, zIndex: 1,
+      id: n.id, type: "atlas", position: lay.pos[n.id]!, draggable: false, zIndex: 2,
       data: { label: basename(n.path), sub: undefined, kind: hot.has(n.id) ? "hotspot" : central.has(n.id) ? "central" : "plain", r: lnodes[i]!.r, pulse: pulsing.has(n.id), delay: delay.get(n.id) ?? 0 } satisfies AtlasNodeData,
     }));
     const cycleOf = new Map(graph.nodes.map((n) => [n.id, n.cycle_idx]));
     const edges: Edge[] = vEdges.map((e, i) => {
       const cyc = cycleOf.get(e.source) !== null && cycleOf.get(e.source) === cycleOf.get(e.target);
-      return { id: `e${i}`, source: e.source, target: e.target, type: "atlas", markerEnd: cyc ? "url(#ah-cycle)" : "url(#ah-plain)",
+      return { id: `e${i}`, source: e.source, target: e.target, type: "atlas", zIndex: 1, markerEnd: cyc ? "url(#ah-cycle)" : "url(#ah-plain)",
         data: { kind: cyc ? "cycle" : "plain", animated: false, a: e.source, b: e.target, delay: 0.5 } satisfies AtlasEdgeData };
     });
     return {
@@ -263,19 +263,19 @@ export default function MapPage() {
   const legendBlock = <Legend />;
   const regionsBlock = (
     <div>
-      <MonoLabel className="mb-3">REGIONS</MonoLabel>
+      <MonoLabel className="mb-2">Folders</MonoLabel>
       {effectiveView === "folders" ? (
-        <p className="text-small text-muted">Each circle is a folder. Switch to Files to see regions.</p>
+        <p className="text-small text-pencil">Each circle is a folder. Switch to Files to see regions.</p>
       ) : (
         <ul className="flex max-h-56 flex-col gap-1 overflow-y-auto pr-1">
           {allRegions.map((r) => (
             <li key={r.cluster}>
-              <label className="flex min-h-8 cursor-pointer items-center gap-2 text-small text-text-3">
+              <label className="flex min-h-8 cursor-pointer items-center gap-2 px-1 text-small text-ink-2 hover:bg-paper-2">
                 <input
                   type="checkbox"
                   checked={!hidden.has(r.cluster)}
                   onChange={() => setHidden((h) => { const n = new Set(h); n.has(r.cluster) ? n.delete(r.cluster) : n.add(r.cluster); return n; })}
-                  className="size-4 accent-cyan"
+                  className="size-4 accent-[var(--ink)]"
                 />
                 <span className="truncate font-mono">{r.cluster === "(root)" ? "root" : r.cluster}</span>
               </label>
@@ -291,92 +291,89 @@ export default function MapPage() {
   void files;
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <MonoLabel>PLATE 02 ——— DEPENDENCY MAP</MonoLabel>
-          <p className="mt-1 text-small text-muted">
-            {built.shown} of {built.total} {effectiveView === "folders" ? "folders" : "files"}
-            {built.truncated && effectiveView === "files" ? " (cycle members and most central files first; use Folders for everything)" : ""}
-          </p>
-        </div>
-        <div className="flex gap-2" role="group" aria-label="View">
-          <Button variant={effectiveView === "files" ? "primary" : "secondary"} onClick={() => setView("files")}>Files</Button>
-          <Button variant={effectiveView === "folders" ? "primary" : "secondary"} onClick={() => setView("folders")}>Folders</Button>
-        </div>
-      </div>
+    <div className="flex flex-col gap-8">
+      <PageHead
+        sheet="Sheet 02 · Map"
+        title="Who imports whom"
+        actions={<Segmented label="View" value={effectiveView} onChange={(v) => setView(v)} options={[{ id: "files", label: "Files" }, { id: "folders", label: "Folders" }]} />}
+      >
+        {built.shown} of {built.total} {effectiveView === "folders" ? "folders" : "files"}, sized by how many files import them.
+        {built.truncated && effectiveView === "files" ? " Cycle members and the most central files come first; switch to Folders to see everything." : ""}
+      </PageHead>
 
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[220px_minmax(0,1fr)_290px]">
-        <aside aria-label="Legend and regions" className="order-2 flex flex-col gap-5 rounded-card border border-border bg-surface p-4 lg:order-1">
-          {narrow ? <details><summary className="mono-label cursor-pointer">Legend and regions</summary><div className="mt-4 flex flex-col gap-5">{legendBlock}{regionsBlock}</div></details> : <>{legendBlock}{regionsBlock}</>}
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[200px_minmax(0,1fr)_280px]">
+        <aside aria-label="Legend and regions" className="order-2 flex flex-col gap-6 lg:order-1">
+          {narrow ? <details><summary className="mono-label cursor-pointer">Legend and folders</summary><div className="mt-4 flex flex-col gap-5">{legendBlock}{regionsBlock}</div></details> : <>{legendBlock}{regionsBlock}</>}
         </aside>
 
-        <div className="relative order-1 h-[72vh] min-h-[420px] overflow-hidden rounded-panel border border-border bg-bg lg:order-2" aria-label="Map canvas">
+        <div className="relative order-1 h-[72vh] min-h-[420px] overflow-hidden bg-graticule border-[1.5px] border-ink bg-paper outline outline-1 outline-offset-[3px] outline-ink lg:order-2" aria-label="Map canvas">
           <MapDefs />
           <MapCtx.Provider value={ctx}>
             <div onPointerOver={(e) => { const el = (e.target as HTMLElement).closest("[data-id]") as HTMLElement | null; const id = el?.dataset.id ?? null; setHover(id && !id.startsWith("region:") ? id : null); }} onPointerLeave={() => setHover(null)} className="h-full w-full">
               <ReactFlowProvider key={`${effectiveView}-${hidden.size}`}>
                 <Canvas nodes={built.nodes} edges={edges} onPane={() => setSelected(null)} flyTo={flyTo} />
-                <div className="pointer-events-none absolute bottom-3 left-3 z-20"><ScaleBar /></div>
-                <div className="pointer-events-none absolute bottom-3 right-3 z-20"><NorthMark /></div>
               </ReactFlowProvider>
             </div>
           </MapCtx.Provider>
+          <div className="pointer-events-none absolute bottom-3 left-3 z-10 border-[1.5px] border-ink bg-paper px-3 py-2">
+            <div className="font-display text-[15px] font-semibold leading-tight text-ink">{name ?? "Repository"}</div>
+            <div className="font-mono text-[10.5px] uppercase tracking-[0.1em] text-pencil">{built.shown} {effectiveView} · {graph?.cycles.length ?? 0} cycle{graph?.cycles.length === 1 ? "" : "s"}</div>
+          </div>
         </div>
 
         <aside aria-label="Cycle and selected file" className="order-3 flex flex-col gap-4">
           {cycle && (
             <Card variant="risk">
-              <MonoLabel className="text-amber-soft">IMPORT CYCLE</MonoLabel>
-              <p className="mt-2 text-small text-amber-soft">
+              <div className="mono-label text-signal-ink">Import cycle</div>
+              <p className="mt-2 text-small text-ink">
                 {cycle.groups === 1 ? "1 group" : `${cycle.groups} groups`} of files import each other; the largest has {cycle.size} files.
               </p>
               {cycle.loop && (
-                <ol className="mt-3 flex flex-col gap-1 font-mono text-[11.5px] text-text-2" aria-label="One loop through the cycle">
+                <ol className="mt-3 flex flex-col gap-1 font-mono text-[11.5px] text-ink-2" aria-label="One loop through the cycle">
                   {cycle.loop.map((n, i) => (
                     <li key={i} className="flex items-center gap-2">
-                      <span aria-hidden className="text-amber">{i === 0 ? "●" : "↳"}</span>
-                      <button className="truncate text-left hover:text-text" title={n.path} onClick={() => { setSelected(n.id); setFlyTo(n.id); setView("files"); }}>{n.path}</button>
+                      <span aria-hidden className="text-signal-ink">{i === 0 ? "●" : "↳"}</span>
+                      <button className="truncate text-left underline-offset-2 hover:text-ink hover:underline" title={n.path} onClick={() => { setSelected(n.id); setFlyTo(n.id); setView("files"); }}>{n.path}</button>
                     </li>
                   ))}
                 </ol>
               )}
-              <p className="mt-3 text-[12px] text-text-3">A change in any of these can ripple through all of them, and none can be tested or reused alone.</p>
+              <p className="mt-3 text-[12.5px] text-ink-2">A change in any of these can ripple through all of them, and none can be tested or reused alone.</p>
             </Card>
           )}
 
           <Card>
-            <MonoLabel>SELECTED</MonoLabel>
-            {!sel && !selFolder && <p className="mt-2 text-small text-muted">Click a circle (or press Enter on it) to see what it depends on. Esc clears.</p>}
+            <MonoLabel>Selected</MonoLabel>
+            {!sel && !selFolder && <p className="text-wonk mt-2 text-[16px] leading-snug text-pencil">Click a circle, or press Enter on it, to see what it depends on. Esc clears.</p>}
             {selFolder && (
               <div className="mt-2 flex flex-col gap-2 text-small">
-                <p className="break-all font-mono text-text-2">{selFolder.id}</p>
-                <p className="text-text-3">{selFolder.files} {selFolder.files === 1 ? "file" : "files"} · {selFolder.files_in_cycles} in cycles · {selFolder.internal_edges} internal imports</p>
+                <p className="break-all font-mono text-ink">{selFolder.id}</p>
+                <p className="text-pencil">{selFolder.files} {selFolder.files === 1 ? "file" : "files"} · {selFolder.files_in_cycles} in cycles · {selFolder.internal_edges} internal imports</p>
                 <Button variant="secondary" onClick={() => { setView("files"); setSelected(null); }}>Show its files</Button>
               </div>
             )}
             {sel && (
               <div className="mt-2 flex flex-col gap-3 text-small">
-                <p className="break-all font-mono text-text-2">{sel.path}</p>
+                <p className="break-all font-mono text-ink">{sel.path}</p>
                 <dl className="grid grid-cols-2 gap-x-3 gap-y-1">
-                  <dt className="text-muted">Depends on</dt><dd className="text-right font-mono text-text-2">{detail ? detail.imports.length : sel.fan_out}</dd>
-                  <dt className="text-muted">Used by</dt><dd className="text-right font-mono text-cyan-soft">{detail ? detail.imported_by.length : sel.fan_in}</dd>
-                  <dt className="text-muted">Complexity</dt><dd className="text-right font-mono text-text-2">{hs?.max_complexity ?? "—"}</dd>
-                  <dt className="text-muted">Hotspot score</dt><dd className={`text-right font-mono ${(hs?.hotspot_score ?? 0) > 70 ? "text-amber-soft" : "text-text-2"}`}>{hs?.hotspot_score === null || hs?.hotspot_score === undefined ? "—" : Math.round(hs.hotspot_score)}</dd>
+                  <dt className="text-pencil">Depends on</dt><dd className="text-right font-mono text-ink-2">{detail ? detail.imports.length : sel.fan_out}</dd>
+                  <dt className="text-pencil">Used by</dt><dd className="text-right font-mono text-ink">{detail ? detail.imported_by.length : sel.fan_in}</dd>
+                  <dt className="text-pencil">Complexity</dt><dd className="text-right font-mono text-ink-2">{hs?.max_complexity ?? "—"}</dd>
+                  <dt className="text-pencil">Hotspot score</dt><dd className={`text-right font-mono ${(hs?.hotspot_score ?? 0) > 70 ? "font-semibold text-signal-ink" : "text-ink-2"}`}>{hs?.hotspot_score === null || hs?.hotspot_score === undefined ? "—" : Math.round(hs.hotspot_score)}</dd>
                 </dl>
                 {detail && detail.imported_by.length > 0 && (
                   <div>
-                    <div className="mono-label mb-1">USED BY</div>
+                    <div className="mono-label mb-1">Used by</div>
                     <ul className="flex flex-col gap-0.5">
                       {detail.imported_by.slice(0, 6).map((n) => (
-                        <li key={n.id}><button className="truncate text-left font-mono text-[11.5px] text-text-3 hover:text-text" onClick={() => { setSelected(n.id); setFlyTo(n.id); }}>{n.path}</button></li>
+                        <li key={n.id}><button className="truncate text-left font-mono text-[11.5px] text-ink-2 hover:text-ink hover:underline" onClick={() => { setSelected(n.id); setFlyTo(n.id); }}>{n.path}</button></li>
                       ))}
                     </ul>
                   </div>
                 )}
-                <Link className="inline-flex min-h-11 items-center justify-center rounded-ui border border-cyan-bg bg-cyan-tint px-4 font-semibold text-cyan-soft hover:border-cyan" to={`/repo/${repoId}/ask?q=${encodeURIComponent(`Explain ${sel.path}: what does it do and what depends on it?`)}`}>
-                  Explain this file →
-                </Link>
+                <ButtonLink to={`/repo/${repoId}/ask?q=${encodeURIComponent(`Explain ${sel.path}: what does it do and what depends on it?`)}`}>
+                  Explain this file
+                </ButtonLink>
               </div>
             )}
           </Card>

@@ -24,26 +24,26 @@ export function FileMetricsPanel({ fileId }: { fileId: string }) {
     getFileMetrics(fileId).then(setM).catch((e) => setError(e instanceof Error ? e.message : "Could not load metrics"));
   }, [fileId]);
 
-  if (error) return <Panel title="Metrics"><p className="text-danger">{error}</p></Panel>;
+  if (error) return <Panel title="Metrics"><p className="text-signal-ink">{error}</p></Panel>;
   if (!m) return null;
   const f = m.file;
   const pct = (v: number | null) => (v === null ? "–" : `${Math.round(v * 100)}%`);
   return (
-    <Panel title={`Metrics: ${f.path}`} actions={f.hotspot_score !== null ? <Badge tone="danger">score {f.hotspot_score.toFixed(1)}</Badge> : undefined}>
+    <Panel title={`Metrics: ${f.path}`} actions={f.hotspot_score !== null ? <Badge tone={f.hotspot_score > 70 ? "danger" : f.hotspot_score > 40 ? "warning" : "neutral"}>score {f.hotspot_score.toFixed(1)}</Badge> : undefined}>
       {f.hotspot_reasons.length > 0 && (
-        <div className="mb-gutter">
-          <h3 className="mb-gap font-semibold">Why this file is a hotspot</h3>
-          <ul className="flex flex-col gap-gap">
+        <div className="mb-4">
+          <h3 className="mb-2 font-display text-[17px] font-semibold">Why this file is a hotspot</h3>
+          <ul className="flex flex-col gap-2">
             {f.hotspot_reasons.map((r) => (
-              <li key={r.factor} className="flex items-start gap-gap">
+              <li key={r.factor} className="flex items-start gap-2">
                 <Badge tone={tone[r.severity]}>{r.severity}</Badge>
-                <span>{r.text} <span className="text-muted">({r.points.toFixed(1)} pts)</span></span>
+                <span>{r.text} <span className="text-pencil">({r.points.toFixed(1)} pts)</span></span>
               </li>
             ))}
           </ul>
         </div>
       )}
-      <div className="mb-section grid grid-cols-2 gap-gutter md:grid-cols-4">
+      <div className="mb-8 grid grid-cols-2 gap-x-4 gap-y-5 md:grid-cols-4">
         <Stat label="Lines" value={`${dash(f.lines)} (${dash(f.code_lines)} code)`} />
         <Stat label="Comment ratio" value={pct(f.comment_ratio)} hint="comment-only lines / non-blank lines" />
         <Stat label="Complexity max / total" value={`${dash(f.max_complexity)} / ${dash(f.total_complexity)}`} hint="cyclomatic" />
@@ -58,14 +58,14 @@ export function FileMetricsPanel({ fileId }: { fileId: string }) {
         <Stat label="Test file" value={f.has_test ? <span className="font-mono text-small">{f.test_file}</span> : f.has_test === false ? "none found" : "–"} />
       </div>
 
-      <h3 className="mb-gap font-semibold">Functions by complexity</h3>
+      <h3 className="mb-2 font-display text-[17px] font-semibold">Functions by complexity</h3>
       <Table columns={fnColumns} rows={m.functions} rowKey={(x) => `${x.parent_name}.${x.name}.${x.start_line}`} empty="No functions." />
 
-      <h3 className="mb-gap mt-section font-semibold">Duplicated blocks ({m.duplicates.length})</h3>
+      <h3 className="mb-2 mt-8 font-display text-[17px] font-semibold">Duplicated blocks ({m.duplicates.length})</h3>
       {m.duplicates.length === 0 ? (
-        <p className="text-muted">None found.</p>
+        <p className="text-pencil">None found.</p>
       ) : (
-        <ul className="flex flex-col gap-gap">
+        <ul className="flex flex-col gap-2">
           {m.duplicates.map((d) => (
             <li key={`${d.group_id}-${d.start_line}`}>
               <span className="font-mono">lines {d.start_line}–{d.end_line}</span> also appear in{" "}
@@ -75,15 +75,15 @@ export function FileMetricsPanel({ fileId }: { fileId: string }) {
         </ul>
       )}
 
-      <h3 className="mb-gap mt-section font-semibold">Changes together with</h3>
+      <h3 className="mb-2 mt-8 font-display text-[17px] font-semibold">Changes together with</h3>
       {m.cochange.length === 0 ? (
-        <p className="text-muted">No file shares 2+ commits with this one.</p>
+        <p className="text-pencil">No file shares 2+ commits with this one.</p>
       ) : (
-        <ul className="flex flex-col gap-gap">
+        <ul className="flex flex-col gap-2">
           {m.cochange.map((c) => (
             <li key={c.path}>
               <span className="font-mono">{c.path}</span>{" "}
-              <span className="text-muted">{c.count} shared commits, coupling {Math.round(c.coupling * 100)}%</span>
+              <span className="text-pencil">{c.count} shared commits, coupling {Math.round(c.coupling * 100)}%</span>
             </li>
           ))}
         </ul>

@@ -1,11 +1,10 @@
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 import { lazy, Suspense, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Badge, Card, EmptyState, ErrorState, MonoLabel, Panel, ScoreBar, Skeleton, StatCard, Table, type Column } from "../components/ui";
+import { Arrow, ButtonLink, Card, EmptyState, ErrorState, PageHead, Panel, ScoreBar, Skeleton, Table, type Column } from "../components/ui";
 import type { HotspotItem } from "../api";
 import { Dialog } from "../features/Dialog";
 import { basename, useRepo } from "../hooks/RepoData";
-import { rise } from "../ui/motion";
 
 const CodeViewer = lazy(() => import("../features/CodeViewer"));
 
@@ -15,8 +14,11 @@ const median = (xs: number[]) => {
   return s.length % 2 ? s[(s.length - 1) / 2]! : (s[s.length / 2 - 1]! + s[s.length / 2]!) / 2;
 };
 
+/** A number set inside a sentence: heavier, ink, tabular. */
+const Num = ({ children }: { children: React.ReactNode }) => <span className="font-semibold tabular-nums text-ink">{children}</span>;
+
 export default function Overview() {
-  const { repoId, files, hotspots, graph, error } = useRepo();
+  const { repoId, files, hotspots, graph, error, name } = useRepo();
   const [viewer, setViewer] = useState<{ path: string; start: number; end: number } | null>(null);
 
   const stats = useMemo(() => {
@@ -46,69 +48,71 @@ export default function Overview() {
 
   const central = useMemo(() => (graph ? [...graph.nodes].sort((a, b) => Number(b.pagerank) - Number(a.pagerank)).slice(0, 5) : []), [graph]);
   const top = (hotspots?.items ?? []).slice(0, 8);
-  const shades = ["bg-text-3", "bg-muted", "bg-dim", "bg-faint", "bg-border-strong", "bg-ghost"];
+  // categorical chart tokens (labels always carry the name and percentage, colour is never the only signal)
+  const shades = ["bg-chart-1", "bg-chart-2", "bg-chart-3", "bg-chart-4", "bg-chart-5", "bg-chart-6"];
   const question = central[0] ? `How does ${basename(central[0].path)} work, and what depends on it?` : "Where is the main entry point?";
 
   const cols: Column<HotspotItem>[] = [
-    { header: "File", render: (r) => <span className="font-mono text-small text-text-2" title={r.path}>{r.path}</span> },
+    { header: "File", render: (r) => <span className="font-mono text-small text-ink" title={r.path}>{r.path}</span> },
     { header: "Score", render: (r) => (r.hotspot_score === null ? "—" : <ScoreBar value={r.hotspot_score} delay={0.15} />) },
-    { header: "Why", render: (r) => (r.hotspot_reasons[0] ? <Badge tone={(r.hotspot_score ?? 0) > 70 ? "amber" : "neutral"}>{r.hotspot_reasons[0].factor.replace(/_/g, " ")}</Badge> : "—") },
-    { header: "Commits", className: "text-right font-mono tabular-nums", render: (r) => r.commits_total ?? "—" },
+    { header: "Why", className: "hidden md:table-cell", render: (r) => (r.hotspot_reasons[0] ? <span className="text-small text-ink-2" title={r.hotspot_reasons[0].text}>{r.hotspot_reasons[0].text.split(/[;(]/)[0]!.trim()}</span> : "—") },
+    { header: "Commits", className: "hidden text-right font-mono tabular-nums sm:table-cell", render: (r) => r.commits_total ?? "—" },
   ];
 
   if (error) return <ErrorState message={error} />;
   const fmt = (v: number | null | undefined, suffix = "") => (v === null || v === undefined ? "—" : `${Number.isInteger(v) ? v.toLocaleString() : v.toFixed(1)}${suffix}`);
 
   return (
-    <div className="flex flex-col gap-6">
-      <div>
-        <MonoLabel>PLATE 01 ——— OVERVIEW</MonoLabel>
-      </div>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        {!stats
-          ? Array.from({ length: 5 }, (_, i) => <Skeleton key={i} className="h-24 rounded-card" />)
-          : [
-              { label: "Files", value: fmt(stats.files) },
-              { label: "Symbols", value: fmt(stats.symbols) },
-              { label: "Import edges", value: stats.edges === null ? "—" : `${stats.edges.toLocaleString()}${stats.edgesCapped ? "+" : ""}`, hint: "between source files" },
-              { label: "Import cycles", value: fmt(stats.cycles), risk: (stats.cycles ?? 0) > 0, hint: "groups of files that import each other" },
-              { label: "Median complexity", value: fmt(stats.complexity), hint: "worst function per file" },
-            ].map((s, i) => (
-              <motion.div key={s.label} {...rise(i)} className="h-full">
-                <StatCard {...s} />
-              </motion.div>
-            ))}
+    <div className="flex flex-col gap-12">
+      <PageHead sheet="Sheet 01 · Overview" title={<>The lay of the land</>}>
+        Size, the files that would hurt most to change, and where to start reading.
+      </PageHead>
+
+      {/* the numbers, written as a sentence instead of a row of stat tiles */}
+      <div className="border-y border-rule py-7">
+        {!stats ? (
+          <div className="flex flex-col gap-3"><Skeleton className="h-8 w-4/5" /><Skeleton className="h-8 w-3/5" /></div>
+        ) : (
+          <p className="max-w-5xl font-display text-[clamp(22px,2.6vw,32px)] font-normal leading-[1.3] tracking-[-0.015em] text-ink-2 [font-variation-settings:'SOFT'_60]">
+            {name ?? "This repository"} has <Num>{fmt(stats.files)}</Num> files and <Num>{fmt(stats.symbols)}</Num> functions and classes,
+            joined by <Num>{stats.edges === null ? "—" : `${stats.edges.toLocaleString()}${stats.edgesCapped ? "+" : ""}`}</Num> imports.{" "}
+            {(stats.cycles ?? 0) > 0 ? (
+              <><span className="font-semibold text-signal-ink underline decoration-signal decoration-2 underline-offset-[5px]">{stats.cycles} import cycle{stats.cycles === 1 ? "" : "s"}</span> tie{stats.cycles === 1 ? "s" : ""} files into knots.{" "}</>
+            ) : <>No import cycles.{" "}</>}
+            {stats.complexity !== null && <>In a typical file the most tangled function has a complexity of <Num>{fmt(stats.complexity)}</Num>.</>}
+          </p>
+        )}
       </div>
 
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
-        <Panel title="Top hotspots" label="PLATE 02" actions={<Link className="text-small text-cyan underline" to={`/repo/${repoId}/hotspots`}>All hotspots</Link>}>
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-x-12 gap-y-12 lg:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)]">
+        <Panel title="Where it would hurt to change something" description="The top hotspots. Click a row to read the file." actions={<ButtonLink variant="arrow" size="sm" to={`/repo/${repoId}/hotspots`}>All files <Arrow /></ButtonLink>}>
           {!hotspots ? (
             <div className="flex flex-col gap-3"><Skeleton className="h-8" /><Skeleton className="h-8" /><Skeleton className="h-8" /></div>
           ) : top.length === 0 ? (
             <EmptyState message="No scored files: this repository has no analysable code with history yet." />
           ) : (
-            <motion.div {...rise(0, 8)}>
-              <Table columns={cols} rows={top} rowKey={(r) => r.id} onRowClick={(r) => setViewer({ path: r.path, start: 1, end: Math.min(r.lines, 40) })} />
-            </motion.div>
+            <Table columns={cols} rows={top} rowKey={(r) => r.id} onRowClick={(r) => setViewer({ path: r.path, start: 1, end: Math.min(r.lines, 40) })} />
           )}
         </Panel>
 
-        <div className="flex flex-col gap-6">
-          <Panel title="Languages" label="PLATE 03">
+        <div className="flex flex-col gap-12">
+          <Panel title="Languages" description="Share of lines.">
             {languages.length === 0 ? (
-              <p className="text-small text-muted">—</p>
+              <p className="text-small text-pencil">—</p>
             ) : (
               <>
-                <div className="flex h-2.5 overflow-hidden rounded-full bg-line" role="img" aria-label={languages.map((l) => `${l.name} ${l.pct.toFixed(0)}%`).join(", ")}>
+                <div className="flex h-4 border border-ink" role="img" aria-label={languages.map((l) => `${l.name} ${l.pct.toFixed(0)}%`).join(", ")}>
                   {languages.map((l, i) => (
-                    <motion.span key={l.name} className={shades[i % shades.length]} initial={{ width: 0 }} animate={{ width: `${l.pct}%` }} transition={{ duration: 0.9, delay: 0.1 + i * 0.06, ease: [0.2, 0.7, 0.2, 1] }} />
+                    <motion.span key={l.name} className={`${shades[i % shades.length]} border-r border-paper last:border-r-0`} initial={{ width: 0 }} animate={{ width: `${l.pct}%` }} transition={{ duration: 0.9, delay: 0.1 + i * 0.06, ease: [0.2, 0.7, 0.2, 1] }} />
                   ))}
                 </div>
-                <ul className="mt-4 flex flex-col gap-1.5">
+                <ul className="mt-4 flex flex-col">
                   {languages.map((l, i) => (
-                    <li key={l.name} className="flex items-center justify-between text-small">
-                      <span className="flex items-center gap-2 text-text-3"><span aria-hidden className={`size-2 rounded-full ${shades[i % shades.length]}`} />{l.name}</span>
-                      <span className="font-mono text-muted">{l.pct.toFixed(0)}%</span>
+                    <li key={l.name} className="flex items-baseline gap-2 py-1 text-small">
+                      <span aria-hidden className={`size-2.5 shrink-0 translate-y-[1px] ${shades[i % shades.length]}`} />
+                      <span className="text-ink-2">{l.name}</span>
+                      <span aria-hidden className="flex-1 border-b border-dotted border-rule-strong" />
+                      <span className="font-mono text-pencil">{l.pct < 1 ? "<1" : l.pct.toFixed(0)}%</span>
                     </li>
                   ))}
                 </ul>
@@ -116,26 +120,28 @@ export default function Overview() {
             )}
           </Panel>
 
-          <Panel title="Most central files" label="PLATE 04">
+          <Panel title="Start reading here" description="The files most others import.">
             {central.length === 0 ? (
-              <p className="text-small text-muted">—</p>
+              <p className="text-small text-pencil">—</p>
             ) : (
-              <ul className="flex flex-col gap-2.5">
-                {central.map((n) => (
-                  <li key={n.id} className="flex items-center justify-between gap-3">
-                    <span className="min-w-0 truncate font-mono text-small text-text-2" title={n.path}>{n.path}</span>
-                    <span className="shrink-0 font-mono text-small text-cyan-soft">{n.fan_in} dependents</span>
+              <ol className="flex flex-col">
+                {central.map((n, i) => (
+                  <li key={n.id} className="flex items-baseline gap-2 py-1.5">
+                    <span className="w-5 font-mono text-[11px] text-pencil">{i + 1}.</span>
+                    <span className="min-w-0 truncate font-mono text-small text-ink" title={n.path}>{basename(n.path)}</span>
+                    <span aria-hidden className="min-w-4 flex-1 border-b border-dotted border-rule-strong" />
+                    <span className="shrink-0 text-small text-pencil"><span className="font-mono text-ink">{n.fan_in}</span> importers</span>
                   </li>
                 ))}
-              </ul>
+              </ol>
             )}
-            <Link className="mt-4 inline-block text-small text-cyan underline" to={`/repo/${repoId}/map`}>Open the map →</Link>
+            <ButtonLink variant="arrow" size="sm" className="mt-5" to={`/repo/${repoId}/map`}>Open the map <Arrow /></ButtonLink>
           </Panel>
 
-          <Card variant="tint">
-            <MonoLabel>ASK THIS REPO</MonoLabel>
-            <p className="mt-2 text-body text-cyan-soft">“{question}”</p>
-            <Link className="mt-3 inline-block text-small text-cyan underline" to={`/repo/${repoId}/ask?q=${encodeURIComponent(question)}`}>Ask this question →</Link>
+          <Card variant="note" tilt={-1.2}>
+            <div className="mono-label text-ink-2">Try asking</div>
+            <p className="mt-2 font-display text-[19px] font-semibold leading-snug text-ink">“{question}”</p>
+            <ButtonLink size="sm" className="mt-4" to={`/repo/${repoId}/ask?q=${encodeURIComponent(question)}`}>Ask this</ButtonLink>
           </Card>
         </div>
       </div>
