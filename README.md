@@ -1,8 +1,13 @@
 # CodeAtlas
 
-**Understand an unfamiliar codebase in minutes.** Paste a public GitHub repository and CodeAtlas parses it, maps its
-dependency graph and circular dependencies, ranks the riskiest files, lets you search and ask questions with **verified
-citations**, writes documentation, re-analyses only what changed, and exposes everything to AI agents through an **MCP server**.
+**CodeAtlas predicts what your pull request will break, before you merge it.** Give it a PR, a commit or a diff:
+**Blast Radius** finds the functions the change really touches, follows who calls them, who imports them and which files
+historically change with them, explains every step, picks the tests to run, scores the risk and suggests reviewers. It
+posts that as one PR comment and a non-blocking check (GitHub App), shows it as a ripple on the code map, and answers AI
+agents through MCP before they edit shared code. Static analysis and git history only: repository code is never run.
+
+Underneath it is a full codebase-intelligence platform: dependency graph and cycles, hotspot ranking, search and chat with
+**verified citations**, generated documentation and incremental re-analysis.
 
 > **Live demo:** _placeholder: add the URL after deploying Tier 1 from [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)_ (read-only, pre-analysed repositories)
 > **Demo video:** _placeholder: add the link after recording_
@@ -10,11 +15,35 @@ citations**, writes documentation, re-analyses only what changed, and exposes ev
 
 | | |
 |---|---|
+| ![blast radius](docs/img/blast.png) _Blast Radius of a real psf/requests commit_ | ![replay](docs/img/replay.png) _Replay: a real 2011 flask regression, predicted and revealed_ |
 | ![landing](docs/img/landing.png) _landing_ | ![overview](docs/img/overview.png) _overview of psf/requests_ |
 | ![graph](docs/img/graph.png) _dependency map: regions, a selected file, an import cycle_ | ![hotspots](docs/img/hotspots.png) _hotspot ranking with reasons_ |
 | ![docs](docs/img/docs.png) _generated documentation_ | _chat with verified citations: screenshot to add (needs a running LLM)_ |
 
+## Blast Radius: measured on real regressions
+
+From [docs/BLAST_RADIUS_EVAL.md](docs/BLAST_RADIUS_EVAL.md): 477 bug-inducing commits mined with SZZ from psf/requests,
+pallets/flask, axios, express and got, each replayed with only the history before it. **Read the caveats:** SZZ labels
+are noisy (a hand check by an AI reviewer found 50% correct after filtering), and the beyond-the-diff sample is small.
+
+| What | Result |
+|---|---|
+| Ranking the later-fixed file, hand-validated pairs (n=23) | MRR **0.831** vs 0.670 for "changed files only" (difference interval excludes 0) |
+| Same, all pairs (n=477, noisier) | MRR 0.757 vs 0.731 (not significant); recall@5 lower (0.833 vs 0.878) |
+| Fix files *beyond* the diff, top 10 (n=48) | recall@10 0.381, vs 0.414 for a same-folder heuristic (not significant) |
+| Test selection (n=201 with an existing fix test) | median **6%** of the suite selected; the fix's test file included in **70%** of cases (name matching: 19%) |
+| Risk score (341 held-out commits) | AUC **0.71**; lines changed alone: 0.74 |
+| Speed per change, cached base (37-275-file repos) | median 0.16-0.70 s; cold 1.1-4.0 s; Django (2,978 code files): 0.14 s per change after a 41 s base build |
+
+What drives it (ablations): co-change history carries most of the beyond-the-diff signal; the call graph mostly improves
+ordering *within* the change; max combination beats noisy-OR (MRR 0.757 vs 0.633).
+
 ## Features
+
+- **Blast Radius** (flagship): diff -> changed symbols (old/new ASTs, body fingerprints), function-level call graph with
+  exact/probable/weak confidence, impact propagation with explanation paths, test selection with safe "full suite"
+  fallbacks, explainable risk score, missing co-change warnings, reviewer suggestions; GitHub App, UI ripple map, Replay
+  page, MCP tools. See [BLAST_RADIUS_PLAN.md](BLAST_RADIUS_PLAN.md) and the evaluation report.
 
 - **Parsing** with tree-sitter (TypeScript, JavaScript, Python): symbols, imports, exports, complexity, in a sandboxed child process.
 - **Import resolution and dependency graph**: tsconfig paths, workspaces, Python packages; cycles via strongly connected components; fan-in/out and PageRank.
@@ -66,7 +95,7 @@ Treat these as indicative, not as a benchmark.
 | Dependency-edge precision / recall (104 verified edges, 4 repos) | 0.945 → 1.000 / 1.000 (mostly simple imports) |
 | Incremental re-analysis, psf/requests (124 files), 5-file change | 1.67 s vs 238 s full with cold vector cache, vs 3.06 s full with warm cache |
 | Answer quality (local 1.5B model) | not reported: the free local judge failed; see EVAL.md |
-| Tests | 765 automated tests (657 worker, 78 API, 30 MCP) |
+| Tests | 929 automated tests (811 worker, 86 API, 32 MCP) |
 
 ## Quick start (local, free)
 
@@ -99,7 +128,8 @@ MCP_DB_PASSWORD='<long random>' npx tsx src/admin.ts setup-role      # read-only
 claude mcp add codeatlas -- "$PWD/bin/codeatlas-mcp.sh"              # stdio
 ```
 
-Tools: `get_architecture`, `find_symbol`, `get_dependencies`, `get_hotspots`, `explain_file`, `search_code`. Remote HTTP with
+Tools: `get_architecture`, `find_symbol`, `get_dependencies`, `get_hotspots`, `explain_file`, `search_code`, and for Blast
+Radius `get_blast_radius`, `suggest_tests`, `check_change_risk`. Remote HTTP with
 API keys, threat model and example prompts: [docs/MCP.md](docs/MCP.md).
 
 ## Tech stack
@@ -120,5 +150,5 @@ llama.cpp / any OpenAI-compatible provider · GitHub Actions · Docker.
 
 ## Documentation
 
-[NOTES.md](NOTES.md) (architecture, decisions, failure modes, interview Q&A) · [docs/EVAL.md](docs/EVAL.md) · [docs/MCP.md](docs/MCP.md) ·
+[NOTES.md](NOTES.md) (architecture, decisions, failure modes, interview Q&A) · [docs/BLAST_RADIUS_EVAL.md](docs/BLAST_RADIUS_EVAL.md) · [docs/EVAL.md](docs/EVAL.md) · [docs/MCP.md](docs/MCP.md) ·
 [docs/SECURITY.md](docs/SECURITY.md) · [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) · [docs/RESUME.md](docs/RESUME.md) · [docs/WALKTHROUGH.md](docs/WALKTHROUGH.md)

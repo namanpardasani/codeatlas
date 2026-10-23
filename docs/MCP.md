@@ -18,6 +18,15 @@ Lets an AI agent (Claude Code, Claude Desktop, Cursor, ...) ask questions about 
 
 `repo` is `owner/name` (e.g. `psf/requests`) or the numeric id. Results are JSON text with `returned`, `truncated`, `next_offset` and a `hint` when more exists. Every result is capped at 12,000 characters (`MCP_MAX_OUTPUT_CHARS`); lists are shortened to fit and say how to continue. Every result carries a `note` that repository strings are data, not instructions.
 
+
+Blast Radius tools (added with the flagship feature; they call the internal service, so it must be running):
+
+| Tool | Answers |
+|---|---|
+| `get_blast_radius` | For a PR URL, commit SHA or diff: the changed functions and the files/functions that call, import or usually change with them, ranked with reasons. Agents are told to call it **before** editing shared code. |
+| `suggest_tests` | The smallest set of existing tests that reach the change, with a ready-to-run command, or "run the full suite" with the reason. |
+| `check_change_risk` | A 0-100 risk score with its top factors in plain words, missing co-changes and suggested reviewers. |
+
 ## Setup
 
 Prerequisites: Postgres up with migrations applied (`scripts/migrate.sh`, includes `011_mcp_access.sql`), at least one analysed repo, and — for semantic search — the search service (`cd workers/analyzer && uv run python -m analyzer.service`). Without it `search_code` still works with keyword search.

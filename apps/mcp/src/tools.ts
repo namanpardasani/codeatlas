@@ -352,3 +352,62 @@ export async function searchCode(
     false,
   );
 }
+
+// ---------------------------------------------------------------------------------------------------------------
+// Blast Radius (computed by the Python service; repo id is the authorised one, never the caller's)
+export type BlastView = "impact" | "tests" | "risk";
+export type ChangeArg = { pr_url?: string; commit_sha?: string; diff?: string };
+
+export async function blastRadius({ repo, fetchImpl = fetch }: Ctx, a: ChangeArg & { limit?: number }, view: BlastView) {
+  const given = [a.pr_url, a.commit_sha, a.diff].filter(Boolean);
+  if (given.length !== 1) throw new UserError("Give exactly one of pr_url, commit_sha or diff.");
+  let res: Response;
+  try {
+    res = await fetchImpl(`${config.searchUrl}/blast`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ repo_id: repo.id, pr_url: a.pr_url, commit_sha: a.commit_sha, diff: a.diff }),
+      signal: AbortSignal.timeout(config.blastTimeoutMs),
+    });
+  } catch {
+    throw new UserError("The analysis service is not running (blast radius needs it).");
+  }
+  const body: any = await res.json().catch(() => ({}));
+  if (!res.ok) throw new UserError(clean(body.error ?? `analysis failed (${res.status})`, 300));
+  const head = { ...meta(repo), change: clean(a.pr_url ?? a.commit_sha ?? `diff (${a.diff!.length} chars)`, 200),
+                 risk: body.risk ? { score: body.risk.score, label: body.risk.label } : null };
+  const limit = Math.max(1, Math.min(a.limit ?? 15, 40));
+  if (view === "tests") {
+    const t = body.tests ?? {};
+    return fit({
+      ...head, summary: clean(t.summary, 300), full_suite: Boolean(t.full_suite),
+      full_suite_reasons: (t.full_suite_reasons ?? []).map((x: string) => clean(x, 200)),
+      command: clean(t.command, 1500),
+      tests: (t.selected ?? []).slice(0, limit * 3).map((x: any) => ({ file: clean(x.file, 200), name: clean(x.name, 200),
+        score: x.score, why: clean(x.reason, 160) })),
+      new_tests: (t.new_tests ?? []).slice(0, 20).map((x: any) => ({ file: clean(x.file, 200), name: clean(x.name, 200) })),
+    }, ["tests", "new_tests"]);
+  }
+  if (view === "risk") {
+    const r = body.risk ?? {};
+    return fit({
+      ...head, model: r.model, top_factors: (r.top_factors ?? []).map((x: string) => clean(x, 200)),
+      factors: (r.factors ?? []).map((f: any) => ({ factor: f.feature, points: f.contribution, text: clean(f.text, 200) })),
+      missing_cochanges: (r.missing_cochanges ?? []).map((m: any) => clean(m.text, 250)),
+      reviewers: (body.reviewers ?? []).map((v: any) => ({ name: clean(v.name, 80), why: clean(v.reason, 200) })),
+    }, ["factors", "missing_cochanges"]);
+  }
+  const changed = (body.change?.files ?? []).map((f: any) => ({
+    path: clean(f.path, 200), status: f.status, category: f.category,
+    symbols: (f.symbols ?? []).slice(0, 12).map((s: any) => `${s.change}: ${clean(s.name, 100)}`),
+  }));
+  const beyond = (body.impact?.files ?? []).filter((f: any) => f.distance > 0).slice(0, limit).map((f: any) => ({
+    path: clean(f.path, 200), score: f.score, distance: f.distance,
+    why: (f.why ?? []).map((s: any) => clean(s.reason, 160)),
+  }));
+  const symbols = (body.impact?.symbols ?? []).slice(0, limit).map((s: any) => ({
+    symbol: `${clean(s.path, 200)}::${clean(s.name, 120)}`, score: s.score, why: clean(s.reason, 160) }));
+  return fit({ ...head, changed, impacted_files: beyond, impacted_symbols: symbols,
+               tests: clean(body.tests?.summary, 200), top_risk_factors: (body.risk?.top_factors ?? []).map((x: string) => clean(x, 200)) },
+             ["impacted_symbols", "impacted_files", "changed"]);
+}

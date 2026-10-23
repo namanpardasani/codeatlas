@@ -1,0 +1,3620 @@
+{
+ "generated": "2026-10-23",
+ "limit_per_repo": 25,
+ "stats": {
+  "psf/requests": {
+   "fix:message": 2316,
+   "fix:no-modified-source": 121,
+   "fix:ok": 159,
+   "skipped:other-split": 75,
+   "fix:non-functional-message": 5,
+   "fix:excluded-message": 102,
+   "fix:merge": 1037,
+   "szz:nothing-to-blame": 26,
+   "fix:non-functional-change": 33,
+   "fix:too-many-files": 1,
+   "pairs": 25
+  },
+  "pallets/flask": {
+   "fix:non-functional-message": 25,
+   "fix:ok": 141,
+   "skipped:other-split": 75,
+   "fix:no-modified-source": 104,
+   "fix:merge": 1535,
+   "fix:message": 2158,
+   "fix:excluded-message": 245,
+   "szz:nothing-to-blame": 20,
+   "fix:non-functional-change": 21,
+   "fix:too-many-files": 3,
+   "pairs": 25
+  },
+  "axios/axios": {
+   "fix:message": 336,
+   "fix:ok": 128,
+   "szz:no-valid-inducer": 2,
+   "szz:nothing-to-blame": 24,
+   "skipped:other-split": 75,
+   "fix:too-many-files": 9,
+   "fix:non-functional-message": 14,
+   "fix:excluded-message": 36,
+   "fix:non-functional-change": 2,
+   "fix:no-modified-source": 15,
+   "pairs": 25,
+   "fix:merge": 1
+  },
+  "expressjs/express": {
+   "fix:message": 1804,
+   "fix:excluded-message": 110,
+   "fix:ok": 120,
+   "skipped:other-split": 75,
+   "szz:no-valid-inducer": 1,
+   "fix:no-modified-source": 46,
+   "fix:too-many-files": 3,
+   "fix:merge": 194,
+   "szz:nothing-to-blame": 13,
+   "fix:non-functional-change": 6,
+   "fix:non-functional-message": 1,
+   "pairs": 25
+  },
+  "sindresorhus/got": {
+   "fix:message": 514,
+   "fix:excluded-message": 53,
+   "fix:no-modified-source": 28,
+   "fix:ok": 137,
+   "skipped:other-split": 75,
+   "fix:too-many-files": 1,
+   "fix:non-functional-change": 2,
+   "szz:nothing-to-blame": 25,
+   "fix:non-functional-message": 8,
+   "szz:no-valid-inducer": 10,
+   "pairs": 25
+  }
+ },
+ "filters": "SZZ + functional-change filter",
+ "pairs": [
+  {
+   "repo": "psf/requests",
+   "fix": "8bfe0d873f382ec92e4000084bb7e00505bc29b2",
+   "fix_subject": "Store the request cookiejar in PreparedRequest.cookies fix #1728",
+   "fix_time": 1383792741,
+   "inducing": "ab27027aa8916e6e199bbb35083beb5d6339f6aa",
+   "inducing_subject": "cookies",
+   "inducing_time": 1355564024,
+   "blamed_lines": 3,
+   "total_blamed": 7,
+   "candidates": 5,
+   "fix_files": {
+    "requests/auth.py": "M",
+    "requests/models.py": "M",
+    "requests/sessions.py": "M"
+   },
+   "inducing_files": {
+    "requests/compat.py.orig": "D",
+    "requests/cookies.py": "M",
+    "requests/defaults.py": "M",
+    "requests/models.py": "M"
+   },
+   "references_issue": true,
+   "id": "requests:ab27027a->8bfe0d87"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "2bbd7ba1c2c5a56c0957be64b5f94f6a4b0243ca",
+   "fix_subject": "Fixed #1711",
+   "fix_time": 1383056283,
+   "inducing": "012f0334ce43fe23044fc58e4246a804db88650d",
+   "inducing_subject": "added param to cookiejar_from_dict instead of creating new method.",
+   "inducing_time": 1380384538,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/sessions.py": "M"
+   },
+   "inducing_files": {
+    "requests/cookies.py": "M",
+    "requests/sessions.py": "M"
+   },
+   "references_issue": true,
+   "id": "requests:012f0334->2bbd7ba1"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "cfbbd15de72a616fd9c648e1a0724acf2528db1b",
+   "fix_subject": "Small fix broken cookie parse",
+   "fix_time": 1384810379,
+   "inducing": "cdab4fabf448f287f6f537265aa23ac06a080599",
+   "inducing_subject": "unquote double-quotes cookie values",
+   "inducing_time": 1372704583,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/cookies.py": "M"
+   },
+   "inducing_files": {
+    "requests/cookies.py": "M",
+    "test_requests.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:cdab4fab->cfbbd15d"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "495f87363b3a8b5856850aea5db15df15d597f77",
+   "fix_subject": "fixed #1723",
+   "fix_time": 1383557565,
+   "inducing": "3c0b94047c1ccfca4ac4f2fe32afef0ae314094e",
+   "inducing_subject": "address connection leak issue from #520",
+   "inducing_time": 1342579633,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/api.py": "M"
+   },
+   "inducing_files": {
+    "requests/api.py": "M",
+    "requests/models.py": "M",
+    "requests/sessions.py": "M",
+    "tests/informal/test_leaked_connections.py": "A",
+    "tests/test_requests.py": "M"
+   },
+   "references_issue": true,
+   "id": "requests:3c0b9404->495f8736"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "a501b0ca81e340fb2c968e1cabc37565187006f7",
+   "fix_subject": "Fix for AppEngine",
+   "fix_time": 1382979116,
+   "inducing": "79bb9ee1417afe2231972c1331308500104e5dc7",
+   "inducing_subject": "netrc parsing",
+   "inducing_time": 1329770119,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/utils.py": "M"
+   },
+   "inducing_files": {
+    "requests/utils.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:79bb9ee1->a501b0ca"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "6931bd67153f92246c2fdd69d2c0ec29c13bb885",
+   "fix_subject": "second commit : Fixed #1623. Added 'MD5-sess' algorithm to HTTPDigestAuth",
+   "fix_time": 1382778859,
+   "inducing": "c89a3e207ea01c78a193b13da6172427be86ac45",
+   "inducing_subject": "Clarify digest hash method names",
+   "inducing_time": 1334142179,
+   "blamed_lines": 3,
+   "total_blamed": 6,
+   "candidates": 3,
+   "fix_files": {
+    "requests/auth.py": "M"
+   },
+   "inducing_files": {
+    "requests/auth.py": "M"
+   },
+   "references_issue": true,
+   "id": "requests:c89a3e20->6931bd67"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "a4605fe32426bcc404ab1eb4ea4b0dde9238a3e8",
+   "fix_subject": "Fix failing test to preserve behaviour",
+   "fix_time": 1381198679,
+   "inducing": "5bf396d5d12bf9debc667a509c84f640560da517",
+   "inducing_subject": "Honor session hooks",
+   "inducing_time": 1381166596,
+   "blamed_lines": 5,
+   "total_blamed": 5,
+   "candidates": 1,
+   "fix_files": {
+    "requests/sessions.py": "M"
+   },
+   "inducing_files": {
+    "requests/sessions.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:5bf396d5->a4605fe3"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "8370e664649af8902658e3079b49307c9d395554",
+   "fix_subject": "fixed print statement",
+   "fix_time": 1380945371,
+   "inducing": "f4311269d77dbbfdc1fa84b79146dc8f5eea246e",
+   "inducing_subject": "improve top-level docstring",
+   "inducing_time": 1346110560,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/__init__.py": "M"
+   },
+   "inducing_files": {
+    "requests/__init__.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:f4311269->8370e664"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "d22eaf96e2a1c64bc29579a072f67d2a9c758ef8",
+   "fix_subject": "Fixed #1630",
+   "fix_time": 1380379467,
+   "inducing": "39fe0068aa657764778782ce4ca11d5e3ee08c66",
+   "inducing_subject": "Fixed #1630, added test case for cookie persistence.",
+   "inducing_time": 1380353585,
+   "blamed_lines": 5,
+   "total_blamed": 6,
+   "candidates": 2,
+   "fix_files": {
+    "requests/cookies.py": "M",
+    "requests/sessions.py": "M"
+   },
+   "inducing_files": {
+    "requests/sessions.py": "M",
+    "test_requests.py": "M"
+   },
+   "references_issue": true,
+   "id": "requests:39fe0068->d22eaf96"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "1d1831ba40fe53a37e5ab87e9913dd1c52349066",
+   "fix_subject": "fixed extra bonus bug",
+   "fix_time": 1380287860,
+   "inducing": "b84547d78699a3a5c75dbdf2c2e422dbaa83b988",
+   "inducing_subject": "Add copy method to PreparedRequest objects",
+   "inducing_time": 1374354515,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/models.py": "M"
+   },
+   "inducing_files": {
+    "requests/models.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:b84547d7->1d1831ba"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "3501ea463432400c77479dddedab3b7af967b618",
+   "fix_subject": "Fixed #1623. Added 'MD5-sess' algorithm to HTTPDigestAuth",
+   "fix_time": 1380177612,
+   "inducing": "c89a3e207ea01c78a193b13da6172427be86ac45",
+   "inducing_subject": "Clarify digest hash method names",
+   "inducing_time": 1334142179,
+   "blamed_lines": 3,
+   "total_blamed": 6,
+   "candidates": 3,
+   "fix_files": {
+    "requests/auth.py": "M"
+   },
+   "inducing_files": {
+    "requests/auth.py": "M"
+   },
+   "references_issue": true,
+   "id": "requests:c89a3e20->3501ea46"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "134699faf9c7cb2d8fcbe505d0385b68b7d7a819",
+   "fix_subject": "Fix for new proxy API.",
+   "fix_time": 1362385247,
+   "inducing": "347a52aa5ced6ff3fec8723ccfb8531fdbcf8d9c",
+   "inducing_subject": "Fixed proxy requests to pool connections.",
+   "inducing_time": 1358512874,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "requests/adapters.py": "M"
+   },
+   "inducing_files": {
+    "requests/adapters.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:347a52aa->134699fa"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "8d9d9fb06493e322c04d64b9234df0ae218e9500",
+   "fix_subject": "Fixing error return to be consistent with tuple return at the end of the method.",
+   "fix_time": 1375129866,
+   "inducing": "2161d8f78d71f619c07132add0b1966f62e40c6f",
+   "inducing_subject": "encode files",
+   "inducing_time": 1355560494,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/models.py": "M"
+   },
+   "inducing_files": {
+    "requests/models.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:2161d8f7->8d9d9fb0"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "37786613e06f055a0495b05940f31531a9afd705",
+   "fix_subject": "Fix duplication of efforts caught by @dofelw",
+   "fix_time": 1375103347,
+   "inducing": "366e8e849877aea44ce96abebd4f26f5bcce12fb",
+   "inducing_subject": "basics working",
+   "inducing_time": 1355558682,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/models.py": "M"
+   },
+   "inducing_files": {
+    "Makefile": "M",
+    "requests/models.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:366e8e84->37786613"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "4f64938ff02438bf6b1e379371f5182d48397c32",
+   "fix_subject": "Fix a few warnings flagged by PyDev",
+   "fix_time": 1374480877,
+   "inducing": "ef8563ab36c6b52834ee9c35f6f75a424cd9ceef",
+   "inducing_subject": "CHUNKED REQUESTS!",
+   "inducing_time": 1357801109,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "requests/models.py": "M",
+    "requests/structures.py": "M"
+   },
+   "inducing_files": {
+    "requests/adapters.py": "M",
+    "requests/models.py": "M",
+    "requests/structures.py": "M",
+    "requests/utils.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:ef8563ab->4f64938f"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "90837359632b43aba7900b65b42744715f0b739a",
+   "fix_subject": "@1434 Fix https://github.com/kennethreitz/requests/issues/1434",
+   "fix_time": 1372199939,
+   "inducing": "41876fd8c6b7146026acfe58b18ceeb21aed3069",
+   "inducing_subject": "Implemented content streaming for responses.",
+   "inducing_time": 1315065570,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/utils.py": "M"
+   },
+   "inducing_files": {
+    "requests/models.py": "M",
+    "requests/utils.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:41876fd8->90837359"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "5e94f38001fdaccda924aab9e5f0ffc064492129",
+   "fix_subject": "- fixed func call syntax on lower to lower() - added test cases for trying to test GETS on mixed-case schemas",
+   "fix_time": 1369418490,
+   "inducing": "3004ad539875ffc2c9ec5a376af7203189ce6fe1",
+   "inducing_subject": "Lower-ify url before checking against prefix with startswith()",
+   "inducing_time": 1369409160,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "requests/adapters.py": "M",
+    "requests/sessions.py": "M",
+    "test_requests.py": "M"
+   },
+   "inducing_files": {
+    "requests/adapters.py": "M",
+    "requests/sessions.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:3004ad53->5e94f380"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "e7c9bbb96f8cebe873e26bf2f5f306c130e98e7d",
+   "fix_subject": "Only switch to chunked if we don't know the length of a file like object. This fixes the case of trying to upload a 0-length file - chunked upload was being forced. Services like S3 that disallow chun",
+   "fix_time": 1369322489,
+   "inducing": "ef8563ab36c6b52834ee9c35f6f75a424cd9ceef",
+   "inducing_subject": "CHUNKED REQUESTS!",
+   "inducing_time": 1357801109,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "requests/models.py": "M"
+   },
+   "inducing_files": {
+    "requests/adapters.py": "M",
+    "requests/models.py": "M",
+    "requests/structures.py": "M",
+    "requests/utils.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:ef8563ab->e7c9bbb9"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "98114245c686ef7cd62c9932071fd972ad3efedb",
+   "fix_subject": "Refactor merge_kwargs for clarity and to fix a few bugs",
+   "fix_time": 1367513219,
+   "inducing": "65a765fe882ab30f794be8108abf9defd05900c5",
+   "inducing_subject": "new local merging of keyword arguments for sessions",
+   "inducing_time": 1319000995,
+   "blamed_lines": 10,
+   "total_blamed": 37,
+   "candidates": 11,
+   "fix_files": {
+    "requests/sessions.py": "M",
+    "requests/utils.py": "M",
+    "test_requests.py": "M"
+   },
+   "inducing_files": {
+    "requests/sessions.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:65a765fe->98114245"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "6e76ab7188b2e5f6338b8b15d7d77b69f1627a7b",
+   "fix_subject": "Fix for #1362.",
+   "fix_time": 1368717755,
+   "inducing": "a776e7cb3e57e56a2d9974b730e6f5e7776751a4",
+   "inducing_subject": "fix params support",
+   "inducing_time": 1355739802,
+   "blamed_lines": 4,
+   "total_blamed": 7,
+   "candidates": 3,
+   "fix_files": {
+    "AUTHORS.rst": "M",
+    "requests/models.py": "M",
+    "test_requests.py": "M"
+   },
+   "inducing_files": {
+    "requests/models.py": "M",
+    "requests/sessions.py": "M"
+   },
+   "references_issue": true,
+   "id": "requests:a776e7cb->6e76ab71"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "4c8af1fff47eea5f52c7b333101c221399c8c613",
+   "fix_subject": "Fixes #1320: transport adapters stored in ordered form",
+   "fix_time": 1368617649,
+   "inducing": "d11522b29e3d05017c1464f13dd3be70c3ffd1a4",
+   "inducing_subject": "Connection Adapter Mounting!",
+   "inducing_time": 1355745333,
+   "blamed_lines": 3,
+   "total_blamed": 5,
+   "candidates": 3,
+   "fix_files": {
+    "AUTHORS.rst": "M",
+    "requests/sessions.py": "M",
+    "test_requests.py": "M"
+   },
+   "inducing_files": {
+    "requests/sessions.py": "M"
+   },
+   "references_issue": true,
+   "id": "requests:d11522b2->4c8af1ff"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "9cb3d6444d7c2e2787267874f59c271cd2bcf1be",
+   "fix_subject": "Fixing the call to init_poolmanagers to correctly unpickle the adapter.",
+   "fix_time": 1368321188,
+   "inducing": "e706d18cf893198a26ca3f41dd5014dabd87ae89",
+   "inducing_subject": "Pickling of Session and HTTPAdapter + a test",
+   "inducing_time": 1363025554,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/adapters.py": "M"
+   },
+   "inducing_files": {
+    "requests/adapters.py": "M",
+    "requests/sessions.py": "M",
+    "test_requests.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:e706d18c->9cb3d644"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "0c609b59abfa25e00e320034e46c5bf4443078b6",
+   "fix_subject": "Fix session CookieJars without breaking more stuff this time",
+   "fix_time": 1366946150,
+   "inducing": "9763a671da1061244aa0a98e924efa1ec8379a7b",
+   "inducing_subject": "Fix crash when session.cookies was not a RequestsCookieJar",
+   "inducing_time": 1366943691,
+   "blamed_lines": 4,
+   "total_blamed": 5,
+   "candidates": 2,
+   "fix_files": {
+    "requests/sessions.py": "M"
+   },
+   "inducing_files": {
+    "requests/sessions.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:9763a671->0c609b59"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "9763a671da1061244aa0a98e924efa1ec8379a7b",
+   "fix_subject": "Fix crash when session.cookies was not a RequestsCookieJar",
+   "fix_time": 1366943691,
+   "inducing": "3f86e22a07fb1bd91c70d3c487efbadb55f6b36a",
+   "inducing_subject": "Make sure session cookies do not overwrite explicit request cookies Implement RequestsCookieJar.copy Use RequestsCookieJar.update when merging cookiejars",
+   "inducing_time": 1360994219,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "requests/sessions.py": "M"
+   },
+   "inducing_files": {
+    "requests/cookies.py": "M",
+    "requests/sessions.py": "M",
+    "requests/utils.py": "M"
+   },
+   "references_issue": false,
+   "id": "requests:3f86e22a->9763a671"
+  },
+  {
+   "repo": "psf/requests",
+   "fix": "afcc883d7f5968a8d64ea400335fb47f3f73d042",
+   "fix_subject": "Fix #1293",
+   "fix_time": 1365262012,
+   "inducing": "ca85b4ec6ce2428891d2e1ae72dad2b873c87bbe",
+   "inducing_subject": "Tests pass this time.",
+   "inducing_time": 1358893294,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "requests/models.py": "M"
+   },
+   "inducing_files": {
+    "requests/models.py": "M"
+   },
+   "references_issue": true,
+   "id": "requests:ca85b4ec->afcc883d"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "001100bc0b3a700540024c410a985c7f9e09f565",
+   "fix_subject": "Fixed PyStringIO in tests for 2.x",
+   "fix_time": 1391951611,
+   "inducing": "d094d5b6fc86a26680a8c496f719c4d711fcd766",
+   "inducing_subject": "Fixed warning and broken tests on 3.3",
+   "inducing_time": 1391898586,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "flask/testsuite/helpers.py": "M"
+   },
+   "inducing_files": {
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/testing.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:d094d5b6->001100bc"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "d094d5b6fc86a26680a8c496f719c4d711fcd766",
+   "fix_subject": "Fixed warning and broken tests on 3.3",
+   "fix_time": 1391898586,
+   "inducing": "2506c0b9a96d48f14624acfa552fc88e38a542ae",
+   "inducing_subject": "Fixed sending etags for file streams with a name.  This fixes #930.",
+   "inducing_time": 1391881509,
+   "blamed_lines": 2,
+   "total_blamed": 4,
+   "candidates": 3,
+   "fix_files": {
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/testing.py": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "flask/helpers.py": "M",
+    "flask/testsuite/helpers.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:2506c0b9->d094d5b6"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "b7337080e48990393cf960890504710bc7cbc136",
+   "fix_subject": "Fix test_send_file_object",
+   "fix_time": 1378567789,
+   "inducing": "2d87e9bc37ef1ce8f9068fac92783a4fe3d3d382",
+   "inducing_subject": "Added support for send_file",
+   "inducing_time": 1273483662,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "flask/testsuite/helpers.py": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "docs/api.rst": "M",
+    "flask.py": "M",
+    "tests/flask_tests.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:2d87e9bc->b7337080"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "cff35237efea11c4bbc8c2fc75e24cbea30b26ce",
+   "fix_subject": "Fix test_no_error_swallowing",
+   "fix_time": 1378567275,
+   "inducing": "9f8a2075c79fec1b5481f5a5a95bb23b40bf68f2",
+   "inducing_subject": "Use assert_in where appropriate",
+   "inducing_time": 1369246370,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "flask/testsuite/ext.py": "M"
+   },
+   "inducing_files": {
+    "flask/testsuite/__init__.py": "M",
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/blueprints.py": "M",
+    "flask/testsuite/config.py": "M",
+    "flask/testsuite/ext.py": "M",
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/subclassing.py": "M",
+    "flask/testsuite/templating.py": "M",
+    "flask/testsuite/testing.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:9f8a2075->cff35237"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "3e4dbf93d9ef2b64d32b291aa6f7620bdbc6576a",
+   "fix_subject": "Fixed a test that broke on 3.x",
+   "fix_time": 1375196200,
+   "inducing": "d1d835c02302884b2db1cab099b3ea6a84f41d32",
+   "inducing_subject": "Added SESSION_REFRESH_EACH_REQUEST config option.",
+   "inducing_time": 1375195434,
+   "blamed_lines": 4,
+   "total_blamed": 4,
+   "candidates": 1,
+   "fix_files": {
+    "flask/testsuite/basic.py": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "docs/config.rst": "M",
+    "flask/app.py": "M",
+    "flask/sessions.py": "M",
+    "flask/testsuite/basic.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:d1d835c0->3e4dbf93"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "b6116c1de3f3556f6ae18d87348355d2545ce314",
+   "fix_subject": "Remove Werkzeug bug workaround from flask/app.py",
+   "fix_time": 1375119724,
+   "inducing": "a101cfc35be437ad0e4f56da0d92f14c27abda67",
+   "inducing_subject": "Worked around a werkzeug bug with redirects",
+   "inducing_time": 1309365108,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "flask/app.py": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "flask/app.py": "M",
+    "tests/flask_tests.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:a101cfc3->b6116c1d"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "f88cc2d2f9d14d97e33ddd2bbaa4b1885db06e1c",
+   "fix_subject": "Fix broken test_appcontext_signals test case",
+   "fix_time": 1372344567,
+   "inducing": "0676bb8ab54a575616cd65d3c2ef1cc31fb82a84",
+   "inducing_subject": "Added appcontext_pushed and appcontext_popped signals",
+   "inducing_time": 1370422406,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    ".travis-devel-requirements.txt": "M",
+    ".travis-lowest-requirements.txt": "M",
+    ".travis-release-requirements.txt": "M",
+    "CHANGES": "M",
+    "flask/testsuite/signals.py": "M",
+    "tox.ini": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "docs/api.rst": "M",
+    "docs/signals.rst": "M",
+    "flask/__init__.py": "M",
+    "flask/ctx.py": "M",
+    "flask/signals.py": "M",
+    "flask/testsuite/signals.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:0676bb8a->f88cc2d2"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "44e39ab0713566bd91363f19ed09921df5db0196",
+   "fix_subject": "Fixed class-based views support",
+   "fix_time": 1371194917,
+   "inducing": "661ee54bc2bc1ea0763ac9c226f8e14bb0beb5b1",
+   "inducing_subject": "Raise exceptions if a function is overridden by a new endpoint.  This fixes #570",
+   "inducing_time": 1349622736,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "flask/app.py": "M",
+    "flask/testsuite/basic.py": "M"
+   },
+   "inducing_files": {
+    "flask/app.py": "M",
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/views.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:661ee54b->44e39ab0"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "fd99abea57cfa3e72aee2116c58f962ec155a29c",
+   "fix_subject": "Fixed too strict tests for cookie setting that broke on werkzeug changes",
+   "fix_time": 1370422051,
+   "inducing": "9f8a2075c79fec1b5481f5a5a95bb23b40bf68f2",
+   "inducing_subject": "Use assert_in where appropriate",
+   "inducing_time": 1369246370,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "flask/testsuite/basic.py": "M"
+   },
+   "inducing_files": {
+    "flask/testsuite/__init__.py": "M",
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/blueprints.py": "M",
+    "flask/testsuite/config.py": "M",
+    "flask/testsuite/ext.py": "M",
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/subclassing.py": "M",
+    "flask/testsuite/templating.py": "M",
+    "flask/testsuite/testing.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:9f8a2075->fd99abea"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "1b40b3b573f5d98cf9fbc453305cd535c0b2578d",
+   "fix_subject": "Fixed request context preservation and teardown handler interaction.",
+   "fix_time": 1370206048,
+   "inducing": "c6316132b173f96a6f5a90ff3b62f706f8a62560",
+   "inducing_subject": "Context preserving is now part of Flask and not the test client.  This fixes #326",
+   "inducing_time": 1316888858,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "CHANGES": "M",
+    "flask/app.py": "M",
+    "flask/ctx.py": "M",
+    "flask/testsuite/basic.py": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "flask/ctx.py": "M",
+    "flask/globals.py": "M",
+    "flask/testing.py": "M",
+    "flask/testsuite/basic.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:c6316132->1b40b3b5"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "3d9055b3b73b1d09f933bfd070f704e9e8bdff2a",
+   "fix_subject": "Added the JSONIFY_PRETTYPRINT_REGULAR config variable.  This fixes #725",
+   "fix_time": 1370042400,
+   "inducing": "8339cb35082fc93d3a9c98616aed7fe0c1c642dc",
+   "inducing_subject": "Added support for unicode json dumping.  This fixes #535",
+   "inducing_time": 1350517695,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "CHANGES": "M",
+    "docs/config.rst": "M",
+    "flask/app.py": "M",
+    "flask/json.py": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "docs/config.rst": "M",
+    "flask/app.py": "M",
+    "flask/json.py": "M",
+    "flask/testsuite/helpers.py": "M"
+   },
+   "references_issue": true,
+   "id": "flask:8339cb35->3d9055b3"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "90e3906d02780c47e813649b1e282bfd279d7cb1",
+   "fix_subject": "Fixed some test failures",
+   "fix_time": 1369933107,
+   "inducing": "4cb6eea8f1e1edc707874f72cbca43a0f698ec7d",
+   "inducing_subject": "Split up testsuite and moved it to flask.testsuite.  This fixes #246",
+   "inducing_time": 1314354086,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/blueprints.py": "M",
+    "flask/testsuite/helpers.py": "M"
+   },
+   "inducing_files": {
+    "flask/testsuite/__init__.py": "A",
+    "flask/testsuite/basic.py": "A",
+    "flask/testsuite/blueprints.py": "A",
+    "flask/testsuite/config.py": "A",
+    "flask/testsuite/deprecations.py": "A",
+    "flask/testsuite/examples.py": "A",
+    "flask/testsuite/helpers.py": "A",
+    "flask/testsuite/signals.py": "A",
+    "flask/testsuite/static/index.html": "A",
+    "flask/testsuite/templates/_macro.html": "A",
+    "flask/testsuite/templates/context_template.html": "A",
+    "flask/testsuite/templates/escaping_template.html": "A",
+    "flask/testsuite/templates/mail.txt": "A",
+    "flask/testsuite/templates/nested/nested.txt": "A",
+    "flask/testsuite/templates/simple_template.html": "A",
+    "flask/testsuite/templates/template_filter.html": "A",
+    "flask/testsuite/templating.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/__init__.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/__init__.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/admin/__init__.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/admin/static/css/test.css": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/admin/static/test.txt": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/admin/templates/admin/index.html": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/frontend/__init__.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/frontend/templates/frontend/index.html": "A",
+    "flask/testsuite/test_apps/config_module_app.py": "A",
+    "flask/testsuite/test_apps/config_package_app/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/admin/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/admin/static/css/test.css": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/admin/static/test.txt": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/admin/templates/index.html": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/frontend/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/frontend/templates/index.html": "A",
+    "flask/testsuite/test_apps/subdomaintestmodule/__init__.py": "A",
+    "flask/testsuite/test_apps/subdomaintestmodule/static/hello.txt": "A",
+    "flask/testsuite/testing.py": "A",
+    "flask/testsuite/views.py": "A",
+    "scripts/flaskext_test.py": "A",
+    "setup.py": "M",
+    "tests/blueprintapp/__init__.py": "D",
+    "tests/blueprintapp/apps/__init__.py": "D",
+    "tests/blueprintapp/apps/admin/__init__.py": "D",
+    "tests/blueprintapp/apps/admin/static/css/test.css": "D",
+    "tests/blueprintapp/apps/admin/static/test.txt": "D",
+    "tests/blueprintapp/apps/admin/templates/admin/index.html": "D",
+    "tests/blueprintapp/apps/frontend/__init__.py": "D",
+    "tests/blueprintapp/apps/frontend/templates/frontend/index.html": "D",
+    "tests/flask_tests.py": "D",
+    "tests/flaskext_test.py": "D",
+    "tests/moduleapp/__init__.py": "D",
+    "tests/moduleapp/apps/__init__.py": "D",
+    "tests/moduleapp/apps/admin/__init__.py": "D",
+    "tests/moduleapp/apps/admin/static/css/test.css": "D",
+    "tests/moduleapp/apps/admin/static/test.txt": "D",
+    "tests/moduleapp/apps/admin/templates/index.html": "D",
+    "tests/moduleapp/apps/frontend/__init__.py": "D",
+    "tests/moduleapp/apps/frontend/templates/index.html": "D",
+    "tests/static/index.html": "D",
+    "tests/subdomaintestmodule/__init__.py": "D",
+    "tests/subdomaintestmodule/static/hello.txt": "D",
+    "tests/templates/_macro.html": "D",
+    "tests/templates/context_template.html": "D",
+    "tests/templates/escaping_template.html": "D",
+    "tests/templates/mail.txt": "D",
+    "tests/templates/nested/nested.txt": "D",
+    "tests/templates/simple_template.html": "D",
+    "tests/templates/template_filter.html": "D"
+   },
+   "references_issue": false,
+   "id": "flask:4cb6eea8->90e3906d"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "abc1505196ba3bc9517ec142ced7c1204c3ac21b",
+   "fix_subject": "Fixed various issues on the Python 3 port",
+   "fix_time": 1369922838,
+   "inducing": "e1d356fb713f3272db2a23f9f898c34c5dc79dc0",
+   "inducing_subject": "ported some more stuff to py 3.3",
+   "inducing_time": 1369179184,
+   "blamed_lines": 2,
+   "total_blamed": 7,
+   "candidates": 5,
+   "fix_files": {
+    "flask/_compat.py": "M",
+    "flask/json.py": "M",
+    "flask/testing.py": "M"
+   },
+   "inducing_files": {
+    "examples/flaskr/flaskr.py": "M",
+    "examples/minitwit/minitwit.py": "M",
+    "flask/_compat.py": "M",
+    "flask/app.py": "M",
+    "flask/config.py": "M",
+    "flask/exthook.py": "M",
+    "flask/helpers.py": "M",
+    "flask/testing.py": "M",
+    "flask/testsuite/__init__.py": "M",
+    "flask/testsuite/appctx.py": "M",
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/blueprints.py": "M",
+    "flask/testsuite/config.py": "M",
+    "flask/testsuite/deprecations.py": "M",
+    "flask/testsuite/ext.py": "M",
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/regression.py": "M",
+    "flask/testsuite/reqctx.py": "M",
+    "flask/testsuite/signals.py": "M",
+    "flask/testsuite/subclassing.py": "M",
+    "flask/testsuite/templating.py": "M",
+    "flask/testsuite/testing.py": "M",
+    "flask/testsuite/views.py": "M",
+    "scripts/flaskext_test.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:e1d356fb->abc15051"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "51042f4c9f2c68a63ad5b8ee3000a52518a4b87b",
+   "fix_subject": "fix issues in test_context_refcounts that were unnoticed yet as they did not make the test fail",
+   "fix_time": 1369922443,
+   "inducing": "239780be289efd365c07be2f60bab9223388399e",
+   "inducing_subject": "Use assert_true instead of assert_",
+   "inducing_time": 1369236218,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "flask/testsuite/appctx.py": "M"
+   },
+   "inducing_files": {
+    "flask/testsuite/__init__.py": "M",
+    "flask/testsuite/appctx.py": "M",
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/blueprints.py": "M",
+    "flask/testsuite/config.py": "M",
+    "flask/testsuite/ext.py": "M",
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/reqctx.py": "M",
+    "flask/testsuite/signals.py": "M",
+    "flask/testsuite/subclassing.py": "M",
+    "flask/testsuite/templating.py": "M",
+    "flask/testsuite/testing.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:239780be->51042f4c"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "83f76585725fd380b61f35576bb1c307fe2a1a5e",
+   "fix_subject": "fix metaclass usage for py3",
+   "fix_time": 1369505957,
+   "inducing": "dcf21989dc71f4ab93ceaf0627e40c516462bd8c",
+   "inducing_subject": "Added class based views",
+   "inducing_time": 1309257949,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "flask/views.py": "M"
+   },
+   "inducing_files": {
+    "flask/app.py": "M",
+    "flask/views.py": "A",
+    "tests/flask_tests.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:dcf21989->83f76585"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "af5576a6c50ec849a824c1ace15f187d378db771",
+   "fix_subject": "fix iterator in testsuite helpers",
+   "fix_time": 1369503986,
+   "inducing": "a0801719f8f24a0e3192eca203bbd341c4e557ec",
+   "inducing_subject": "Remove six dependency",
+   "inducing_time": 1369251630,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "flask/testsuite/helpers.py": "M"
+   },
+   "inducing_files": {
+    "flask/helpers.py": "M",
+    "flask/json.py": "M",
+    "flask/templating.py": "M",
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/blueprints.py": "M",
+    "flask/testsuite/ext.py": "M",
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/testing.py": "M",
+    "setup.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:a0801719->af5576a6"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "85ba8c96e9371368cff772e4e270cf685d015e03",
+   "fix_subject": "Fixed a broken test",
+   "fix_time": 1369314445,
+   "inducing": "95c4dcb4d50e69b927855cd6a446579d2fe45b4e",
+   "inducing_subject": "Refactored flask.ext process to not swallow exceptions on weird Pythons.",
+   "inducing_time": 1317123203,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "flask/testsuite/ext.py": "M"
+   },
+   "inducing_files": {
+    "flask/ext/__init__.py": "M",
+    "flask/exthook.py": "A",
+    "flask/testsuite/ext.py": "M",
+    "scripts/flaskext_compat.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:95c4dcb4->85ba8c96"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "4c27f7a8c4bbe6621681178be716e6270067a3ad",
+   "fix_subject": "Removed incorrect JSON exception subclasses",
+   "fix_time": 1369313950,
+   "inducing": "9711fd402010b2e14a98879f0457174c3ca15a24",
+   "inducing_subject": "On JSON requests, the JSON response should have Content-Type: application/json and the body of the response should be a JSON object.",
+   "inducing_time": 1331242899,
+   "blamed_lines": 13,
+   "total_blamed": 23,
+   "candidates": 5,
+   "fix_files": {
+    "CHANGES": "M",
+    "flask/exceptions.py": "D",
+    "flask/testsuite/helpers.py": "M",
+    "flask/wrappers.py": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "flask/testsuite/helpers.py": "M",
+    "flask/wrappers.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:9711fd40->4c27f7a8"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "135c53a5f2f990512d2be348dc16ef719233a314",
+   "fix_subject": "Fix .iteritems() access in flask.sessions",
+   "fix_time": 1369251045,
+   "inducing": "522cd0009367d1f775b0e978681426773f51ce14",
+   "inducing_subject": "python-modernize automated changes: fix_unicode (but without six.u())",
+   "inducing_time": 1368893550,
+   "blamed_lines": 2,
+   "total_blamed": 5,
+   "candidates": 3,
+   "fix_files": {
+    "flask/sessions.py": "M"
+   },
+   "inducing_files": {
+    "flask/json.py": "M",
+    "flask/sessions.py": "M",
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/blueprints.py": "M",
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/testing.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:522cd000->135c53a5"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "3d36d6efb9371be92f6f22c844ed6a17c87f4a88",
+   "fix_subject": "Fix leak in leak detection code",
+   "fix_time": 1369249772,
+   "inducing": "4cb6eea8f1e1edc707874f72cbca43a0f698ec7d",
+   "inducing_subject": "Split up testsuite and moved it to flask.testsuite.  This fixes #246",
+   "inducing_time": 1314354086,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "flask/testsuite/__init__.py": "M"
+   },
+   "inducing_files": {
+    "flask/testsuite/__init__.py": "A",
+    "flask/testsuite/basic.py": "A",
+    "flask/testsuite/blueprints.py": "A",
+    "flask/testsuite/config.py": "A",
+    "flask/testsuite/deprecations.py": "A",
+    "flask/testsuite/examples.py": "A",
+    "flask/testsuite/helpers.py": "A",
+    "flask/testsuite/signals.py": "A",
+    "flask/testsuite/static/index.html": "A",
+    "flask/testsuite/templates/_macro.html": "A",
+    "flask/testsuite/templates/context_template.html": "A",
+    "flask/testsuite/templates/escaping_template.html": "A",
+    "flask/testsuite/templates/mail.txt": "A",
+    "flask/testsuite/templates/nested/nested.txt": "A",
+    "flask/testsuite/templates/simple_template.html": "A",
+    "flask/testsuite/templates/template_filter.html": "A",
+    "flask/testsuite/templating.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/__init__.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/__init__.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/admin/__init__.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/admin/static/css/test.css": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/admin/static/test.txt": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/admin/templates/admin/index.html": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/frontend/__init__.py": "A",
+    "flask/testsuite/test_apps/blueprintapp/apps/frontend/templates/frontend/index.html": "A",
+    "flask/testsuite/test_apps/config_module_app.py": "A",
+    "flask/testsuite/test_apps/config_package_app/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/admin/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/admin/static/css/test.css": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/admin/static/test.txt": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/admin/templates/index.html": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/frontend/__init__.py": "A",
+    "flask/testsuite/test_apps/moduleapp/apps/frontend/templates/index.html": "A",
+    "flask/testsuite/test_apps/subdomaintestmodule/__init__.py": "A",
+    "flask/testsuite/test_apps/subdomaintestmodule/static/hello.txt": "A",
+    "flask/testsuite/testing.py": "A",
+    "flask/testsuite/views.py": "A",
+    "scripts/flaskext_test.py": "A",
+    "setup.py": "M",
+    "tests/blueprintapp/__init__.py": "D",
+    "tests/blueprintapp/apps/__init__.py": "D",
+    "tests/blueprintapp/apps/admin/__init__.py": "D",
+    "tests/blueprintapp/apps/admin/static/css/test.css": "D",
+    "tests/blueprintapp/apps/admin/static/test.txt": "D",
+    "tests/blueprintapp/apps/admin/templates/admin/index.html": "D",
+    "tests/blueprintapp/apps/frontend/__init__.py": "D",
+    "tests/blueprintapp/apps/frontend/templates/frontend/index.html": "D",
+    "tests/flask_tests.py": "D",
+    "tests/flaskext_test.py": "D",
+    "tests/moduleapp/__init__.py": "D",
+    "tests/moduleapp/apps/__init__.py": "D",
+    "tests/moduleapp/apps/admin/__init__.py": "D",
+    "tests/moduleapp/apps/admin/static/css/test.css": "D",
+    "tests/moduleapp/apps/admin/static/test.txt": "D",
+    "tests/moduleapp/apps/admin/templates/index.html": "D",
+    "tests/moduleapp/apps/frontend/__init__.py": "D",
+    "tests/moduleapp/apps/frontend/templates/index.html": "D",
+    "tests/static/index.html": "D",
+    "tests/subdomaintestmodule/__init__.py": "D",
+    "tests/subdomaintestmodule/static/hello.txt": "D",
+    "tests/templates/_macro.html": "D",
+    "tests/templates/context_template.html": "D",
+    "tests/templates/escaping_template.html": "D",
+    "tests/templates/mail.txt": "D",
+    "tests/templates/nested/nested.txt": "D",
+    "tests/templates/simple_template.html": "D",
+    "tests/templates/template_filter.html": "D"
+   },
+   "references_issue": false,
+   "id": "flask:4cb6eea8->3d36d6ef"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "05f66ad73543db207791ea5d6a2de2e8eaaf1640",
+   "fix_subject": "Fix some literals",
+   "fix_time": 1369235148,
+   "inducing": "3069e2d7f73f80ebc342029616a5cbc5381cfdf1",
+   "inducing_subject": "Fight the generic asserts!",
+   "inducing_time": 1314355123,
+   "blamed_lines": 75,
+   "total_blamed": 126,
+   "candidates": 15,
+   "fix_files": {
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/blueprints.py": "M",
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/regression.py": "M",
+    "flask/testsuite/reqctx.py": "M",
+    "flask/testsuite/signals.py": "M",
+    "flask/testsuite/templating.py": "M",
+    "flask/testsuite/testing.py": "M",
+    "flask/testsuite/views.py": "M"
+   },
+   "inducing_files": {
+    "flask/testsuite/basic.py": "M",
+    "flask/testsuite/blueprints.py": "M",
+    "flask/testsuite/config.py": "M",
+    "flask/testsuite/deprecations.py": "M",
+    "flask/testsuite/helpers.py": "M",
+    "flask/testsuite/signals.py": "M",
+    "flask/testsuite/templating.py": "M",
+    "flask/testsuite/testing.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:3069e2d7->05f66ad7"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "b8b769ad41edeb2320774d88502dd998df272397",
+   "fix_subject": "automated change using python-modernize: fix methodattrs",
+   "fix_time": 1368887979,
+   "inducing": "0da56d7f5cfb6a637129444bfe0d6bf2584363ac",
+   "inducing_subject": "deprecated init_jinja_globals",
+   "inducing_time": 1300436128,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "flask/app.py": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "flask/app.py": "M",
+    "flask/helpers.py": "M",
+    "tests/flask_tests.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:0da56d7f->b8b769ad"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "f74f446961f9fd8ecb2edffca53b82016cc41343",
+   "fix_subject": "fixing process_response",
+   "fix_time": 1365089502,
+   "inducing": "7a08331ac062ee1e2ae3c7547f77c2d342ddb3df",
+   "inducing_subject": "Latest iteration of the blueprint code.  Far from being done",
+   "inducing_time": 1306677298,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "flask/app.py": "M"
+   },
+   "inducing_files": {
+    "flask/app.py": "M",
+    "flask/blueprints.py": "A",
+    "flask/ctx.py": "M",
+    "flask/helpers.py": "M",
+    "flask/module.py": "M",
+    "flask/templating.py": "M",
+    "flask/wrappers.py": "M",
+    "tests/flask_tests.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:7a08331a->f74f4469"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "61d3bbf1d237cd8f03e37af88ad4a6b59f27d4e1",
+   "fix_subject": "Fixed last commit and added test",
+   "fix_time": 1358790907,
+   "inducing": "f1537a9d7a1e5ab53e38166a2a8fd7bad9278c18",
+   "inducing_subject": "Always trap proxy exceptions",
+   "inducing_time": 1358790272,
+   "blamed_lines": 3,
+   "total_blamed": 3,
+   "candidates": 1,
+   "fix_files": {
+    "flask/app.py": "M",
+    "flask/testsuite/regression.py": "M"
+   },
+   "inducing_files": {
+    "CHANGES": "M",
+    "flask/app.py": "M"
+   },
+   "references_issue": false,
+   "id": "flask:f1537a9d->61d3bbf1"
+  },
+  {
+   "repo": "pallets/flask",
+   "fix": "2b30900e2c007cf39b3d73a8ad53afe2f29a3a2c",
+   "fix_subject": "Fix #623",
+   "fix_time": 1352404637,
+   "inducing": "f8f2e2dff481e55fa9ae7cc3f70f36d61bcf56d7",
+   "inducing_subject": "Added more tests for the new stack behavior.",
+   "inducing_time": 1333980969,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "flask/helpers.py": "M"
+   },
+   "inducing_files": {
+    "flask/__init__.py": "M",
+    "flask/helpers.py": "M",
+    "flask/testsuite/appctx.py": "M"
+   },
+   "references_issue": true,
+   "id": "flask:f8f2e2df->2b30900e"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "163da7226fd2cd21f0f238f99b2f75a51bf9b2a3",
+   "fix_subject": "fix: update the implementation to rather parse out the values than throw (#10687)",
+   "fix_time": 1775896296,
+   "inducing": "363185461b90b1b78845dc8a99a1f103d9b122a1",
+   "inducing_subject": "fix: unrestricted cloud metadata exfiltration via header injection chain (#10660)",
+   "inducing_time": 1775476914,
+   "blamed_lines": 19,
+   "total_blamed": 23,
+   "candidates": 3,
+   "fix_files": {
+    "lib/core/AxiosHeaders.js": "M",
+    "lib/helpers/shouldBypassProxy.js": "M",
+    "tests/browser/adapter.browser.test.js": "M",
+    "tests/unit/adapters/fetch.test.js": "M",
+    "tests/unit/adapters/http.test.js": "M",
+    "tests/unit/axiosHeaders.test.js": "M",
+    "tests/unit/helpers/shouldBypassProxy.test.js": "M"
+   },
+   "inducing_files": {
+    "lib/core/Axios.js": "M",
+    "lib/core/AxiosHeaders.js": "M",
+    "tests/browser/adapter.browser.test.js": "M",
+    "tests/unit/adapters/fetch.test.js": "M",
+    "tests/unit/adapters/http.test.js": "M",
+    "tests/unit/axiosHeaders.test.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:36318546->163da722"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "914bc2605ae43cee86fc1327c3f0022e1870d431",
+   "fix_subject": "fix(progress): clamp loaded to total for computable upload/download events (#7458)",
+   "fix_time": 1775749250,
+   "inducing": "a3ff99b59d8ec2ab5dd049e68c043617a4072e42",
+   "inducing_subject": "feat(adapter): add fetch adapter; (#6371)",
+   "inducing_time": 1714332829,
+   "blamed_lines": 4,
+   "total_blamed": 5,
+   "candidates": 2,
+   "fix_files": {
+    "lib/helpers/progressEventReducer.js": "M",
+    "test/unit/helpers/progressEventReducer.js": "A"
+   },
+   "inducing_files": {
+    ".github/workflows/ci.yml": "M",
+    "index.d.cts": "M",
+    "index.d.ts": "M",
+    "lib/adapters/adapters.js": "M",
+    "lib/adapters/fetch.js": "A",
+    "lib/adapters/xhr.js": "M",
+    "lib/core/AxiosHeaders.js": "M",
+    "lib/defaults/index.js": "M",
+    "lib/helpers/AxiosTransformStream.js": "M",
+    "lib/helpers/composeSignals.js": "A",
+    "lib/helpers/progressEventReducer.js": "A",
+    "lib/helpers/resolveConfig.js": "A",
+    "lib/helpers/throttle.js": "M",
+    "lib/helpers/trackStream.js": "A",
+    "lib/platform/common/utils.js": "M",
+    "lib/utils.js": "M",
+    "package-lock.json": "M",
+    "package.json": "M",
+    "rollup.config.js": "M",
+    "test/helpers/server.js": "A",
+    "test/unit/adapters/fetch.js": "A"
+   },
+   "references_issue": true,
+   "id": "axios:a3ff99b5->914bc260"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "0912bde937c9505ce5464d5b9c56b81d1edeab63",
+   "fix_subject": "fix: support multiselect in form data (#10676)",
+   "fix_time": 1775748699,
+   "inducing": "c008e57fe4ef586290d01beed0b6cb099c2c7a41",
+   "inducing_subject": "Added `axios.formToJSON` method; (#4735)",
+   "inducing_time": 1653459700,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/helpers/formDataToJSON.js": "M",
+    "tests/unit/helpers/formDataToJSON.test.js": "M"
+   },
+   "inducing_files": {
+    "index.d.ts": "M",
+    "lib/axios.js": "M",
+    "lib/core/Axios.js": "M",
+    "lib/defaults/index.js": "M",
+    "lib/helpers/formDataToJSON.js": "A",
+    "lib/utils.js": "M",
+    "test/specs/helpers/formDataToJSON.spec.js": "A",
+    "test/specs/instance.spec.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:c008e57f->0912bde9"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "f53ebf21989164a1f41b85f012bc545c17df7f16",
+   "fix_subject": "fix(core): use strict equality in buildFullPath check (#7252)",
+   "fix_time": 1775584101,
+   "inducing": "f10c2e0de7fde0051f848609a29c2906d0caa1d9",
+   "inducing_subject": "fix(buildFullPath): handle `allowAbsoluteUrls: false` without `baseURL` (#6833)",
+   "inducing_time": 1742320897,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/core/buildFullPath.js": "M"
+   },
+   "inducing_files": {
+    "lib/core/buildFullPath.js": "M",
+    "test/specs/core/buildFullPath.spec.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:f10c2e0d->f53ebf21"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "363185461b90b1b78845dc8a99a1f103d9b122a1",
+   "fix_subject": "fix: unrestricted cloud metadata exfiltration via header injection chain (#10660)",
+   "fix_time": 1775476914,
+   "inducing": "688826facdf0c51073bf5712432ff0fc3b396db6",
+   "inducing_subject": "fix(headers): trim trailing CRLF in normalized header values (#7456)",
+   "inducing_time": 1772380083,
+   "blamed_lines": 3,
+   "total_blamed": 5,
+   "candidates": 2,
+   "fix_files": {
+    "lib/core/Axios.js": "M",
+    "lib/core/AxiosHeaders.js": "M",
+    "tests/browser/adapter.browser.test.js": "M",
+    "tests/unit/adapters/fetch.test.js": "M",
+    "tests/unit/adapters/http.test.js": "M",
+    "tests/unit/axiosHeaders.test.js": "M"
+   },
+   "inducing_files": {
+    "lib/core/AxiosHeaders.js": "M",
+    "test/unit/core/AxiosHeaders.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:688826fa->36318546"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "947f7091d849435220accd2e656f34c824810200",
+   "fix_subject": "Fixes #10610 Deprecation Warning : url.parse() is deprecated in Node.\u2026 (#10625)",
+   "fix_time": 1775113378,
+   "inducing": "38be3b2e18fd35bc89d46a6cd3fe2379191fd5f6",
+   "inducing_subject": "docs: add abort controller example (#7287)",
+   "inducing_time": 1767092984,
+   "blamed_lines": 3,
+   "total_blamed": 6,
+   "candidates": 2,
+   "fix_files": {
+    "examples/abort-controller/server.js": "M",
+    "lib/adapters/http.js": "M",
+    "sandbox/server.js": "M",
+    "tests/unit/adapters/http.test.js": "M"
+   },
+   "inducing_files": {
+    "examples/abort-controller/index.html": "A",
+    "examples/abort-controller/server.js": "A"
+   },
+   "references_issue": true,
+   "id": "axios:38be3b2e->947f7091"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "94e1543576aec5381607dde6f3356a9073dc97bf",
+   "fix_subject": "fix(fetch): cancel ReadableStream body after request stream capability probe (#7515)",
+   "fix_time": 1773645162,
+   "inducing": "a3ff99b59d8ec2ab5dd049e68c043617a4072e42",
+   "inducing_subject": "feat(adapter): add fetch adapter; (#6371)",
+   "inducing_time": 1714332829,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/fetch.js": "M",
+    "tests/unit/adapters/fetch.test.js": "M"
+   },
+   "inducing_files": {
+    ".github/workflows/ci.yml": "M",
+    "index.d.cts": "M",
+    "index.d.ts": "M",
+    "lib/adapters/adapters.js": "M",
+    "lib/adapters/fetch.js": "A",
+    "lib/adapters/xhr.js": "M",
+    "lib/core/AxiosHeaders.js": "M",
+    "lib/defaults/index.js": "M",
+    "lib/helpers/AxiosTransformStream.js": "M",
+    "lib/helpers/composeSignals.js": "A",
+    "lib/helpers/progressEventReducer.js": "A",
+    "lib/helpers/resolveConfig.js": "A",
+    "lib/helpers/throttle.js": "M",
+    "lib/helpers/trackStream.js": "A",
+    "lib/platform/common/utils.js": "M",
+    "lib/utils.js": "M",
+    "package-lock.json": "M",
+    "package.json": "M",
+    "rollup.config.js": "M",
+    "test/helpers/server.js": "A",
+    "test/unit/adapters/fetch.js": "A"
+   },
+   "references_issue": true,
+   "id": "axios:a3ff99b5->94e15435"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "e943f6c54581deb983f065b05b9af757ebb0ca5d",
+   "fix_subject": "fix: proxy from env v2 fix (#7499)",
+   "fix_time": 1773508206,
+   "inducing": "12b32957f1258aee94ef859809ed39f8f88f9dfa",
+   "inducing_subject": "fix(http): fixed proxy-from-env module import (#5222)",
+   "inducing_time": 1731006722,
+   "blamed_lines": 2,
+   "total_blamed": 4,
+   "candidates": 3,
+   "fix_files": {
+    "lib/adapters/http.js": "M",
+    "mise.toml": "D",
+    "package-lock.json": "M",
+    "package.json": "M",
+    "rollup.config.js": "M",
+    "tests/smoke/cjs/package-lock.json": "M",
+    "tests/smoke/esm/package-lock.json": "M",
+    "tests/smoke/esm/package.json": "M"
+   },
+   "inducing_files": {
+    "lib/adapters/http.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:12b32957->e943f6c5"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "688826facdf0c51073bf5712432ff0fc3b396db6",
+   "fix_subject": "fix(headers): trim trailing CRLF in normalized header values (#7456)",
+   "fix_time": 1772380083,
+   "inducing": "110ae9ae613068f4292be9fbd2bf0abf28a6377a",
+   "inducing_subject": "fix: handling of array values for AxiosHeaders (#5085)",
+   "inducing_time": 1665688261,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/core/AxiosHeaders.js": "M",
+    "test/unit/core/AxiosHeaders.js": "M"
+   },
+   "inducing_files": {
+    "index.d.ts": "M",
+    "lib/core/AxiosHeaders.js": "M",
+    "test/unit/core/AxiosHeaders.js": "M",
+    "test/unit/regression/bugs.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:110ae9ae->688826fa"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "672491db34b5575d2abb1c3f91382bc1f45ae7b7",
+   "fix_subject": "fix: safe FormData detection for WeChat Mini Program (#7306) (#7324)",
+   "fix_time": 1771083776,
+   "inducing": "28c721588c7a77e7503d0a434e016f852c597b57",
+   "inducing_subject": "fix: Denial of Service via __proto__ Key in mergeConfig (#7369)",
+   "inducing_time": 1770229506,
+   "blamed_lines": 8,
+   "total_blamed": 8,
+   "candidates": 1,
+   "fix_files": {
+    "lib/utils.js": "M"
+   },
+   "inducing_files": {
+    "lib/core/mergeConfig.js": "M",
+    "lib/utils.js": "M",
+    "test/unit/core/prototypePollution.js": "A"
+   },
+   "references_issue": true,
+   "id": "axios:28c72158->672491db"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "28c721588c7a77e7503d0a434e016f852c597b57",
+   "fix_subject": "fix: Denial of Service via __proto__ Key in mergeConfig (#7369)",
+   "fix_time": 1770229506,
+   "inducing": "6b9b05b9078c78c9532ed8c29dfb910fdc1b1018",
+   "inducing_subject": "Improved FormData support; (#4448)",
+   "inducing_time": 1647282130,
+   "blamed_lines": 14,
+   "total_blamed": 116,
+   "candidates": 39,
+   "fix_files": {
+    "lib/core/mergeConfig.js": "M",
+    "lib/utils.js": "M",
+    "test/unit/core/prototypePollution.js": "A"
+   },
+   "inducing_files": {
+    "README.md": "M",
+    "index.d.ts": "M",
+    "lib/adapters/http.js": "M",
+    "lib/axios.js": "M",
+    "lib/core/Axios.js": "M",
+    "lib/defaults.js": "M",
+    "lib/defaults/env/FormData.js": "A",
+    "lib/helpers/null.js": "A",
+    "lib/helpers/toFormData.js": "M",
+    "lib/utils.js": "M",
+    "package-lock.json": "M",
+    "package.json": "M",
+    "test/specs/defaults.spec.js": "M",
+    "test/specs/helpers/toFormData.spec.js": "M",
+    "test/specs/instance.spec.js": "M",
+    "test/specs/utils/endsWith.js": "A",
+    "test/specs/utils/isX.spec.js": "M",
+    "test/specs/utils/kindOf.js": "A",
+    "test/specs/utils/kindOfTest.js": "A",
+    "test/specs/utils/toArray.js": "A",
+    "test/unit/adapters/http.js": "M",
+    "test/unit/utils/isFormData.js": "A"
+   },
+   "references_issue": true,
+   "id": "axios:6b9b05b9->28c72158"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "696fa753c5366afbd21859c294c64c9ff2b359ab",
+   "fix_subject": "fix: status is missing in AxiosError on and after v1.13.3 (#7368)",
+   "fix_time": 1770191232,
+   "inducing": "bb5f9a5ab768452de9e166dc28d0ffc234245ef1",
+   "inducing_subject": "fix(fetch): treat fetch-related TypeError as an AxiosError.ERR_NETWORK error; (#6380)",
+   "inducing_time": 1715106406,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/fetch.js": "M",
+    "test/unit/regression/bugs.js": "M"
+   },
+   "inducing_files": {
+    "lib/adapters/fetch.js": "M",
+    "test/unit/adapters/fetch.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:bb5f9a5a->696fa753"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "569f028a5878faaec8d7d138ba686aac407bda4c",
+   "fix_subject": "fix: added a option to choose between legacy and the new request/response interceptor ordering",
+   "fix_time": 1769753524,
+   "inducing": "170588f3d78f855450d1ce50968651a54cda7386",
+   "inducing_subject": "Refactored project file structure to avoid circular imports; (#4220)",
+   "inducing_time": 1646636983,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "README.md": "M",
+    "index.d.cts": "M",
+    "index.d.ts": "M",
+    "lib/core/Axios.js": "M",
+    "lib/defaults/transitional.js": "M",
+    "test/specs/interceptors.spec.js": "M"
+   },
+   "inducing_files": {
+    "lib/adapters/http.js": "M",
+    "lib/adapters/xhr.js": "M",
+    "lib/core/transformData.js": "M",
+    "lib/defaults.js": "D",
+    "lib/defaults/index.js": "A",
+    "lib/defaults/transitional.js": "A",
+    "test/specs/defaults.spec.js": "M"
+   },
+   "references_issue": false,
+   "id": "axios:170588f3->569f028a"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "5945e40bb171d4ac4fc195df276cf952244f0f89",
+   "fix_subject": "fix(interceptor): handle the error in the same interceptor (#6269)",
+   "fix_time": 1767899494,
+   "inducing": "62d625603916115691bcea2842c5d6e331279b99",
+   "inducing_subject": "issue#2609 | Sasha | predictable axios requests (#2702)",
+   "inducing_time": 1614589895,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "lib/core/Axios.js": "M",
+    "test/specs/interceptors.spec.js": "M"
+   },
+   "inducing_files": {
+    "README.md": "M",
+    "lib/core/Axios.js": "M",
+    "lib/core/InterceptorManager.js": "M",
+    "test/specs/adapter.spec.js": "M",
+    "test/specs/interceptors.spec.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:62d62560->5945e40b"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "d7e60653460480ffacecf85383012ca1baa6263e",
+   "fix_subject": "fix(http2): Use port 443 for HTTPS connections by default. (#7256)",
+   "fix_time": 1766103758,
+   "inducing": "d676df772244726533ca320f42e967f5af056bac",
+   "inducing_subject": "feat(http): add HTTP2 support; (#7150)",
+   "inducing_time": 1760875596,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/http.js": "M"
+   },
+   "inducing_files": {
+    "README.md": "M",
+    "index.d.cts": "M",
+    "index.d.ts": "M",
+    "lib/adapters/http.js": "M",
+    "package-lock.json": "M",
+    "package.json": "M",
+    "test/helpers/server.js": "M",
+    "test/unit/adapters/http.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:d676df77->d7e60653"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "7d19335e43d6754a1a9a66e424f7f7da259895bf",
+   "fix_subject": "fix: silentJSONParsing=false should throw on invalid JSON (#7253) (#7257)",
+   "fix_time": 1765010754,
+   "inducing": "c30252f685e8f4326722de84923fcbc8cf557f06",
+   "inducing_subject": "Added data URL support for node.js; (#4725)",
+   "inducing_time": 1653026676,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/defaults/index.js": "M",
+    "test/regression_silent_json.js": "A"
+   },
+   "inducing_files": {
+    ".eslintrc.js": "M",
+    "index.d.ts": "M",
+    "lib/adapters/http.js": "M",
+    "lib/adapters/xhr.js": "M",
+    "lib/core/AxiosError.js": "M",
+    "lib/defaults/env/FormData.js": "D",
+    "lib/defaults/index.js": "M",
+    "lib/env/classes/FormData.js": "A",
+    "lib/helpers/fromDataURI.js": "A",
+    "lib/helpers/toFormData.js": "M",
+    "lib/platform/browser/classes/FormData.js": "A",
+    "lib/platform/browser/index.js": "M",
+    "lib/platform/node/classes/FormData.js": "A",
+    "lib/platform/node/index.js": "M",
+    "lib/utils.js": "M",
+    "package.json": "M",
+    "test/unit/adapters/http.js": "M",
+    "test/unit/helpers/fromDataURI.js": "A"
+   },
+   "references_issue": true,
+   "id": "axios:c30252f6->7d19335e"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "6ef867e684adf7fb2343e3b29a79078a3c76dc29",
+   "fix_subject": "fix: unclear error message is thrown when specifying an empty proxy authorization (#6314)",
+   "fix_time": 1762974279,
+   "inducing": "495d5fb1333f2cb0c7e49ecfd6470dd1700ca96c",
+   "inducing_subject": "Resolving proxy from env on redirect (#4436)",
+   "inducing_time": 1652289854,
+   "blamed_lines": 4,
+   "total_blamed": 4,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/http.js": "M",
+    "test/unit/adapters/http.js": "M"
+   },
+   "inducing_files": {
+    "lib/adapters/http.js": "M",
+    "package.json": "M",
+    "test/unit/adapters/http.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:495d5fb1->6ef867e6"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "1c6a86dd2c0623ee1af043a8491dbc96d40e883b",
+   "fix_subject": "fix: turn AxiosError into a native error (#5394) (#5558)",
+   "fix_time": 1762880770,
+   "inducing": "7f1236652adb813ff884be008fe73ddf0590c664",
+   "inducing_subject": "Refactored AxiosError to a constructor; Refactored `Cancel` to a constructor, a subclass of the `AxiosError`; Expose CanceledError class; Refactored axios error codes; Added `toFlatObject` util;",
+   "inducing_time": 1634226826,
+   "blamed_lines": 36,
+   "total_blamed": 55,
+   "candidates": 8,
+   "fix_files": {
+    "lib/cancel/CanceledError.js": "M",
+    "lib/core/AxiosError.js": "M",
+    "test/specs/cancel/CanceledError.spec.js": "M",
+    "test/specs/core/AxiosError.spec.js": "M"
+   },
+   "inducing_files": {
+    "index.d.ts": "M",
+    "lib/adapters/http.js": "M",
+    "lib/adapters/xhr.js": "M",
+    "lib/axios.js": "M",
+    "lib/cancel/Cancel.js": "D",
+    "lib/cancel/CancelToken.js": "M",
+    "lib/cancel/CanceledError.js": "A",
+    "lib/core/AxiosError.js": "A",
+    "lib/core/createError.js": "D",
+    "lib/core/dispatchRequest.js": "M",
+    "lib/core/enhanceError.js": "M",
+    "lib/core/settle.js": "M",
+    "lib/defaults.js": "M",
+    "lib/helpers/validator.js": "M",
+    "lib/utils.js": "M",
+    "test/specs/api.spec.js": "M",
+    "test/specs/cancel.spec.js": "M",
+    "test/specs/cancel/Cancel.spec.js": "D",
+    "test/specs/cancel/CancelToken.spec.js": "M",
+    "test/specs/cancel/CanceledError.spec.js": "A",
+    "test/specs/cancel/isCancel.spec.js": "M",
+    "test/specs/core/AxiosError.spec.js": "A",
+    "test/specs/core/createError.spec.js": "D",
+    "test/specs/core/enhanceError.spec.js": "M",
+    "test/specs/helpers/isAxiosError.spec.js": "M",
+    "test/specs/instance.spec.js": "M",
+    "test/specs/transform.spec.js": "M",
+    "test/specs/utils/toFlatObject.js": "A",
+    "test/unit/adapters/http.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:7f123665->1c6a86dd"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "12c314b603e7852a157e93e47edb626a471ba6c5",
+   "fix_subject": "perf(http): fix early loop exit; (#7202)",
+   "fix_time": 1762209790,
+   "inducing": "d676df772244726533ca320f42e967f5af056bac",
+   "inducing_subject": "feat(http): add HTTP2 support; (#7150)",
+   "inducing_time": 1760875596,
+   "blamed_lines": 6,
+   "total_blamed": 6,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/http.js": "M"
+   },
+   "inducing_files": {
+    "README.md": "M",
+    "index.d.cts": "M",
+    "index.d.ts": "M",
+    "lib/adapters/http.js": "M",
+    "package-lock.json": "M",
+    "package.json": "M",
+    "test/helpers/server.js": "M",
+    "test/unit/adapters/http.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:d676df77->12c314b6"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "0588880ac7ddba7594ef179930493884b7e90bf5",
+   "fix_subject": "fix(http): use default export for http2 module to support stubs; (#7196)",
+   "fix_time": 1761765029,
+   "inducing": "d676df772244726533ca320f42e967f5af056bac",
+   "inducing_subject": "feat(http): add HTTP2 support; (#7150)",
+   "inducing_time": 1760875596,
+   "blamed_lines": 8,
+   "total_blamed": 8,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/http.js": "M"
+   },
+   "inducing_files": {
+    "README.md": "M",
+    "index.d.cts": "M",
+    "index.d.ts": "M",
+    "lib/adapters/http.js": "M",
+    "package-lock.json": "M",
+    "package.json": "M",
+    "test/helpers/server.js": "M",
+    "test/unit/adapters/http.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:d676df77->0588880a"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "bcd5581d208cd372055afdcb2fd10b68ca40613c",
+   "fix_subject": "fix(http): fixed a regression that caused the data stream to be interrupted for responses with non-OK HTTP statuses; (#7193)",
+   "fix_time": 1761677048,
+   "inducing": "d676df772244726533ca320f42e967f5af056bac",
+   "inducing_subject": "feat(http): add HTTP2 support; (#7150)",
+   "inducing_time": 1760875596,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/http.js": "M",
+    "test/unit/adapters/http.js": "M"
+   },
+   "inducing_files": {
+    "README.md": "M",
+    "index.d.cts": "M",
+    "index.d.ts": "M",
+    "lib/adapters/http.js": "M",
+    "package-lock.json": "M",
+    "package.json": "M",
+    "test/helpers/server.js": "M",
+    "test/unit/adapters/http.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:d676df77->bcd5581d"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "d000fbfd0722a9c3bd0bcea3451c6d515813635d",
+   "fix_subject": "fix(http2): fix possible race condition when handling http2 stream on almost timed out session by improving timeout out algorithm; (#7186)",
+   "fix_time": 1761518800,
+   "inducing": "d676df772244726533ca320f42e967f5af056bac",
+   "inducing_subject": "feat(http): add HTTP2 support; (#7150)",
+   "inducing_time": 1760875596,
+   "blamed_lines": 8,
+   "total_blamed": 8,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/http.js": "M",
+    "test/unit/adapters/http.js": "M"
+   },
+   "inducing_files": {
+    "README.md": "M",
+    "index.d.cts": "M",
+    "index.d.ts": "M",
+    "lib/adapters/http.js": "M",
+    "package-lock.json": "M",
+    "package.json": "M",
+    "test/helpers/server.js": "M",
+    "test/unit/adapters/http.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:d676df77->d000fbfd"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "015faeca9f26db76f9562760f04bb9f8229f4db1",
+   "fix_subject": "fix(fetch): prevent TypeError when config.env is undefined (#7155)",
+   "fix_time": 1760628026,
+   "inducing": "cf78825e1229b60d1629ad0bbc8a752ff43c3f53",
+   "inducing_subject": "fix(fetch): use current global fetch instead of cached one when env fetch is not specified to keep MSW support; (#7030)",
+   "inducing_time": 1757795056,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/fetch.js": "M"
+   },
+   "inducing_files": {
+    "lib/adapters/fetch.js": "M",
+    "test/unit/adapters/fetch.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:cf78825e->015faeca"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "cf78825e1229b60d1629ad0bbc8a752ff43c3f53",
+   "fix_subject": "fix(fetch): use current global fetch instead of cached one when env fetch is not specified to keep MSW support; (#7030)",
+   "fix_time": 1757795056,
+   "inducing": "c959ff29013a3bc90cde3ac7ea2d9a3f9c08974b",
+   "inducing_subject": "feat(fetch): add fetch, Request, Response env config variables for the adapter; (#7003)",
+   "inducing_time": 1756580544,
+   "blamed_lines": 8,
+   "total_blamed": 8,
+   "candidates": 1,
+   "fix_files": {
+    "lib/adapters/fetch.js": "M",
+    "test/unit/adapters/fetch.js": "M"
+   },
+   "inducing_files": {
+    "index.d.cts": "M",
+    "index.d.ts": "M",
+    "lib/adapters/adapters.js": "M",
+    "lib/adapters/fetch.js": "M",
+    "lib/core/dispatchRequest.js": "M",
+    "lib/utils.js": "M",
+    "test/unit/adapters/fetch.js": "M"
+   },
+   "references_issue": true,
+   "id": "axios:c959ff29->cf78825e"
+  },
+  {
+   "repo": "axios/axios",
+   "fix": "6d84189349c43b1dcdd977b522610660cc4c7042",
+   "fix_subject": "fix(params): removing '[' and ']' from URL encode exclude characters (#3316) (#5715)",
+   "fix_time": 1754073887,
+   "inducing": "7fa69152e952b26c6655a3ee3775b0f90050e5d3",
+   "inducing_subject": "Restoring buildURL",
+   "inducing_time": 1448047034,
+   "blamed_lines": 3,
+   "total_blamed": 3,
+   "candidates": 1,
+   "fix_files": {
+    "lib/helpers/buildURL.js": "M",
+    "test/specs/helpers/buildURL.spec.js": "M"
+   },
+   "inducing_files": {
+    "lib/helpers/buildURL.js": "A"
+   },
+   "references_issue": true,
+   "id": "axios:7fa69152->6d841893"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "31b2e2d7b4774eed16a93f9a8a20a9967e91e524",
+   "fix_subject": "fix behavior of multiple app.VERB for the same path",
+   "fix_time": 1400164252,
+   "inducing": "f41d09a3cf0592b65a1359495b65d3d7cf949c50",
+   "inducing_subject": "remove app.router and refactor middleware processing",
+   "inducing_time": 1390690645,
+   "blamed_lines": 4,
+   "total_blamed": 5,
+   "candidates": 2,
+   "fix_files": {
+    "History.md": "M",
+    "lib/application.js": "M",
+    "test/app.head.js": "M"
+   },
+   "inducing_files": {
+    "History.md": "M",
+    "examples/error-pages/index.js": "M",
+    "examples/error/index.js": "M",
+    "examples/web-service/index.js": "M",
+    "lib/application.js": "M",
+    "lib/express.js": "M",
+    "lib/router/index.js": "M",
+    "lib/router/route.js": "M",
+    "test/Route.js": "A",
+    "test/Router.js": "M",
+    "test/app.js": "M",
+    "test/app.options.js": "M",
+    "test/app.router.js": "M",
+    "test/app.routes.js": "D",
+    "test/req.route.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:f41d09a3->31b2e2d7"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "bc9bcb0317400ffa70d89e558305305fd0bcac18",
+   "fix_subject": "Fix req.next when inside router instance",
+   "fix_time": 1399668795,
+   "inducing": "f41d09a3cf0592b65a1359495b65d3d7cf949c50",
+   "inducing_subject": "remove app.router and refactor middleware processing",
+   "inducing_time": 1390690645,
+   "blamed_lines": 5,
+   "total_blamed": 5,
+   "candidates": 1,
+   "fix_files": {
+    "History.md": "M",
+    "lib/router/index.js": "M",
+    "test/res.format.js": "M"
+   },
+   "inducing_files": {
+    "History.md": "M",
+    "examples/error-pages/index.js": "M",
+    "examples/error/index.js": "M",
+    "examples/web-service/index.js": "M",
+    "lib/application.js": "M",
+    "lib/express.js": "M",
+    "lib/router/index.js": "M",
+    "lib/router/route.js": "M",
+    "test/Route.js": "A",
+    "test/Router.js": "M",
+    "test/app.js": "M",
+    "test/app.options.js": "M",
+    "test/app.router.js": "M",
+    "test/app.routes.js": "D",
+    "test/req.route.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:f41d09a3->bc9bcb03"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "d58ca520c8d30f65bb506dbd84009c405bd444e4",
+   "fix_subject": "Fix res.jsonp error if callback param is object",
+   "fix_time": 1399570939,
+   "inducing": "19cb39869f0917967ea8c5c8d96c6e2a08d61492",
+   "inducing_subject": "Fixes from pull request #1643, array method correction",
+   "inducing_time": 1375638410,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "History.md": "M",
+    "lib/response.js": "M",
+    "test/res.jsonp.js": "M"
+   },
+   "inducing_files": {
+    "lib/response.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:19cb3986->d58ca520"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "c99fa6a19268e87b300c1775f90814a23095f199",
+   "fix_subject": "Fix req.host for IPv6 literals",
+   "fix_time": 1399486079,
+   "inducing": "4a1fa58704e3d047a53464dcb6017067077384b7",
+   "inducing_subject": "refactor req.host",
+   "inducing_time": 1364839763,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "History.md": "M",
+    "lib/request.js": "M",
+    "test/req.host.js": "M"
+   },
+   "inducing_files": {
+    "lib/request.js": "M",
+    "test/req.host.js": "D"
+   },
+   "references_issue": false,
+   "id": "express:4a1fa587->c99fa6a1"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "374e6c3789911c14b1e9c7b2150b80f934e6b5d3",
+   "fix_subject": "fix multipart example",
+   "fix_time": 1398376220,
+   "inducing": "dd8e279cac316ad8ba1c52d8a12d37302a7cfa14",
+   "inducing_subject": "Not work..",
+   "inducing_time": 1396299142,
+   "blamed_lines": 14,
+   "total_blamed": 19,
+   "candidates": 4,
+   "fix_files": {
+    "examples/multipart/index.js": "M",
+    "package.json": "M"
+   },
+   "inducing_files": {
+    "examples/multipart/index.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:dd8e279c->374e6c37"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "4ac7474e4e83c3b5f8557e591bae9da54e4420d8",
+   "fix_subject": "trim_prefix causing --use-strict flag to fail",
+   "fix_time": 1398211374,
+   "inducing": "f41d09a3cf0592b65a1359495b65d3d7cf949c50",
+   "inducing_subject": "remove app.router and refactor middleware processing",
+   "inducing_time": 1390690645,
+   "blamed_lines": 2,
+   "total_blamed": 3,
+   "candidates": 2,
+   "fix_files": {
+    "lib/router/index.js": "M"
+   },
+   "inducing_files": {
+    "History.md": "M",
+    "examples/error-pages/index.js": "M",
+    "examples/error/index.js": "M",
+    "examples/web-service/index.js": "M",
+    "lib/application.js": "M",
+    "lib/express.js": "M",
+    "lib/router/index.js": "M",
+    "lib/router/route.js": "M",
+    "test/Route.js": "A",
+    "test/Router.js": "M",
+    "test/app.js": "M",
+    "test/app.options.js": "M",
+    "test/app.router.js": "M",
+    "test/app.routes.js": "D",
+    "test/req.route.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:f41d09a3->4ac7474e"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "896609c859758e2f71fec7862bc666caea37b2ac",
+   "fix_subject": "Fixing bug when updating pet name in MVC example.",
+   "fix_time": 1398093021,
+   "inducing": "3c162ae030dc5555144f6aa8c153ac30e6bd27d6",
+   "inducing_subject": "implement \"before\" middleware for mvc example",
+   "inducing_time": 1335439401,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "examples/mvc/controllers/pet/index.js": "M"
+   },
+   "inducing_files": {
+    "examples/mvc/controllers/pet/index.js": "M",
+    "examples/mvc/controllers/user/index.js": "M",
+    "examples/mvc/lib/boot.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:3c162ae0->896609c8"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "f1315b9efa6150bd27740842ab0e8fac6dad437f",
+   "fix_subject": "fix examples for express 4 (separate middleware)",
+   "fix_time": 1394033726,
+   "inducing": "42aeab500b50f16c12d9757b5a6085d4820a7e83",
+   "inducing_subject": "Fixed redis session example",
+   "inducing_time": 1335375056,
+   "blamed_lines": 3,
+   "total_blamed": 11,
+   "candidates": 7,
+   "fix_files": {
+    "examples/jade/index.js": "M",
+    "examples/multipart/index.js": "M",
+    "examples/session/index.js": "M",
+    "examples/session/redis.js": "M",
+    "examples/vhost/index.js": "M",
+    "package.json": "M"
+   },
+   "inducing_files": {
+    "examples/session/index.js": "M",
+    "examples/session/redis.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:42aeab50->f1315b9e"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "1d97599f8b2f4ea6be0b7082ac1d9d93c8d00665",
+   "fix_subject": "prevent incorrect automatic OPTIONS responses",
+   "fix_time": 1388685923,
+   "inducing": "c3bd65eda2fd6abe9775d32da4944e802111de1a",
+   "inducing_subject": "Revert \"remove old OPTIONS default response\"",
+   "inducing_time": 1373998922,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "lib/router/index.js": "M",
+    "test/app.options.js": "M"
+   },
+   "inducing_files": {
+    "lib/router/index.js": "M",
+    "test/app.options.js": "A"
+   },
+   "references_issue": false,
+   "id": "express:c3bd65ed->1d97599f"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "a3b5f6d07f880298a92164fe7f0519d736524dcf",
+   "fix_subject": "prevent incorrect automatic OPTIONS responses",
+   "fix_time": 1388685923,
+   "inducing": "c3bd65eda2fd6abe9775d32da4944e802111de1a",
+   "inducing_subject": "Revert \"remove old OPTIONS default response\"",
+   "inducing_time": 1373998922,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "lib/router/index.js": "M",
+    "test/app.options.js": "M"
+   },
+   "inducing_files": {
+    "lib/router/index.js": "M",
+    "test/app.options.js": "A"
+   },
+   "references_issue": false,
+   "id": "express:c3bd65ed->a3b5f6d0"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "edd39fb194eddd7baf414f2c85828474009f6662",
+   "fix_subject": "fix weird variable name in example",
+   "fix_time": 1385537975,
+   "inducing": "a71d264d45ab6773443bdebc9f6c314b1e99a4d8",
+   "inducing_subject": "fix weird variable name in example",
+   "inducing_time": 1385537948,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "examples/content-negotiation/index.js": "M"
+   },
+   "inducing_files": {
+    "examples/content-negotiation/index.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:a71d264d->edd39fb1"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "a71d264d45ab6773443bdebc9f6c314b1e99a4d8",
+   "fix_subject": "fix weird variable name in example",
+   "fix_time": 1385537948,
+   "inducing": "058d7ec2eaf6b9cdbd5186278b2c1609faffeebe",
+   "inducing_subject": "Improved variable names and updated comments for better clarity of example",
+   "inducing_time": 1377342884,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "examples/content-negotiation/index.js": "M"
+   },
+   "inducing_files": {
+    "examples/content-negotiation/index.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:058d7ec2->a71d264d"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "2f2a652bc9420f2d05ddfe914048cfe5c327d7c7",
+   "fix_subject": "fixes #1826: res.redirect('toString') fails with 500",
+   "fix_time": 1385493075,
+   "inducing": "76fd462bcc13ccf719cba8dd1512c56a3858ab5c",
+   "inducing_subject": "Removed `res.header(field, value)`",
+   "inducing_time": 1328632227,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "lib/response.js": "M"
+   },
+   "inducing_files": {
+    "lib/response.js": "M",
+    "lib/router/index.js": "M",
+    "test/res.header.js": "D",
+    "test/res.send.js": "M"
+   },
+   "references_issue": true,
+   "id": "express:76fd462b->2f2a652b"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "b7a38af41d517a25e2161b3800609fdb0b9ef899",
+   "fix_subject": "Use url.resolve to compute location header of relative paths",
+   "fix_time": 1383352087,
+   "inducing": "661914781ed5c66f99b389320d99cb175a2c665f",
+   "inducing_subject": "semicolons",
+   "inducing_time": 1383349172,
+   "blamed_lines": 1,
+   "total_blamed": 3,
+   "candidates": 3,
+   "fix_files": {
+    "lib/response.js": "M"
+   },
+   "inducing_files": {
+    "lib/response.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:66191478->b7a38af4"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "c9d9ed3493b7e5aed21e9d36fe5e340a0befea12",
+   "fix_subject": "fix res.sendfile() callback",
+   "fix_time": 1381978261,
+   "inducing": "ab61837885f8698f12105acbf0b41bb496e623c5",
+   "inducing_subject": "change res.sendfile() to use send() module",
+   "inducing_time": 1342195120,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "lib/response.js": "M"
+   },
+   "inducing_files": {
+    "examples/auth/app.js": "M",
+    "examples/expose-data-to-client/index.js": "M",
+    "examples/mvc/index.js": "M",
+    "examples/view-locals/index.js": "M",
+    "lib/middleware.js": "M",
+    "lib/response.js": "M",
+    "package.json": "M",
+    "test/res.locals.js": "M",
+    "test/res.sendfile.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:ab618378->c9d9ed34"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "7059d3b71e0d72e9d01d25c05e151f7ec457beef",
+   "fix_subject": "Allow multiple call concatenation for res.links. Fixes #1683",
+   "fix_time": 1378518243,
+   "inducing": "e6129d8ba513d3473f098b28bc815d08d72a59fb",
+   "inducing_subject": "Added `res.links(obj)`",
+   "inducing_time": 1339976082,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/response.js": "M",
+    "test/res.links.js": "M"
+   },
+   "inducing_files": {
+    "lib/response.js": "M",
+    "test/res.links.js": "A"
+   },
+   "references_issue": true,
+   "id": "express:e6129d8b->7059d3b7"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "19cb39869f0917967ea8c5c8d96c6e2a08d61492",
+   "fix_subject": "Fixes from pull request #1643, array method correction",
+   "fix_time": 1375638410,
+   "inducing": "bdbdab7fcce56b67ea958165fe360948ed2c96b2",
+   "inducing_subject": "Fixes from pull request #1643",
+   "inducing_time": 1375565595,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/response.js": "M"
+   },
+   "inducing_files": {
+    "lib/response.js": "M",
+    "test/res.jsonp.js": "M"
+   },
+   "references_issue": true,
+   "id": "express:bdbdab7f->19cb3986"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "bdbdab7fcce56b67ea958165fe360948ed2c96b2",
+   "fix_subject": "Fixes from pull request #1643",
+   "fix_time": 1375565595,
+   "inducing": "2f19b4fefc29ba35e3f9fa1d36e913dbc9d5a5ae",
+   "inducing_subject": "Corrected callback crashing app when array",
+   "inducing_time": 1369622152,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/response.js": "M",
+    "test/res.jsonp.js": "M"
+   },
+   "inducing_files": {
+    "lib/response.js": "M"
+   },
+   "references_issue": true,
+   "id": "express:2f19b4fe->bdbdab7f"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "8559c0e2a40323907a5452c7b701c9c763302079",
+   "fix_subject": "fix `req.subdomains` when no Host is present",
+   "fix_time": 1368115852,
+   "inducing": "e3ac2c5b02a83f7fb3d70a2335ff6efd62919e99",
+   "inducing_subject": "change req.subdomain styling back",
+   "inducing_time": 1359000674,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/request.js": "M",
+    "test/req.subdomains.js": "M"
+   },
+   "inducing_files": {
+    "lib/request.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:e3ac2c5b->8559c0e2"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "579857cfaadb72302175d2db12ae50cec695c990",
+   "fix_subject": "fix example port",
+   "fix_time": 1365873263,
+   "inducing": "0b4e2df4805d262785352fa3acf4ce8c791c5023",
+   "inducing_subject": "add \"view\" constructor setting to override view behaviour",
+   "inducing_time": 1365872030,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "examples/view-constructor/index.js": "M"
+   },
+   "inducing_files": {
+    "examples/markdown/index.js": "M",
+    "examples/view-constructor/github-view.js": "A",
+    "examples/view-constructor/index.js": "A",
+    "lib/application.js": "M",
+    "test/app.render.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:0b4e2df4->579857cf"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "57e48c4767b345a6c098a0cfc32ee745ce1ec972",
+   "fix_subject": "Possible fix for #1557, allows routes to be created using literal regexes across V8 contexts.  Removes all uses of `instanceof`.",
+   "fix_time": 1364839412,
+   "inducing": "0377540e2dd7eeba93775a30f6d362a5217c0a6a",
+   "inducing_subject": "utils: added pathRegexp()",
+   "inducing_time": 1333404445,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/utils.js": "M",
+    "test/app.param.js": "M"
+   },
+   "inducing_files": {
+    "lib/router/route.js": "M",
+    "lib/utils.js": "M"
+   },
+   "references_issue": true,
+   "id": "express:0377540e->57e48c47"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "64a234958a9704bb68793fbed30b2d2a00a4285a",
+   "fix_subject": "fix jsonp whitespace escape. Closes #1132",
+   "fix_time": 1356715475,
+   "inducing": "a6caa267bd1948f014885d6fe8463cd7d1b7af77",
+   "inducing_subject": "add res.jsonp(). Closes #1307",
+   "inducing_time": 1346344183,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "lib/response.js": "M",
+    "test/res.jsonp.js": "M"
+   },
+   "inducing_files": {
+    "lib/response.js": "M",
+    "test/res.json.js": "M",
+    "test/res.jsonp.js": "A",
+    "test/res.send.js": "M"
+   },
+   "references_issue": true,
+   "id": "express:a6caa267->64a23495"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "a7ca3817db6d2939ecf317618423c5b8bb17ece4",
+   "fix_subject": "fix route chaining regression. Closes #1397",
+   "fix_time": 1352060915,
+   "inducing": "6dac874ff47013ff1795ab3c0027ec7248051aca",
+   "inducing_subject": "renamed Router#_route() -> route()",
+   "inducing_time": 1325098511,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "lib/application.js": "M",
+    "test/app.router.js": "M"
+   },
+   "inducing_files": {
+    "lib/application.js": "M",
+    "lib/router/index.js": "M",
+    "test/Router.js": "A",
+    "test/utils.js": "M"
+   },
+   "references_issue": true,
+   "id": "express:6dac874f->a7ca3817"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "44d0625e919ff6f600ec91dffd0e8b7d9333b9ad",
+   "fix_subject": "fix view-locals example. Closes #1370",
+   "fix_time": 1350342476,
+   "inducing": "6f102ff40f4479c3d82dc889f8a36052fabc7d8d",
+   "inducing_subject": "Added view-locals example",
+   "inducing_time": 1336062914,
+   "blamed_lines": 3,
+   "total_blamed": 3,
+   "candidates": 1,
+   "fix_files": {
+    "examples/view-locals/index.js": "M"
+   },
+   "inducing_files": {
+    "examples/view-locals/index.js": "A",
+    "examples/view-locals/layout.jade": "A",
+    "examples/view-locals/user.jade": "A",
+    "examples/view-locals/user.js": "A"
+   },
+   "references_issue": true,
+   "id": "express:6f102ff4->44d0625e"
+  },
+  {
+   "repo": "expressjs/express",
+   "fix": "c2fa6cc94d27d842d407b44a9fdb484421a5bf86",
+   "fix_subject": "fix route-separation example",
+   "fix_time": 1349836312,
+   "inducing": "7ded5a2de5badfbde8daf75497a628c45d512732",
+   "inducing_subject": "Started route separation example",
+   "inducing_time": 1289673221,
+   "blamed_lines": 6,
+   "total_blamed": 9,
+   "candidates": 2,
+   "fix_files": {
+    "examples/route-separation/index.js": "M",
+    "examples/route-separation/post.js": "M",
+    "examples/route-separation/public/style.css": "M",
+    "examples/route-separation/user.js": "M",
+    "examples/route-separation/views/users/edit.jade": "M"
+   },
+   "inducing_files": {
+    "examples/route-separation/app.js": "A",
+    "examples/route-separation/public/style.css": "A",
+    "examples/route-separation/site.js": "A",
+    "examples/route-separation/user.js": "A",
+    "examples/route-separation/views/index.ejs": "A",
+    "examples/route-separation/views/layout.ejs": "A",
+    "examples/route-separation/views/user/edit.ejs": "A",
+    "examples/route-separation/views/user/list.ejs": "A",
+    "examples/route-separation/views/user/view.ejs": "A",
+    "examples/session/app.js": "M"
+   },
+   "references_issue": false,
+   "id": "express:7ded5a2d->c2fa6cc9"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "2453e5e4213fe036a0108de3e4db414dcf2b4c30",
+   "fix_subject": "Fix unhandled exception when lookup returns invalid IP early",
+   "fix_time": 1627761571,
+   "inducing": "3c23eea5a096f6f8ea0edf3e2a27e1caca88acf9",
+   "inducing_subject": "Got 12 improvements (#1667)",
+   "inducing_time": 1618118428,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "source/core/index.ts": "M",
+    "test/http.ts": "M"
+   },
+   "inducing_files": {
+    ".gitignore": "M",
+    "benchmark/index.ts": "M",
+    "package.json": "M",
+    "source/as-promise/create-rejection.ts": "D",
+    "source/as-promise/index.ts": "M",
+    "source/as-promise/normalize-arguments.ts": "D",
+    "source/as-promise/parse-body.ts": "D",
+    "source/as-promise/types.ts": "M",
+    "source/core/calculate-retry-delay.ts": "M",
+    "source/core/errors.ts": "A",
+    "source/core/index.ts": "M",
+    "source/core/options.ts": "A",
+    "source/core/parse-link-header.ts": "A",
+    "source/core/response.ts": "A",
+    "source/core/timed-out.ts": "A",
+    "source/core/utils/dns-ip-version.ts": "D",
+    "source/core/utils/get-buffer.ts": "D",
+    "source/core/utils/is-client-request.ts": "A",
+    "source/core/utils/is-response-ok.ts": "D",
+    "source/core/utils/timed-out.ts": "D",
+    "source/create.ts": "M",
+    "source/index.ts": "M",
+    "source/types.ts": "M",
+    "source/utils/deep-freeze.ts": "D",
+    "source/utils/deprecation-warning.ts": "D",
+    "test/agent.ts": "M",
+    "test/arguments.ts": "M",
+    "test/cache.ts": "M",
+    "test/cancel.ts": "M",
+    "test/create.ts": "M",
+    "test/error.ts": "M",
+    "test/headers.ts": "M",
+    "test/helpers.ts": "M",
+    "test/helpers/slow-data-stream.ts": "M",
+    "test/helpers/with-server.ts": "M",
+    "test/hooks.ts": "M",
+    "test/http.ts": "M",
+    "test/https.ts": "M",
+    "test/merge-instances.ts": "M",
+    "test/normalize-arguments.ts": "M",
+    "test/pagination.ts": "M",
+    "test/parse-link-header.ts": "A",
+    "test/post.ts": "M",
+    "test/promise.ts": "M",
+    "test/redirects.ts": "M",
+    "test/response-parse.ts": "M",
+    "test/retry.ts": "M",
+    "test/stream.ts": "M",
+    "test/timeout.ts": "M",
+    "test/unix-socket.ts": "M",
+    "tsconfig.json": "M"
+   },
+   "references_issue": false,
+   "id": "got:3c23eea5->2453e5e4"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "846e298b6b48a7b78e46eb487b4fdc0ffc0f8cd9",
+   "fix_subject": "Follow-up fix",
+   "fix_time": 1627667386,
+   "inducing": "a398e36881ce0517c9ee2a88ed7c93fcb8bc7f9e",
+   "inducing_subject": "Revert `init` hooks not being called on empty options",
+   "inducing_time": 1627662683,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "source/core/options.ts": "M",
+    "source/create.ts": "M",
+    "test/create.ts": "M"
+   },
+   "inducing_files": {
+    "source/create.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:a398e368->846e298b"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "732e9bd9406ba1c3dd64b445264e891f33fc0254",
+   "fix_subject": "Follow-up fix",
+   "fix_time": 1627647595,
+   "inducing": "3c23eea5a096f6f8ea0edf3e2a27e1caca88acf9",
+   "inducing_subject": "Got 12 improvements (#1667)",
+   "inducing_time": 1618118428,
+   "blamed_lines": 7,
+   "total_blamed": 11,
+   "candidates": 3,
+   "fix_files": {
+    "source/core/options.ts": "M",
+    "test/normalize-arguments.ts": "M"
+   },
+   "inducing_files": {
+    ".gitignore": "M",
+    "benchmark/index.ts": "M",
+    "package.json": "M",
+    "source/as-promise/create-rejection.ts": "D",
+    "source/as-promise/index.ts": "M",
+    "source/as-promise/normalize-arguments.ts": "D",
+    "source/as-promise/parse-body.ts": "D",
+    "source/as-promise/types.ts": "M",
+    "source/core/calculate-retry-delay.ts": "M",
+    "source/core/errors.ts": "A",
+    "source/core/index.ts": "M",
+    "source/core/options.ts": "A",
+    "source/core/parse-link-header.ts": "A",
+    "source/core/response.ts": "A",
+    "source/core/timed-out.ts": "A",
+    "source/core/utils/dns-ip-version.ts": "D",
+    "source/core/utils/get-buffer.ts": "D",
+    "source/core/utils/is-client-request.ts": "A",
+    "source/core/utils/is-response-ok.ts": "D",
+    "source/core/utils/timed-out.ts": "D",
+    "source/create.ts": "M",
+    "source/index.ts": "M",
+    "source/types.ts": "M",
+    "source/utils/deep-freeze.ts": "D",
+    "source/utils/deprecation-warning.ts": "D",
+    "test/agent.ts": "M",
+    "test/arguments.ts": "M",
+    "test/cache.ts": "M",
+    "test/cancel.ts": "M",
+    "test/create.ts": "M",
+    "test/error.ts": "M",
+    "test/headers.ts": "M",
+    "test/helpers.ts": "M",
+    "test/helpers/slow-data-stream.ts": "M",
+    "test/helpers/with-server.ts": "M",
+    "test/hooks.ts": "M",
+    "test/http.ts": "M",
+    "test/https.ts": "M",
+    "test/merge-instances.ts": "M",
+    "test/normalize-arguments.ts": "M",
+    "test/pagination.ts": "M",
+    "test/parse-link-header.ts": "A",
+    "test/post.ts": "M",
+    "test/promise.ts": "M",
+    "test/redirects.ts": "M",
+    "test/response-parse.ts": "M",
+    "test/retry.ts": "M",
+    "test/stream.ts": "M",
+    "test/timeout.ts": "M",
+    "test/unix-socket.ts": "M",
+    "tsconfig.json": "M"
+   },
+   "references_issue": false,
+   "id": "got:3c23eea5->732e9bd9"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "1018c2029eea1f5b75b5120265996f1c0b3c12ae",
+   "fix_subject": "Fix merging `searchParams`",
+   "fix_time": 1627646961,
+   "inducing": "3c23eea5a096f6f8ea0edf3e2a27e1caca88acf9",
+   "inducing_subject": "Got 12 improvements (#1667)",
+   "inducing_time": 1618118428,
+   "blamed_lines": 8,
+   "total_blamed": 9,
+   "candidates": 2,
+   "fix_files": {
+    "documentation/2-options.md": "M",
+    "source/core/options.ts": "M",
+    "test/normalize-arguments.ts": "M"
+   },
+   "inducing_files": {
+    ".gitignore": "M",
+    "benchmark/index.ts": "M",
+    "package.json": "M",
+    "source/as-promise/create-rejection.ts": "D",
+    "source/as-promise/index.ts": "M",
+    "source/as-promise/normalize-arguments.ts": "D",
+    "source/as-promise/parse-body.ts": "D",
+    "source/as-promise/types.ts": "M",
+    "source/core/calculate-retry-delay.ts": "M",
+    "source/core/errors.ts": "A",
+    "source/core/index.ts": "M",
+    "source/core/options.ts": "A",
+    "source/core/parse-link-header.ts": "A",
+    "source/core/response.ts": "A",
+    "source/core/timed-out.ts": "A",
+    "source/core/utils/dns-ip-version.ts": "D",
+    "source/core/utils/get-buffer.ts": "D",
+    "source/core/utils/is-client-request.ts": "A",
+    "source/core/utils/is-response-ok.ts": "D",
+    "source/core/utils/timed-out.ts": "D",
+    "source/create.ts": "M",
+    "source/index.ts": "M",
+    "source/types.ts": "M",
+    "source/utils/deep-freeze.ts": "D",
+    "source/utils/deprecation-warning.ts": "D",
+    "test/agent.ts": "M",
+    "test/arguments.ts": "M",
+    "test/cache.ts": "M",
+    "test/cancel.ts": "M",
+    "test/create.ts": "M",
+    "test/error.ts": "M",
+    "test/headers.ts": "M",
+    "test/helpers.ts": "M",
+    "test/helpers/slow-data-stream.ts": "M",
+    "test/helpers/with-server.ts": "M",
+    "test/hooks.ts": "M",
+    "test/http.ts": "M",
+    "test/https.ts": "M",
+    "test/merge-instances.ts": "M",
+    "test/normalize-arguments.ts": "M",
+    "test/pagination.ts": "M",
+    "test/parse-link-header.ts": "A",
+    "test/post.ts": "M",
+    "test/promise.ts": "M",
+    "test/redirects.ts": "M",
+    "test/response-parse.ts": "M",
+    "test/retry.ts": "M",
+    "test/stream.ts": "M",
+    "test/timeout.ts": "M",
+    "test/unix-socket.ts": "M",
+    "tsconfig.json": "M"
+   },
+   "references_issue": false,
+   "id": "got:3c23eea5->1018c202"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "59ae3b062f53974599fd5e674e1ce72bc68b0163",
+   "fix_subject": "Fix an assertion for `options.method`",
+   "fix_time": 1626539727,
+   "inducing": "3c23eea5a096f6f8ea0edf3e2a27e1caca88acf9",
+   "inducing_subject": "Got 12 improvements (#1667)",
+   "inducing_time": 1618118428,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "source/core/options.ts": "M"
+   },
+   "inducing_files": {
+    ".gitignore": "M",
+    "benchmark/index.ts": "M",
+    "package.json": "M",
+    "source/as-promise/create-rejection.ts": "D",
+    "source/as-promise/index.ts": "M",
+    "source/as-promise/normalize-arguments.ts": "D",
+    "source/as-promise/parse-body.ts": "D",
+    "source/as-promise/types.ts": "M",
+    "source/core/calculate-retry-delay.ts": "M",
+    "source/core/errors.ts": "A",
+    "source/core/index.ts": "M",
+    "source/core/options.ts": "A",
+    "source/core/parse-link-header.ts": "A",
+    "source/core/response.ts": "A",
+    "source/core/timed-out.ts": "A",
+    "source/core/utils/dns-ip-version.ts": "D",
+    "source/core/utils/get-buffer.ts": "D",
+    "source/core/utils/is-client-request.ts": "A",
+    "source/core/utils/is-response-ok.ts": "D",
+    "source/core/utils/timed-out.ts": "D",
+    "source/create.ts": "M",
+    "source/index.ts": "M",
+    "source/types.ts": "M",
+    "source/utils/deep-freeze.ts": "D",
+    "source/utils/deprecation-warning.ts": "D",
+    "test/agent.ts": "M",
+    "test/arguments.ts": "M",
+    "test/cache.ts": "M",
+    "test/cancel.ts": "M",
+    "test/create.ts": "M",
+    "test/error.ts": "M",
+    "test/headers.ts": "M",
+    "test/helpers.ts": "M",
+    "test/helpers/slow-data-stream.ts": "M",
+    "test/helpers/with-server.ts": "M",
+    "test/hooks.ts": "M",
+    "test/http.ts": "M",
+    "test/https.ts": "M",
+    "test/merge-instances.ts": "M",
+    "test/normalize-arguments.ts": "M",
+    "test/pagination.ts": "M",
+    "test/parse-link-header.ts": "A",
+    "test/post.ts": "M",
+    "test/promise.ts": "M",
+    "test/redirects.ts": "M",
+    "test/response-parse.ts": "M",
+    "test/retry.ts": "M",
+    "test/stream.ts": "M",
+    "test/timeout.ts": "M",
+    "test/unix-socket.ts": "M",
+    "tsconfig.json": "M"
+   },
+   "references_issue": false,
+   "id": "got:3c23eea5->59ae3b06"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "3df52f38edbadb45158c37d499817bc5486989c6",
+   "fix_subject": "Follow-up fix",
+   "fix_time": 1626223105,
+   "inducing": "854430f01350811fe8a0ccf20cd820aabfbd3926",
+   "inducing_subject": "Support async generators as body",
+   "inducing_time": 1626222955,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "source/core/index.ts": "M"
+   },
+   "inducing_files": {
+    "documentation/3-streams.md": "M",
+    "documentation/4-pagination.md": "M",
+    "documentation/examples/h2c.js": "M",
+    "source/core/index.ts": "M",
+    "source/core/options.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:854430f0->3df52f38"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "9e15d887da3b065940bbc8ca38f9c748a0bbc75e",
+   "fix_subject": "Fix incorrect response.complete when using cache",
+   "fix_time": 1625184191,
+   "inducing": "ac5f67dd4b92a95db3c554f117dd2b2798e5e832",
+   "inducing_subject": "Fix cache not working with HTTP2",
+   "inducing_time": 1593871941,
+   "blamed_lines": 3,
+   "total_blamed": 3,
+   "candidates": 1,
+   "fix_files": {
+    "source/core/index.ts": "M",
+    "test/cache.ts": "M"
+   },
+   "inducing_files": {
+    "source/core/index.ts": "M",
+    "test/cache.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:ac5f67dd->9e15d887"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "1e1e50647e93d038a4cc6a9bbbfbf61165d8fd39",
+   "fix_subject": "Fix default pagination handling for empty `Link` header (#1768)",
+   "fix_time": 1625116048,
+   "inducing": "3c23eea5a096f6f8ea0edf3e2a27e1caca88acf9",
+   "inducing_subject": "Got 12 improvements (#1667)",
+   "inducing_time": 1618118428,
+   "blamed_lines": 2,
+   "total_blamed": 2,
+   "candidates": 1,
+   "fix_files": {
+    "source/core/options.ts": "M",
+    "test/pagination.ts": "M"
+   },
+   "inducing_files": {
+    ".gitignore": "M",
+    "benchmark/index.ts": "M",
+    "package.json": "M",
+    "source/as-promise/create-rejection.ts": "D",
+    "source/as-promise/index.ts": "M",
+    "source/as-promise/normalize-arguments.ts": "D",
+    "source/as-promise/parse-body.ts": "D",
+    "source/as-promise/types.ts": "M",
+    "source/core/calculate-retry-delay.ts": "M",
+    "source/core/errors.ts": "A",
+    "source/core/index.ts": "M",
+    "source/core/options.ts": "A",
+    "source/core/parse-link-header.ts": "A",
+    "source/core/response.ts": "A",
+    "source/core/timed-out.ts": "A",
+    "source/core/utils/dns-ip-version.ts": "D",
+    "source/core/utils/get-buffer.ts": "D",
+    "source/core/utils/is-client-request.ts": "A",
+    "source/core/utils/is-response-ok.ts": "D",
+    "source/core/utils/timed-out.ts": "D",
+    "source/create.ts": "M",
+    "source/index.ts": "M",
+    "source/types.ts": "M",
+    "source/utils/deep-freeze.ts": "D",
+    "source/utils/deprecation-warning.ts": "D",
+    "test/agent.ts": "M",
+    "test/arguments.ts": "M",
+    "test/cache.ts": "M",
+    "test/cancel.ts": "M",
+    "test/create.ts": "M",
+    "test/error.ts": "M",
+    "test/headers.ts": "M",
+    "test/helpers.ts": "M",
+    "test/helpers/slow-data-stream.ts": "M",
+    "test/helpers/with-server.ts": "M",
+    "test/hooks.ts": "M",
+    "test/http.ts": "M",
+    "test/https.ts": "M",
+    "test/merge-instances.ts": "M",
+    "test/normalize-arguments.ts": "M",
+    "test/pagination.ts": "M",
+    "test/parse-link-header.ts": "A",
+    "test/post.ts": "M",
+    "test/promise.ts": "M",
+    "test/redirects.ts": "M",
+    "test/response-parse.ts": "M",
+    "test/retry.ts": "M",
+    "test/stream.ts": "M",
+    "test/timeout.ts": "M",
+    "test/unix-socket.ts": "M",
+    "tsconfig.json": "M"
+   },
+   "references_issue": true,
+   "id": "got:3c23eea5->1e1e5064"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "06a2d3d7d8d4fcc6898b6364d1a18ca1d407092b",
+   "fix_subject": "Fix a Node.js 16 bug that hangs Got streams",
+   "fix_time": 1622677058,
+   "inducing": "78b105b5ebcf9d79555bd80a02c8f47f94c933d8",
+   "inducing_subject": "Fix request destroy check for Node.js 12",
+   "inducing_time": 1618353825,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "source/core/index.ts": "M"
+   },
+   "inducing_files": {
+    "source/core/index.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:78b105b5->06a2d3d7"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "78b105b5ebcf9d79555bd80a02c8f47f94c933d8",
+   "fix_subject": "Fix request destroy check for Node.js 12",
+   "fix_time": 1618353825,
+   "inducing": "77df9c33db5ba3126f54317171e1cfcfceefc3d5",
+   "inducing_subject": "Prevent uncaught ParseErrors on initial successful response",
+   "inducing_time": 1618348358,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "source/core/index.ts": "M"
+   },
+   "inducing_files": {
+    "source/core/index.ts": "M",
+    "test/error.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:77df9c33->78b105b5"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "7e1de4240dad5e065a7c8993b65c18efa239b616",
+   "fix_subject": "Fix a test on Node.js 14",
+   "fix_time": 1618173867,
+   "inducing": "c1b692956f651010b832e7739b6781ca3ef99af5",
+   "inducing_subject": "Update to `http2-wrapper@2.0.0` (#1640)",
+   "inducing_time": 1614327904,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "source/core/options.ts": "M",
+    "test/timeout.ts": "M"
+   },
+   "inducing_files": {
+    "package.json": "M",
+    "readme.md": "M",
+    "source/core/index.ts": "M",
+    "test/cache.ts": "M",
+    "test/https.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:c1b69295->7e1de424"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "a59fac415ac013a48b1d514837628a5cf81d6878",
+   "fix_subject": "Fix hanging promise on HTTP/2 timeout",
+   "fix_time": 1618171932,
+   "inducing": "3c23eea5a096f6f8ea0edf3e2a27e1caca88acf9",
+   "inducing_subject": "Got 12 improvements (#1667)",
+   "inducing_time": 1618118428,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "package.json": "M",
+    "source/core/index.ts": "M",
+    "source/core/options.ts": "M",
+    "test/timeout.ts": "M"
+   },
+   "inducing_files": {
+    ".gitignore": "M",
+    "benchmark/index.ts": "M",
+    "package.json": "M",
+    "source/as-promise/create-rejection.ts": "D",
+    "source/as-promise/index.ts": "M",
+    "source/as-promise/normalize-arguments.ts": "D",
+    "source/as-promise/parse-body.ts": "D",
+    "source/as-promise/types.ts": "M",
+    "source/core/calculate-retry-delay.ts": "M",
+    "source/core/errors.ts": "A",
+    "source/core/index.ts": "M",
+    "source/core/options.ts": "A",
+    "source/core/parse-link-header.ts": "A",
+    "source/core/response.ts": "A",
+    "source/core/timed-out.ts": "A",
+    "source/core/utils/dns-ip-version.ts": "D",
+    "source/core/utils/get-buffer.ts": "D",
+    "source/core/utils/is-client-request.ts": "A",
+    "source/core/utils/is-response-ok.ts": "D",
+    "source/core/utils/timed-out.ts": "D",
+    "source/create.ts": "M",
+    "source/index.ts": "M",
+    "source/types.ts": "M",
+    "source/utils/deep-freeze.ts": "D",
+    "source/utils/deprecation-warning.ts": "D",
+    "test/agent.ts": "M",
+    "test/arguments.ts": "M",
+    "test/cache.ts": "M",
+    "test/cancel.ts": "M",
+    "test/create.ts": "M",
+    "test/error.ts": "M",
+    "test/headers.ts": "M",
+    "test/helpers.ts": "M",
+    "test/helpers/slow-data-stream.ts": "M",
+    "test/helpers/with-server.ts": "M",
+    "test/hooks.ts": "M",
+    "test/http.ts": "M",
+    "test/https.ts": "M",
+    "test/merge-instances.ts": "M",
+    "test/normalize-arguments.ts": "M",
+    "test/pagination.ts": "M",
+    "test/parse-link-header.ts": "A",
+    "test/post.ts": "M",
+    "test/promise.ts": "M",
+    "test/redirects.ts": "M",
+    "test/response-parse.ts": "M",
+    "test/retry.ts": "M",
+    "test/stream.ts": "M",
+    "test/timeout.ts": "M",
+    "test/unix-socket.ts": "M",
+    "tsconfig.json": "M"
+   },
+   "references_issue": false,
+   "id": "got:3c23eea5->a59fac41"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "ff918fb6dedb6d8b23421497ec890d43f45121b7",
+   "fix_subject": "Fix promise shortcuts in case of error status code (#1543)",
+   "fix_time": 1606777387,
+   "inducing": "99d70df02f209ffac80a6529001e63b8684056af",
+   "inducing_subject": "Fix shortcut methods giving wrong result",
+   "inducing_time": 1586962392,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "source/as-promise/index.ts": "M",
+    "test/promise.ts": "M"
+   },
+   "inducing_files": {
+    "readme.md": "M",
+    "source/as-promise/core.ts": "M",
+    "source/as-promise/index.ts": "M",
+    "source/core/index.ts": "M",
+    "test/response-parse.ts": "M"
+   },
+   "references_issue": true,
+   "id": "got:99d70df0->ff918fb6"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "29d4e325b110ccf7571d4265d40760be4175f7ff",
+   "fix_subject": "Prepare a fix for hanging promise on Node.js 14.10.x",
+   "fix_time": 1599744313,
+   "inducing": "707219825b2f8ff3df597230a53244636df21642",
+   "inducing_subject": "Add `retry` stream event (#1384)",
+   "inducing_time": 1596742589,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "source/core/index.ts": "M"
+   },
+   "inducing_files": {
+    "readme.md": "M",
+    "source/as-promise/calculate-retry-delay.ts": "D",
+    "source/as-promise/core.ts": "M",
+    "source/as-promise/index.ts": "M",
+    "source/as-promise/types.ts": "M",
+    "source/core/calculate-retry-delay.ts": "A",
+    "source/core/index.ts": "M",
+    "source/core/utils/is-response-ok.ts": "A",
+    "source/create.ts": "M",
+    "test/cancel.ts": "M",
+    "test/retry.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:70721982->29d4e325"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "e02845f1aa737d55dce23381d0f4f2a61b1eb5e1",
+   "fix_subject": "Fix duplicated hooks when paginating",
+   "fix_time": 1595925856,
+   "inducing": "5480b3134cfd35497f618f08f574927c2bd7624b",
+   "inducing_subject": "Make `got.paginate()` an alias for `got.paginate.each()`",
+   "inducing_time": 1589306301,
+   "blamed_lines": 3,
+   "total_blamed": 10,
+   "candidates": 7,
+   "fix_files": {
+    "source/create.ts": "M",
+    "test/hooks.ts": "M"
+   },
+   "inducing_files": {
+    "source/create.ts": "M",
+    "source/types.ts": "M",
+    "test/pagination.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:5480b313->e02845f1"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "ac5f67dd4b92a95db3c554f117dd2b2798e5e832",
+   "fix_subject": "Fix cache not working with HTTP2",
+   "fix_time": 1593871941,
+   "inducing": "da4769e988801e9e6a1c9707af7a0d98fd14b183",
+   "inducing_subject": "Fix `response` event not being emitted on cache verify request (#1305)",
+   "inducing_time": 1593868753,
+   "blamed_lines": 5,
+   "total_blamed": 10,
+   "candidates": 4,
+   "fix_files": {
+    "source/core/index.ts": "M",
+    "test/cache.ts": "M"
+   },
+   "inducing_files": {
+    "source/core/index.ts": "M",
+    "test/cache.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:da4769e9->ac5f67dd"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "da4769e988801e9e6a1c9707af7a0d98fd14b183",
+   "fix_subject": "Fix `response` event not being emitted on cache verify request (#1305)",
+   "fix_time": 1593868753,
+   "inducing": "7b19e8f32c90984a168ac2e29585bcd637535e9a",
+   "inducing_subject": "Fix hanging promise when using cache",
+   "inducing_time": 1588428642,
+   "blamed_lines": 3,
+   "total_blamed": 4,
+   "candidates": 2,
+   "fix_files": {
+    "source/core/index.ts": "M",
+    "test/cache.ts": "M"
+   },
+   "inducing_files": {
+    "source/core/index.ts": "M",
+    "test/cache.ts": "M"
+   },
+   "references_issue": true,
+   "id": "got:7b19e8f3->da4769e9"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "8f775c71c41a377186c6b38c6789542bfd523039",
+   "fix_subject": "Fix non-enumerable options [such as body] not being used",
+   "fix_time": 1593822179,
+   "inducing": "d968e4904b92c8b24816cc9f35262214b0e7f103",
+   "inducing_subject": "Upgrade dependencies",
+   "inducing_time": 1574744983,
+   "blamed_lines": 1,
+   "total_blamed": 3,
+   "candidates": 3,
+   "fix_files": {
+    "source/core/index.ts": "M",
+    "source/create.ts": "M",
+    "test/pagination.ts": "M"
+   },
+   "inducing_files": {
+    "package.json": "M",
+    "source/create.ts": "M",
+    "source/errors.ts": "M",
+    "source/normalize-arguments.ts": "M",
+    "source/request-as-event-emitter.ts": "M",
+    "source/types/reflect/index.d.ts": "M",
+    "source/utils/options-to-url.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:d968e490->8f775c71"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "728aef989c1a6650d2b42a7f69b603075b5d35bf",
+   "fix_subject": "Fix unhandled `The server aborted pending request` rejection",
+   "fix_time": 1593783636,
+   "inducing": "cb4da8df5ecf939d7797e8e5f774ebf39814c435",
+   "inducing_subject": "Add options to customize parsing/stringifying JSON (#1298)",
+   "inducing_time": 1591371881,
+   "blamed_lines": 1,
+   "total_blamed": 2,
+   "candidates": 2,
+   "fix_files": {
+    "source/as-promise/core.ts": "M",
+    "source/core/index.ts": "M",
+    "test/http.ts": "M",
+    "test/promise.ts": "M"
+   },
+   "inducing_files": {
+    "documentation/migration-guides.md": "M",
+    "readme.md": "M",
+    "source/as-promise/core.ts": "M",
+    "source/as-promise/index.ts": "M",
+    "source/core/index.ts": "M",
+    "source/index.ts": "M",
+    "test/http.ts": "M",
+    "test/response-parse.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:cb4da8df->728aef98"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "934211f951bfd56751e90ec4eabe6379d8541a05",
+   "fix_subject": "Fix hanging promise on timeout on HTTP error",
+   "fix_time": 1593774791,
+   "inducing": "3745efc9d9d03c78c898f357a34524524cce514d",
+   "inducing_subject": "Make `calculateDelay` promisable (#1266)",
+   "inducing_time": 1589643502,
+   "blamed_lines": 2,
+   "total_blamed": 3,
+   "candidates": 2,
+   "fix_files": {
+    "source/as-promise/index.ts": "M",
+    "test/error.ts": "M"
+   },
+   "inducing_files": {
+    "readme.md": "M",
+    "source/as-promise/calculate-retry-delay.ts": "M",
+    "source/as-promise/index.ts": "M",
+    "source/as-promise/types.ts": "M",
+    "source/core/index.ts": "M",
+    "test/retry.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:3745efc9->934211f9"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "2ccc4c2e8bd5fb32a647f13627eaed279625f8f2",
+   "fix_subject": "Fix hanging promise on aborted requests on Node v14.3.0 (#1296)",
+   "fix_time": 1590951651,
+   "inducing": "f2c32e375556fb65275504e27d3a753651bb3654",
+   "inducing_subject": "Fix uncaught exceptions caused by the last commit",
+   "inducing_time": 1586892414,
+   "blamed_lines": 3,
+   "total_blamed": 5,
+   "candidates": 2,
+   "fix_files": {
+    "source/core/index.ts": "M"
+   },
+   "inducing_files": {
+    "source/core/index.ts": "M"
+   },
+   "references_issue": true,
+   "id": "got:f2c32e37->2ccc4c2e"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "88622701c70434ddc1040c46ad16de0c0acd9143",
+   "fix_subject": "Fix reusing options when paginating",
+   "fix_time": 1589113394,
+   "inducing": "761c7c614e550f6f5feb4319ee9f1792854a6d02",
+   "inducing_subject": "Experimental pagination feature (#833)",
+   "inducing_time": 1581018959,
+   "blamed_lines": 1,
+   "total_blamed": 1,
+   "candidates": 1,
+   "fix_files": {
+    "source/create.ts": "M",
+    "test/pagination.ts": "M"
+   },
+   "inducing_files": {
+    "package.json": "M",
+    "readme.md": "M",
+    "source/create.ts": "M",
+    "source/index.ts": "M",
+    "source/normalize-arguments.ts": "M",
+    "source/types.ts": "M",
+    "test/pagination.ts": "A"
+   },
+   "references_issue": false,
+   "id": "got:761c7c61->88622701"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "157e02bcb613ab506829326e7af96e8155b4e186",
+   "fix_subject": "Fix `got.mergeOptions()` regression",
+   "fix_time": 1588513268,
+   "inducing": "429db406c6e55b0deac254004682cdddabfcddad",
+   "inducing_subject": "Fix `options.searchParams` duplicates",
+   "inducing_time": 1587909837,
+   "blamed_lines": 15,
+   "total_blamed": 26,
+   "candidates": 5,
+   "fix_files": {
+    "readme.md": "M",
+    "source/core/index.ts": "M",
+    "test/normalize-arguments.ts": "M",
+    "test/pagination.ts": "M"
+   },
+   "inducing_files": {
+    "source/core/index.ts": "M",
+    "test/arguments.ts": "M",
+    "test/error.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:429db406->157e02bc"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "7b19e8f32c90984a168ac2e29585bcd637535e9a",
+   "fix_subject": "Fix hanging promise when using cache",
+   "fix_time": 1588428642,
+   "inducing": "af0b1472abf48a6c5491dcb36a1d8863c5227fb3",
+   "inducing_subject": "Add a `request` property to errors",
+   "inducing_time": 1587226824,
+   "blamed_lines": 3,
+   "total_blamed": 13,
+   "candidates": 4,
+   "fix_files": {
+    "source/core/index.ts": "M",
+    "test/cache.ts": "M"
+   },
+   "inducing_files": {
+    "source/as-promise/core.ts": "M",
+    "source/as-promise/index.ts": "M",
+    "source/as-promise/types.ts": "M",
+    "source/core/index.ts": "M",
+    "test/error.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:af0b1472->7b19e8f3"
+  },
+  {
+   "repo": "sindresorhus/got",
+   "fix": "429db406c6e55b0deac254004682cdddabfcddad",
+   "fix_subject": "Fix `options.searchParams` duplicates",
+   "fix_time": 1587909837,
+   "inducing": "d914a7e7a0d97b03745b9b47623e4ac3532b4dae",
+   "inducing_subject": "Fix merging options and `beforeError` hook logic",
+   "inducing_time": 1587399375,
+   "blamed_lines": 2,
+   "total_blamed": 23,
+   "candidates": 3,
+   "fix_files": {
+    "source/core/index.ts": "M",
+    "test/arguments.ts": "M",
+    "test/error.ts": "M"
+   },
+   "inducing_files": {
+    "source/as-promise/core.ts": "M",
+    "source/as-promise/index.ts": "M",
+    "source/core/index.ts": "M",
+    "test/error.ts": "M",
+    "test/hooks.ts": "M"
+   },
+   "references_issue": false,
+   "id": "got:d914a7e7->429db406"
+  }
+ ]
+}

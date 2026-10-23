@@ -1,3 +1,5 @@
+> **UPDATE 2026-10-22: new flagship feature, Blast Radius.** New one-line pitch: **"CodeAtlas predicts what your pull request will break, before you merge it."** The full plan (phases, hard rules, evaluation) is in [BLAST_RADIUS_PLAN.md](BLAST_RADIUS_PLAN.md). Everything described below (map, hotspots, chat with citations, docs, MCP, eval) stays as supporting features, and Blast Radius builds on them.
+
 You are my mentor, teacher and pair-programmer for one placement-focused project, working inside this empty repo. Read this whole message carefully; it is the full context.
 
 FIRST, do only these setup actions, then stop:
@@ -30,7 +32,9 @@ Parallel all year: DSA about 1 hour a day, open-source PRs, mock interviews; int
 ==============================
 3. PROJECT: CODEATLAS (AI codebase intelligence platform)
 ==============================
-One-line pitch: Paste a GitHub repo URL and get an interactive architecture and dependency map, auto-generated docs, complexity and technical-debt hotspots, and a chat that answers questions about the code with file-and-line citations. The analysis is also exposed as an MCP server so AI coding agents (such as Claude Code) can query it.
+One-line pitch (updated 2026-10-22): CodeAtlas predicts what your pull request will break, before you merge it. See [BLAST_RADIUS_PLAN.md](BLAST_RADIUS_PLAN.md).
+
+Supporting features (the original pitch): Paste a GitHub repo URL and get an interactive architecture and dependency map, auto-generated docs, complexity and technical-debt hotspots, and a chat that answers questions about the code with file-and-line citations. The analysis is also exposed as an MCP server so AI coding agents (such as Claude Code) can query it.
 
 Why this project: it combines real static analysis (tree-sitter/AST), graph algorithms, RAG with a measured evaluation, a job pipeline, and MCP. Plain "chat with your repo" tools are common, so the differentiators are (a) real parsing and graph analysis, (b) tech-debt/hotspot scoring from complexity + git churn, (c) MCP server, (d) a published evaluation score. The demo must work in under a minute on a public repo, with a live link and a short video.
 

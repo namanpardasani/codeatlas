@@ -47,3 +47,11 @@ models/
 *.log
 
 demo-data/
+
+# Blast Radius evaluation: full clones of the dataset repos (reproducible, never committed)
+eval/blast/.repos/
+
+# local screenshots from the design pass (regenerate, don't commit)
+design-explorations/screenshots/
+# superseded Blast Radius eval runs (kept locally, not cited by docs/BLAST_RADIUS_EVAL.md)
+eval/results/prefix/

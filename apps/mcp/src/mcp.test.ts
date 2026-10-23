@@ -126,10 +126,11 @@ const PUB = "mcptest/public";
 describe.skipIf(false)("MCP tools", () => {
   const guard = (fn: () => Promise<void>) => async () => { if (up) await fn(); };
 
-  it("lists exactly the six read-only tools with constant descriptions", guard(async () => {
+  it("lists exactly the nine read-only tools with constant descriptions", guard(async () => {
     const c = await connect();
     const { tools } = await c.listTools();
-    expect(tools.map((t) => t.name).sort()).toEqual(["explain_file", "find_symbol", "get_architecture", "get_dependencies", "get_hotspots", "search_code"]);
+    expect(tools.map((t) => t.name).sort()).toEqual(["check_change_risk", "explain_file", "find_symbol", "get_architecture",
+      "get_blast_radius", "get_dependencies", "get_hotspots", "search_code", "suggest_tests"]);
     for (const t of tools) {
       expect(t.annotations?.readOnlyHint).toBe(true);
       expect(t.annotations?.destructiveHint).toBe(false);
@@ -249,6 +250,57 @@ describe.skipIf(false)("MCP tools", () => {
     const inj = await call(c, "search_code", { repo: PUB, query: "x'); DROP TABLE files; --" });
     expect(inj.isError).toBe(false);
     expect((await admin.query("SELECT count(*)::int AS n FROM files WHERE repo_id = $1", [ids.pub])).rows[0].n).toBe(5);
+  }));
+});
+
+describe("Blast Radius tools", () => {
+  const guard = (fn: () => Promise<void>) => async () => { if (up) await fn(); };
+  const RESULT = {
+    risk: { score: 71, label: "high", model: "v1", top_factors: ["large change (900 lines)", "hidden\u200bfactor"],
+            factors: [{ feature: "size", contribution: 15, text: "large change (900 lines)" }],
+            missing_cochanges: [{ text: "src/router.ts usually changes with src/app.ts (80%)" }] },
+    change: { files: [{ path: "src/app.ts", status: "modified", category: "code", symbols: [{ change: "signature", name: "createApp" }] }] },
+    impact: { files: [{ path: "src/app.ts", score: 1, distance: 0, why: [] },
+                      ...Array.from({ length: 200 }, (_, i) => ({ path: `src/f${i}.ts`, score: 0.3, distance: 1,
+                        why: [{ reason: "calls createApp() (exact, line 3) " + "x".repeat(150) }] }))],
+              symbols: [{ path: "src/server.ts", name: "start", score: 0.6, reason: "calls createApp()" }] },
+    tests: { summary: "2 of 40 tests selected (5%)", full_suite: false, full_suite_reasons: [], command: "npx vitest run tests/app.test.ts",
+             selected: [{ file: "tests/app.test.ts", name: "app > boots", score: 0.6, reason: "calls createApp()" }], new_tests: [] },
+    reviewers: [{ name: "Ann", reason: "4 recent commit(s) to src/app.ts" }],
+  };
+
+  it("forward only the authorised repo id, validate the change, and stay under the output cap", guard(async () => {
+    let sent: any;
+    const fetchImpl = (async (_u: string, init: any) => {
+      sent = JSON.parse(init.body);
+      return new Response(JSON.stringify(RESULT), { status: 200 });
+    }) as unknown as typeof fetch;
+    const c = await connect(ANONYMOUS, { fetchImpl });
+    const impact = await call(c, "get_blast_radius", { repo: PUB, commit_sha: "abcdef1", repo_id: ids.priv, limit: 40 });
+    expect(sent).toMatchObject({ repo_id: ids.pub, commit_sha: "abcdef1" });
+    expect(impact.isError).toBe(false);
+    expect(impact.body.risk).toEqual({ score: 71, label: "high" });
+    expect(impact.body.changed[0].symbols).toEqual(["signature: createApp"]);
+    expect(impact.body.impacted_files.every((f: any) => f.path !== "src/app.ts")).toBe(true);   // beyond the diff only
+    expect(impact.raw.length).toBeLessThanOrEqual(12_000);
+    const tests = await call(c, "suggest_tests", { repo: PUB, diff: "--- a/x\n+++ b/x\n" });
+    expect(tests.body.command).toBe("npx vitest run tests/app.test.ts");
+    expect(tests.body.tests[0]).toMatchObject({ name: "app > boots" });
+    const risk = await call(c, "check_change_risk", { repo: PUB, pr_url: "https://github.com/mcptest/public/pull/3" });
+    expect(risk.body.top_factors).toEqual(["large change (900 lines)", "hiddenfactor"]);          // zero-width removed
+    expect(risk.body.reviewers[0].name).toBe("Ann");
+    expect((await call(c, "get_blast_radius", { repo: PUB })).isError).toBe(true);                // no change given
+    expect((await call(c, "get_blast_radius", { repo: PUB, commit_sha: "abcdef1", diff: "x" })).isError).toBe(true);
+    expect((await call(c, "get_blast_radius", { repo: PUB, pr_url: "https://evil.com/a/b/pull/1" })).isError).toBe(true);
+  }));
+
+  it("report service errors in words, never internals", guard(async () => {
+    const down = await connect(ANONYMOUS, { fetchImpl: (async () => { throw new Error("ECONNREFUSED 127.0.0.1"); }) as unknown as typeof fetch });
+    const r1 = await call(down, "get_blast_radius", { repo: PUB, commit_sha: "abcdef1" });
+    expect(r1.isError).toBe(true);
+    expect(r1.body.error).toMatch(/not running/);
+    const bad = await connect(ANONYMOUS, { fetchImpl: (async () => new Response(JSON.stringify({ error: "commit not found in the repository" }), { status: 400 })) as unknown as typeof fetch });
+    expect((await call(bad, "suggest_tests", { repo: PUB, commit_sha: "abcdef1" })).body.error).toBe("commit not found in the repository");
   }));
 });
 

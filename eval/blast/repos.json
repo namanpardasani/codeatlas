@@ -1,0 +1,40 @@
+{
+  "note": "Blast Radius evaluation dataset repos. `head` pins the history used, so the dataset is reproducible: mining only looks at commits reachable from it.",
+  "repos": [
+    {
+      "name": "psf/requests",
+      "dir": "requests",
+      "url": "https://github.com/psf/requests.git",
+      "language": "python",
+      "head": "611c6162cbc4ac2020a2f91c7cfa4f3abf9bbb60"
+    },
+    {
+      "name": "pallets/flask",
+      "dir": "flask",
+      "url": "https://github.com/pallets/flask.git",
+      "language": "python",
+      "head": "d086db856be187255b8ec61ef409357393020f32"
+    },
+    {
+      "name": "axios/axios",
+      "dir": "axios",
+      "url": "https://github.com/axios/axios.git",
+      "language": "javascript",
+      "head": "e6b79d9cef796ca3a903bb83e51d4752b019fd67"
+    },
+    {
+      "name": "expressjs/express",
+      "dir": "express",
+      "url": "https://github.com/expressjs/express.git",
+      "language": "javascript",
+      "head": "0dee2c52c7c873498f8ed7d8ee4ddd0a04d3ada8"
+    },
+    {
+      "name": "sindresorhus/got",
+      "dir": "got",
+      "url": "https://github.com/sindresorhus/got.git",
+      "language": "typescript",
+      "head": "05b4476913da39a47dd8e20d29e250f28b0a6dca"
+    }
+  ]
+}

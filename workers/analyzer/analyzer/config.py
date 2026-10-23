@@ -32,6 +32,8 @@ HISTORY_WINDOW_DAYS = int(os.environ.get("HISTORY_WINDOW_DAYS", "90"))
 GIT_LOG_TIMEOUT_S = int(os.environ.get("GIT_LOG_TIMEOUT_S", "60"))
 COCHANGE_MAX_FILES_PER_COMMIT = int(os.environ.get("COCHANGE_MAX_FILES_PER_COMMIT", "30"))
 COCHANGE_TOP_PAIRS = int(os.environ.get("COCHANGE_TOP_PAIRS", "200"))
+# directional co-change rules (Blast Radius): commits touching more files than this are refactors/formatting, skipped
+COCHANGE_RULE_MAX_FILES = int(os.environ.get("COCHANGE_RULE_MAX_FILES", "50"))
 # Chunking / embeddings / search (Day 5)
 CHUNK_MAX_CHARS = int(os.environ.get("CHUNK_MAX_CHARS", "1800"))   # ~450 tokens: fits a 512-token model with header
 CHUNK_MIN_CHARS = int(os.environ.get("CHUNK_MIN_CHARS", "300"))    # smaller neighbours get merged
@@ -52,6 +54,10 @@ EMBED_THREADS = int(os.environ.get("EMBED_THREADS", "4"))
 EMBED_BUDGET_S = int(os.environ.get("EMBED_BUDGET_S", "900"))      # stop embedding after this; keyword search still works
 EMBED_CACHE_DIR = os.environ.get("EMBED_CACHE_DIR", os.path.expanduser("~/.cache/codeatlas/models"))
 SEARCH_PORT = int(os.environ.get("SEARCH_PORT", "8001"))
+# Blast Radius (PR / commit / diff analysis served by the internal service)
+BLAST_CLONE_DIR = os.environ.get("BLAST_CLONE_DIR", "/tmp/codeatlas-blast")
+BLAST_MAX_DIFF_BYTES = int(os.environ.get("BLAST_MAX_DIFF_BYTES", str(1024 * 1024)))
+BLAST_RISK_MODEL = os.environ.get("BLAST_RISK_MODEL", "")      # path to a trained v2 model JSON; empty = v1 weights
 # LLM / RAG (Day 6)
 LLM_TIMEOUT_S = float(os.environ.get("LLM_TIMEOUT_S", "120"))
 LLM_MAX_TOKENS = int(os.environ.get("LLM_MAX_TOKENS", "700"))

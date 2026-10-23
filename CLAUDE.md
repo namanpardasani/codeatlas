@@ -2,6 +2,8 @@
 
 Full context, scope, pipeline, stack, data model, eval plan and timeline: see [PROJECT_BRIEF.md](PROJECT_BRIEF.md). Read it at the start of every session.
 
+Flagship feature (added 2026-10-22): **Blast Radius**, which predicts what a PR will break. Read [BLAST_RADIUS_PLAN.md](BLAST_RADIUS_PLAN.md) at the start of every session too: it holds the phases, hard rules (the hosted service never runs analysed code; tests run only in the offline /eval container), the evaluation design and the order of work. If its working rules (quizzes, [ME] parts, no commits) conflict with CURRENT MODE below, ask the user which applies.
+
 ## CURRENT MODE (set by user on 2026-10-16, overrides the rules below)
 
 Build mode: keep building phase after phase without teaching, quizzing, or asking the user to write section-9 parts. The user will learn at the end. Commit in small steps and push to GitHub as work progresses (user explicitly authorized commits and pushes). Still flag security/cost issues, keep NOTES.md updated, and keep notes detailed enough for the user to study later.

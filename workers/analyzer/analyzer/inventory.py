@@ -51,7 +51,32 @@ def is_test_path(path: str) -> bool:
     return (
         any(d in ("test", "tests", "__tests__", "spec", "specs") for d in parts[:-1])
         or name.startswith("test_")
+        or name in ("test.js", "test.mjs", "test.cjs", "test.ts", "tests.js", "tests.ts", "test.py", "tests.py")
         or name.endswith(("_test.py", "_test.go", ".test.ts", ".test.tsx", ".test.js", ".test.jsx", ".spec.ts", ".spec.tsx", ".spec.js", ".spec.jsx"))
+    )
+
+
+def skipped_name(fname: str) -> bool:
+    """Lockfiles, minified/generated files: never analysed (shared by the checkout walk and git-object snapshots)."""
+    return fname in SKIP_NAMES or fname.endswith(SKIP_SUFFIXES)
+
+
+def skipped_dir(parts: list[str]) -> bool:
+    """True when any directory component of a path is vendored / generated (node_modules, dist, ...)."""
+    return any(d in SKIP_DIRS for d in parts)
+
+
+def make_record(rel: str, data: bytes) -> FileRecord | None:
+    """FileRecord for one file's bytes, or None when it is not analysed (too big, binary)."""
+    if len(data) > config.MAX_FILE_BYTES or _is_binary(data[:8192]):
+        return None
+    return FileRecord(
+        path=rel,
+        language=LANGUAGES.get(os.path.splitext(rel)[1].lower()),
+        size=len(data),
+        lines=data.count(b"\n") + (1 if data and not data.endswith(b"\n") else 0),
+        content_hash=hashlib.sha256(data).hexdigest(),
+        is_test=is_test_path(rel),
     )
 
 
@@ -95,7 +120,7 @@ def build_inventory(root: Path) -> list[FileRecord]:
         for fname in sorted(filenames):
             rel = f"{rel_dir}/{fname}" if rel_dir else fname
             full = os.path.join(dirpath, fname)
-            if fname in SKIP_NAMES or fname.endswith(SKIP_SUFFIXES):
+            if skipped_name(fname):
                 continue
             if spec and spec.match_file(rel):
                 continue

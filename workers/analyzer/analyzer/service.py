@@ -86,6 +86,23 @@ def handle_search(body: dict) -> tuple[int, dict]:
     return 200, result.to_dict()
 
 
+def handle_blast(body: dict) -> tuple[int, dict]:
+    """Blast Radius for an analysed repo (PR URL, commit SHA or diff). Errors in the input -> 400 with a reason."""
+    from .blast.inputs import InputError
+    from .blast.run import load_repo, run_blast
+    try:
+        repo_id = int(body["repo_id"])
+    except (KeyError, TypeError, ValueError):
+        return 400, {"error": "repo_id is required"}
+    pick = {k: body.get(k) for k in ("pr_url", "commit_sha", "diff") if isinstance(body.get(k), str) and body.get(k).strip()}
+    try:
+        with db.connect() as conn:
+            repo, file_ids = load_repo(conn, repo_id)
+        return 200, run_blast(repo, file_ids=file_ids, **pick)
+    except InputError as e:
+        return 400, {"error": str(e)}
+
+
 class NoReverseDNSServer(ThreadingHTTPServer):
     """http.server.HTTPServer.server_bind() calls socket.getfqdn(host): a reverse DNS lookup that blocks when the
     resolver is flaky (WSL), stalling startup and leaving resolver sockets behind. We only need the address."""
@@ -130,11 +147,12 @@ class Handler(BaseHTTPRequestHandler):
                 pass
 
     def do_POST(self):  # noqa: N802
-        if self.path not in ("/search", "/chat"):
+        if self.path not in ("/search", "/chat", "/blast"):
             return self._send(404, {"error": "not found"})
         length = int(self.headers.get("Content-Length") or 0)
-        if length <= 0 or length > MAX_BODY:
-            return self._send(413 if length > MAX_BODY else 400, {"error": "bad body size"})
+        limit = config.BLAST_MAX_DIFF_BYTES + 8192 if self.path == "/blast" else MAX_BODY   # a diff can be large
+        if length <= 0 or length > limit:
+            return self._send(413 if length > limit else 400, {"error": "bad body size"})
         try:
             body = json.loads(self.rfile.read(length))
             if not isinstance(body, dict):
@@ -143,6 +161,13 @@ class Handler(BaseHTTPRequestHandler):
             return self._send(400, {"error": "invalid JSON"})
         if self.path == "/chat":
             return self._stream(chat_events(body))
+        if self.path == "/blast":
+            try:
+                status, payload = handle_blast(body)
+            except Exception:  # noqa: BLE001
+                log.exception("blast radius failed")
+                status, payload = 500, {"error": "blast radius analysis failed"}
+            return self._send(status, payload)
         try:
             status, payload = handle_search(body)
         except Exception:  # noqa: BLE001

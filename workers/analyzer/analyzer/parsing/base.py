@@ -1,4 +1,6 @@
+import hashlib
 from abc import ABC, abstractmethod
+from bisect import bisect_left, bisect_right
 
 import zlib
 
@@ -29,8 +31,11 @@ class LanguagePlugin(ABC):
         self.extract(root, source, result)
         self.scan(root, source, result)
         # deterministic output regardless of traversal order
+        self.extract_calls(root, result)
         result.symbols.sort(key=lambda s: (s.start_line, s.end_line, s.name, s.kind))
         result.imports.sort(key=lambda i: (i.line, i.specifier, i.kind))
+        result.calls.sort(key=lambda c: (c.line, c.qualifier or "", c.callee, c.kind))
+        result.var_types.sort(key=lambda v: (v.line, v.name, v.type_name))
         result.exports = sorted(set(result.exports))
         return result
 
@@ -46,6 +51,9 @@ class LanguagePlugin(ABC):
         code_rows: set[int] = set()
         hashes: list[int] = []
         lines: list[int] = []
+        leaf_rows: list[int] = []      # code leaves in source order, for symbol body fingerprints
+        leaf_texts: list[bytes] = []
+        import_rows: set[int] = set()  # rows holding import statements
         crc: dict[str, int] = {}
         stack = [root]
         while stack:
@@ -56,6 +64,9 @@ class LanguagePlugin(ABC):
                 continue
             if t in self.IMPORT_TYPES:
                 code_rows.update(range(n.start_point.row, n.end_point.row + 1))
+                import_rows.update(range(n.start_point.row, n.end_point.row + 1))
+                leaf_rows.append(n.start_point.row)
+                leaf_texts.append(b" ".join(source[n.start_byte:n.end_byte].split()))
                 continue
             if n.child_count == 0:
                 if n.is_missing:
@@ -66,6 +77,9 @@ class LanguagePlugin(ABC):
                     h = crc[t] = zlib.crc32(t.encode())
                 hashes.append(h)
                 lines.append(n.start_point.row + 1)
+                if t != ";":  # optional in JS/TS (ASI): `return x` and `return x;` are the same code
+                    leaf_rows.append(n.start_point.row)
+                    leaf_texts.append(source[n.start_byte:n.end_byte])
                 continue
             stack.extend(reversed(n.children))
 
@@ -81,9 +95,44 @@ class LanguagePlugin(ABC):
             comment_ratio=round(len(pure_comment) / non_blank, 4) if non_blank else 0.0,
         )
         result.token_hashes, result.token_lines = hashes, lines
+        set_body_hashes(result.symbols, leaf_rows, leaf_texts)
+        result.module_hash = module_hash(result.symbols, leaf_rows, leaf_texts)
+        keep = [i for i, r in enumerate(leaf_rows) if r not in import_rows]
+        result.module_code_hash = module_hash(result.symbols, [leaf_rows[i] for i in keep], [leaf_texts[i] for i in keep])
 
     @abstractmethod
     def extract(self, root: ts.Node, source: bytes, result: ParseResult) -> None: ...
+
+    def extract_calls(self, root: ts.Node, result: ParseResult) -> None:
+        """Call sites and simple type hints (optional per language)."""
+
+
+def set_body_hashes(symbols, leaf_rows: list[int], leaf_texts: list[bytes]) -> None:
+    """body_hash = sha1 of the code leaves on the symbol's lines (0-based rows start_line-1 .. end_line-1), joined with a
+    separator so `ab` + `c` never equals `a` + `bc`. Leaves arrive in source order, so their rows are sorted."""
+    for s in symbols:
+        lo = bisect_left(leaf_rows, s.start_line - 1)
+        hi = bisect_right(leaf_rows, s.end_line - 1)
+        h = hashlib.sha1(b"\x00".join(leaf_texts[lo:hi]))
+        s.body_hash = h.hexdigest()[:16]
+
+
+def module_hash(symbols, leaf_rows: list[int], leaf_texts: list[bytes]) -> str:
+    """sha1 of the code leaves NOT inside any top-level symbol: imports, constants, module-level statements."""
+    merged: list[list[int]] = []
+    for a, b in sorted((s.start_line - 1, s.end_line - 1) for s in symbols if s.parent is None):
+        if merged and a <= merged[-1][1] + 1:
+            merged[-1][1] = max(merged[-1][1], b)
+        else:
+            merged.append([a, b])
+    out: list[bytes] = []
+    j = 0
+    for row, txt in zip(leaf_rows, leaf_texts):
+        while j < len(merged) and merged[j][1] < row:
+            j += 1
+        if not (j < len(merged) and merged[j][0] <= row <= merged[j][1]):
+            out.append(txt)
+    return hashlib.sha1(b"\x00".join(out)).hexdigest()[:16]
 
 
 def first_error(root: ts.Node) -> str:

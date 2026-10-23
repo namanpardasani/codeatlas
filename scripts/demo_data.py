@@ -33,8 +33,15 @@ TABLES = [
     ("file_tokens", "SELECT ft.* FROM file_tokens ft JOIN files f ON f.id = ft.file_id WHERE f.repo_id = ANY(%(ids)s)"),
     ("doc_summaries", "SELECT * FROM doc_summaries WHERE repo_id = ANY(%(ids)s)"),
     ("repo_facts", "SELECT * FROM repo_facts WHERE repo_id = ANY(%(ids)s)"),
+    # Blast Radius: call graph, co-change rules and saved results (the read-only demo serves saved results only)
+    ("cochange_rules", "SELECT * FROM cochange_rules WHERE repo_id = ANY(%(ids)s)"),
+    ("file_call_sites", "SELECT * FROM file_call_sites WHERE repo_id = ANY(%(ids)s)"),
+    ("call_edges", "SELECT * FROM call_edges WHERE repo_id = ANY(%(ids)s)"),
+    ("unresolved_calls", "SELECT * FROM unresolved_calls WHERE repo_id = ANY(%(ids)s)"),
+    ("blast_results", "SELECT * FROM blast_results WHERE repo_id = ANY(%(ids)s)"),
 ]
-SEQUENCED = ["repos", "analysis_jobs", "files", "symbols", "imports_raw", "dependencies", "chunks"]
+SEQUENCED = ["repos", "analysis_jobs", "files", "symbols", "imports_raw", "dependencies", "chunks", "call_edges",
+             "unresolved_calls", "blast_results"]
 
 
 def dsn() -> str:

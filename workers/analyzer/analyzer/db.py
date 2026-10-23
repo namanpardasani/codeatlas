@@ -102,11 +102,11 @@ def save_parse_results(conn: psycopg.Connection, repo_id: int,
                 cur.execute("DELETE FROM symbols WHERE repo_id = %s AND file_id = ANY(%s)", (repo_id, ids))
                 cur.execute("DELETE FROM imports_raw WHERE repo_id = %s AND file_id = ANY(%s)", (repo_id, ids))
             cur.executemany(
-                """UPDATE files SET parse_status=%s, parse_error=%s, exports=%s,
+                """UPDATE files SET parse_status=%s, parse_error=%s, exports=%s, export_aliases=%s,
                           code_lines=%s, comment_lines=%s, comment_ratio=%s, total_complexity=%s,
                           max_complexity=%s, max_nesting=%s, function_count=%s, longest_function=%s
                    WHERE id=%s""",
-                [(r.status, r.error, Jsonb(r.exports),
+                [(r.status, r.error, Jsonb(r.exports), Jsonb([list(a) for a in r.export_aliases]),
                   r.metrics.code_lines if r.metrics else None, r.metrics.comment_lines if r.metrics else None,
                   r.metrics.comment_ratio if r.metrics else None,
                   *((a["total_complexity"], a["max_complexity"], a["max_nesting"], a["function_count"],
@@ -116,18 +116,26 @@ def save_parse_results(conn: psycopg.Connection, repo_id: int,
             cur.executemany(
                 """INSERT INTO symbols (repo_id, file_id, idx, name, kind, start_line, end_line, params,
                                         parent_name, is_exported, is_default_export, has_doc, signature,
-                                        complexity, max_nesting, param_count)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                                        complexity, max_nesting, param_count, body_hash, bases)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
                 [(repo_id, fid, i, s.name, s.kind, s.start_line, s.end_line, Jsonb(s.params),
                   s.parent, s.is_exported, s.is_default_export, s.has_doc, s.signature,
-                  s.complexity, s.max_nesting if s.complexity is not None else None, s.param_count)
+                  s.complexity, s.max_nesting if s.complexity is not None else None, s.param_count, s.body_hash, Jsonb(s.bases))
                  for fid, r in results.items() for i, s in enumerate(r.symbols)],
             )
             cur.executemany(
-                """INSERT INTO imports_raw (repo_id, file_id, idx, specifier, kind, names, level, line, is_type_only)
-                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
-                [(repo_id, fid, i, im.specifier, im.kind, Jsonb(im.names), im.level, im.line, im.is_type_only)
+                """INSERT INTO imports_raw (repo_id, file_id, idx, specifier, kind, names, level, line, is_type_only, bindings)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)""",
+                [(repo_id, fid, i, im.specifier, im.kind, Jsonb(im.names), im.level, im.line, im.is_type_only,
+                  Jsonb([list(b) for b in im.bindings]))
                  for fid, r in results.items() for i, im in enumerate(r.imports)],
+            )
+            cur.execute("DELETE FROM file_call_sites WHERE file_id = ANY(%s)", (list(results),))
+            cur.executemany(
+                "INSERT INTO file_call_sites (file_id, repo_id, calls, var_types) VALUES (%s,%s,%s,%s)",
+                [(fid, repo_id, Jsonb([[c.callee, c.qualifier, c.line, c.kind] for c in r.calls]),
+                  Jsonb([[v.name, v.type_name, v.line] for v in r.var_types]))
+                 for fid, r in results.items() if r.status in ("ok", "partial")],
             )
 
 
@@ -206,6 +214,20 @@ def save_git_stats(conn: psycopg.Connection, repo_id: int, job_id: int, file_ids
                  for c in stats.cochange if c.file_a in file_ids and c.file_b in file_ids])
             cur.execute("UPDATE analysis_jobs SET history_commits=%s, history_window_days=%s, history_truncated=%s "
                         "WHERE id=%s", (stats.commits_seen, stats.window_days, stats.truncated, job_id))
+
+
+def save_cochange_rules(conn: psycopg.Connection, repo_id: int, job_id: int, file_ids: dict[str, int], model) -> None:
+    """Directional co-change rules (analyzer/blast/cochange.py). Replaced wholesale: they are cheap to recompute."""
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM cochange_rules WHERE repo_id=%s", (repo_id,))
+            cur.executemany(
+                """INSERT INTO cochange_rules (repo_id, source_file_id, target_file_id, support, confidence)
+                   VALUES (%s,%s,%s,%s,%s)""",
+                [(repo_id, file_ids[r.source], file_ids[r.target], r.support, r.confidence)
+                 for rules in model.rules.values() for r in rules if r.source in file_ids and r.target in file_ids])
+            cur.execute("UPDATE analysis_jobs SET cochange_commits_used=%s, cochange_commits_skipped=%s WHERE id=%s",
+                        (model.commits_used, model.commits_skipped_large, job_id))
 
 
 def save_duplicates(conn: psycopg.Connection, repo_id: int, file_ids: dict[str, int],
@@ -399,12 +421,12 @@ def load_parse_summaries(conn: psycopg.Connection, repo_id: int, file_ids: list[
         res = ParseResult(status=status, error=error, exports=list(exports or []), metrics=metrics)
         by_id[fid] = res
         out[path] = res
-    for (fid, name, kind, start, end, params, parent, exported, default, doc, signature, cx, nest, pcount) in conn.execute(
+    for (fid, name, kind, start, end, params, parent, exported, default, doc, signature, cx, nest, pcount, bh, bases) in conn.execute(
             """SELECT file_id, name, kind, start_line, end_line, params, parent_name, is_exported, is_default_export,
-                      has_doc, signature, complexity, max_nesting, param_count
+                      has_doc, signature, complexity, max_nesting, param_count, body_hash, bases
                FROM symbols WHERE repo_id = %s AND file_id = ANY(%s) ORDER BY file_id, idx""", (repo_id, file_ids)):
         by_id[fid].symbols.append(Symbol(name, kind, start, end, list(params or []), parent, exported, default, doc,
-                                         signature, cx, nest or 0, pcount or 0))
+                                         signature, cx, nest or 0, pcount or 0, bh or "", list(bases or [])))
     return out
 
 
@@ -434,3 +456,60 @@ def set_docs_status(conn: psycopg.Connection, repo_id: int, status: str) -> None
 def save_docs_stats(conn: psycopg.Connection, job_id: int, stats) -> None:
     conn.execute("UPDATE analysis_jobs SET docs_llm_calls=%s, docs_cached=%s, docs_extractive=%s WHERE id=%s",
                  (stats.llm_calls, stats.cached + stats.reused, stats.extractive, job_id))
+
+
+def load_call_inputs(conn: psycopg.Connection, repo_id: int, summaries: dict[str, ParseResult]) -> None:
+    """Complete reused files' ParseResults with what call resolution needs (imports + bindings, call sites, type hints,
+    export aliases), so an incremental run rebuilds the repo-wide call graph without re-parsing unchanged files."""
+    from .parsing.types import CallSite, RawImport, VarType
+    if not summaries:
+        return
+    rows = conn.execute("SELECT id, path, export_aliases FROM files WHERE repo_id = %s AND path = ANY(%s)",
+                        (repo_id, list(summaries))).fetchall()
+    by_id = {fid: summaries[path] for fid, path, _ in rows}
+    for fid, path, aliases in rows:
+        summaries[path].export_aliases = [tuple(a) for a in (aliases or [])]
+        summaries[path].imports = []
+    for fid, spec, kind, names, level, line, type_only, bindings in conn.execute(
+            """SELECT file_id, specifier, kind, names, level, line, is_type_only, bindings FROM imports_raw
+               WHERE repo_id = %s AND file_id = ANY(%s) ORDER BY file_id, idx""", (repo_id, list(by_id))):
+        by_id[fid].imports.append(RawImport(spec, kind, line, list(names or []), level, type_only,
+                                            [tuple(b) for b in (bindings or [])]))
+    for fid, calls, var_types in conn.execute(
+            "SELECT file_id, calls, var_types FROM file_call_sites WHERE repo_id = %s AND file_id = ANY(%s)",
+            (repo_id, list(by_id))):
+        by_id[fid].calls = [CallSite(c[0], c[1], c[2], c[3]) for c in calls]
+        by_id[fid].var_types = [VarType(v[0], v[1], v[2]) for v in var_types]
+
+
+def save_call_graph(conn: psycopg.Connection, repo_id: int, job_id: int, file_ids: dict[str, int], graph) -> None:
+    """Replace the repo's call edges and unresolved calls. Symbols are addressed by (file, idx) in the graph and mapped
+    to row ids here."""
+    sym_id = {(fid, idx): sid for sid, fid, idx in conn.execute(
+        "SELECT id, file_id, idx FROM symbols WHERE repo_id = %s", (repo_id,))}
+
+    def sid(ref):
+        return None if ref is None else sym_id.get((file_ids[ref.path], ref.idx))
+
+    edges = []
+    for e in graph.edges:
+        if e.caller_path not in file_ids or e.callee.path not in file_ids:
+            continue
+        callee = sid(e.callee)
+        if callee is None:
+            continue
+        edges.append((repo_id, file_ids[e.caller_path], sid(e.caller), file_ids[e.callee.path], callee,
+                      e.confidence, e.line, e.kind, e.via))
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM call_edges WHERE repo_id = %s", (repo_id,))
+            cur.execute("DELETE FROM unresolved_calls WHERE repo_id = %s", (repo_id,))
+            cur.executemany(
+                """INSERT INTO call_edges (repo_id, caller_file_id, caller_symbol_id, callee_file_id, callee_symbol_id,
+                                           confidence, line, kind, via) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s)""", edges)
+            cur.executemany(
+                """INSERT INTO unresolved_calls (repo_id, file_id, caller_symbol_id, callee, qualifier, line, reason)
+                   VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+                [(repo_id, file_ids[u.path], sid(u.caller), u.callee, u.qualifier, u.line, u.reason)
+                 for u in graph.unresolved if u.path in file_ids])
+            cur.execute("UPDATE analysis_jobs SET call_stats = %s WHERE id = %s", (Jsonb(dict(graph.stats)), job_id))

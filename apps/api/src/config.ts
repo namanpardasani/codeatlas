@@ -33,6 +33,17 @@ export const config = {
   // number of reverse-proxy hops to trust for the client IP (0 = none). Wrong values let clients spoof X-Forwarded-For.
   trustProxy: Number(env.TRUST_PROXY ?? 0),
   sseMaxPerIp: Number(env.SSE_MAX_PER_IP ?? 5),
+
+  // ---- Blast Radius ----
+  blastPerUserPerHour: Number(env.BLAST_PER_HOUR ?? 30),
+  // GitHub App (PR comments + check runs). Empty = the webhook answers 503 and nothing is posted.
+  githubApp: {
+    appId: env.GITHUB_APP_ID ?? "",
+    privateKey: (env.GITHUB_APP_PRIVATE_KEY ?? "").replace(/\\n/g, "\n"),   // PEM; \n escapes allowed in env files
+    webhookSecret: env.GITHUB_WEBHOOK_SECRET ?? "",
+    runsPerInstallationPerHour: Number(env.GITHUB_APP_RUNS_PER_HOUR ?? 30),
+  },
+  githubApiUrl: "https://api.github.com",
 };
 
 export const eventsChannel = (jobId: number | string) => `job:${jobId}:events`;
@@ -46,5 +57,7 @@ export function productionProblems(c: typeof config = config, e: NodeJS.ProcessE
   if (c.authRequired && !(c.github.clientId && c.github.clientSecret)) out.push("AUTH_REQUIRED=1 but GITHUB_CLIENT_ID/SECRET are not set");
   if (!c.publicUrl.startsWith("https://")) out.push("PUBLIC_URL must be https:// (session cookies are Secure)");
   if (!c.demoMode && /change-me/.test(c.redisUrl)) out.push("REDIS_URL still contains the placeholder password");
+  if (c.githubApp.appId && !(c.githubApp.privateKey.includes("PRIVATE KEY") && c.githubApp.webhookSecret.length >= 20))
+    out.push("GITHUB_APP_ID is set but the private key or a webhook secret of 20+ characters is missing");
   return out;
 }
