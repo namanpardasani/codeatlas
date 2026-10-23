@@ -113,6 +113,7 @@ class Harness:
         assert set(a) == set(b)
         for table in a:
             assert a[table] == b[table], f"incremental != full in `{table}`"
+        self.call_edges_seen = max(getattr(self, "call_edges_seen", 0), len(b["call_edges"]))
 
 
 def snapshot(rid):
@@ -126,7 +127,18 @@ def snapshot(rid):
                                           total_complexity, max_complexity, function_count, module, fan_in, fan_out, pagerank, dup_lines,
                                           dup_ratio, has_test, test_file, hotspot_score, churn FROM files WHERE repo_id = %s"""))
     snap["symbols"] = sorted(q("""SELECT f.path, s.idx, s.name, s.kind, s.start_line, s.end_line, s.complexity, s.max_nesting, s.param_count,
-                                         s.parent_name, s.is_exported, s.has_doc FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.repo_id = %s"""))
+                                         s.parent_name, s.is_exported, s.has_doc, s.body_hash FROM symbols s JOIN files f ON f.id = s.file_id WHERE s.repo_id = %s"""))
+    snap["call_edges"] = sorted(q("""SELECT a.path, cs.name, cs.idx, b.path, ce.name, ce.idx, e.confidence, e.line, e.kind, e.via
+                                     FROM call_edges e JOIN files a ON a.id = e.caller_file_id JOIN files b ON b.id = e.callee_file_id
+                                     LEFT JOIN symbols cs ON cs.id = e.caller_symbol_id JOIN symbols ce ON ce.id = e.callee_symbol_id
+                                     WHERE e.repo_id = %s"""), key=str)
+    snap["unresolved_calls"] = sorted(q("""SELECT f.path, s.idx, u.callee, u.qualifier, u.line, u.reason FROM unresolved_calls u
+                                           JOIN files f ON f.id = u.file_id LEFT JOIN symbols s ON s.id = u.caller_symbol_id
+                                           WHERE u.repo_id = %s"""), key=str)
+    snap["bindings"] = sorted(q("""SELECT f.path, i.idx, i.bindings::text FROM imports_raw i JOIN files f ON f.id = i.file_id
+                                   WHERE i.repo_id = %s"""))
+    snap["cochange_rules"] = sorted(q("""SELECT a.path, b.path, r.support, r.confidence FROM cochange_rules r JOIN files a ON a.id = r.source_file_id
+                                     JOIN files b ON b.id = r.target_file_id WHERE r.repo_id = %s"""))
     snap["imports"] = sorted((p, i, sp, k, res, str(t), pkg, reason) for p, i, sp, k, res, t, pkg, reason in
                              q("""SELECT f.path, i.idx, i.specifier, i.kind, i.resolution, i.targets, i.package, i.reason
                                   FROM imports_raw i JOIN files f ON f.id = i.file_id WHERE i.repo_id = %s"""))
@@ -366,3 +378,10 @@ def test_vectors_are_only_computed_for_new_text(h):
     r = h.run("inc", files)
     assert r.index and 0 < r.index.embedded <= 4          # a handful of changed chunks, not the whole repo
     assert r.index.chunks_total < 12                       # only the changed file was re-chunked
+
+
+def test_equivalence_fixture_actually_has_call_edges(h):
+    """Guard: the call-graph comparison above must not be comparing two empty lists."""
+    first_full(h, BASE)
+    h.compare(BASE)
+    assert h.call_edges_seen > 0

@@ -19,6 +19,8 @@ export const config = {
   // hard cap on the text one tool call may return
   maxOutputChars: Number(env.MCP_MAX_OUTPUT_CHARS ?? 12_000),
   toolTimeoutMs: Number(env.MCP_TOOL_TIMEOUT_MS ?? 15_000),
+  // Blast Radius parses the change and may clone the repo on first use: longer budget than other tools
+  blastTimeoutMs: Number(env.MCP_BLAST_TIMEOUT_MS ?? 120_000),
   // extra Host header values accepted by the HTTP transport (DNS-rebinding protection), comma separated
   allowedHosts: (env.MCP_ALLOWED_HOSTS ?? "").split(",").map((s) => s.trim()).filter(Boolean),
 };

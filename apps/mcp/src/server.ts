@@ -38,7 +38,7 @@ export function buildServer(principal: Principal, deps: Deps): McpServer {
   // Common path for every tool: rate limit -> authorise repo -> run -> bounded, sanitised JSON. Internal errors
   // are logged to stderr (never stdout: that is the stdio protocol channel) and returned without details.
   const guarded =
-    <A extends { repo: string }>(name: string, run: (ctx: tools.Ctx, args: A) => Promise<unknown>) =>
+    <A extends { repo: string }>(name: string, run: (ctx: tools.Ctx, args: A) => Promise<unknown>, timeoutMs = config.toolTimeoutMs) =>
     async (args: A) => {
       const slot = deps.limiter.acquire(principal.label);
       if ("error" in slot) return fail(slot.error);
@@ -48,7 +48,7 @@ export function buildServer(principal: Principal, deps: Deps): McpServer {
         if (repo.status !== "ready") return fail(`${repo.fullName} is not ready (status: ${repo.status}). Try again after the analysis finishes.`);
         const value = await Promise.race([
           run({ db: deps.db, repo, fetchImpl: deps.fetchImpl }, args),
-          new Promise<never>((_, rej) => setTimeout(() => rej(new UserError(`${name} timed out.`)), config.toolTimeoutMs).unref()),
+          new Promise<never>((_, rej) => setTimeout(() => rej(new UserError(`${name} timed out.`)), timeoutMs).unref()),
         ]);
         return text(value);
       } catch (err) {
@@ -164,6 +164,55 @@ export function buildServer(principal: Principal, deps: Deps): McpServer {
       annotations: { ...READ_ONLY, title: "Search code" },
     },
     guarded("search_code", (ctx, a: any) => tools.searchCode(ctx, a)),
+  );
+
+  // ---- Blast Radius -------------------------------------------------------------------------------------------
+  const changeArgs = {
+    pr_url: z.string().trim().max(300).regex(/^https:\/\/github\.com\/[A-Za-z0-9-]{1,39}\/[A-Za-z0-9._-]{1,100}\/pull\/[1-9][0-9]{0,8}\/?$/)
+      .optional().describe("A pull request of this repository, e.g. https://github.com/psf/requests/pull/7505."),
+    commit_sha: z.string().trim().regex(/^[0-9a-fA-F]{7,40}$/).optional().describe("A commit of this repository."),
+    diff: z.string().max(200_000).optional().describe("A unified diff (git diff output) of your planned or current change, made against the analysed version."),
+  };
+  const BEFORE = "Call this BEFORE editing shared code, and again on your diff before finishing: it is static analysis and git " +
+    "history only (fast, nothing is executed).";
+
+  server.registerTool(
+    "get_blast_radius",
+    {
+      title: "Blast radius of a change",
+      description: "What a change could break: the functions it changes (signature/body/deleted/renamed), the files and functions " +
+        "that call or import them, and files that usually change together with them, ranked with the reason for each. " + BEFORE +
+        " Give exactly one of pr_url, commit_sha, diff.",
+      inputSchema: { repo: repoArg, ...changeArgs, limit: limit(15, 40) },
+      annotations: { ...READ_ONLY, title: "Blast radius of a change" },
+    },
+    guarded("get_blast_radius", (ctx, a: any) => tools.blastRadius(ctx, a, "impact"), config.blastTimeoutMs),
+  );
+
+  server.registerTool(
+    "suggest_tests",
+    {
+      title: "Tests to run for a change",
+      description: "The smallest set of existing tests that exercise the code a change touches (pytest node ids or JS test names) " +
+        "plus a ready-to-run command, or 'run the full suite' with the reason when the change touches test setup, build files " +
+        "or code no test reaches. " + BEFORE + " Give exactly one of pr_url, commit_sha, diff.",
+      inputSchema: { repo: repoArg, ...changeArgs, limit: limit(15, 40) },
+      annotations: { ...READ_ONLY, title: "Tests to run" },
+    },
+    guarded("suggest_tests", (ctx, a: any) => tools.blastRadius(ctx, a, "tests"), config.blastTimeoutMs),
+  );
+
+  server.registerTool(
+    "check_change_risk",
+    {
+      title: "Risk of a change",
+      description: "A 0-100 risk score with its top factors in plain words (size, API changes, central or frequently changed files, " +
+        "complexity, import cycles, missing tests), files that usually change together with these but are missing from the change, " +
+        "and suggested reviewers. A heuristic for prioritising review, not a verdict. " + BEFORE,
+      inputSchema: { repo: repoArg, ...changeArgs },
+      annotations: { ...READ_ONLY, title: "Risk of a change" },
+    },
+    guarded("check_change_risk", (ctx, a: any) => tools.blastRadius(ctx, a, "risk"), config.blastTimeoutMs),
   );
 
   return server;

@@ -20,6 +20,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from . import config, db, gitstats
+from .blast.callgraph import build_call_graph
+from .blast.cochange import build_cochange
+from .blast.history import read_history, shallow_boundary
 from .chunking import is_indexable
 from .docs.facts import extract_facts
 from .duplication import find_duplicates
@@ -41,7 +44,7 @@ log = logging.getLogger("analyzer.analysis")
 
 # Bump when parsing / chunking / storage semantics change: previous results are then not trusted and the next
 # analysis runs in full.
-PIPELINE_VERSION = 8
+PIPELINE_VERSION = 10  # 9: body_hash + co-change rules; 10: call sites, bindings, call graph (Blast Radius 0-1)
 
 Progress = Callable[[str, int], None]
 
@@ -144,6 +147,18 @@ def _ext(path: str) -> str:
     return posixpath.splitext(path)[1].lower()
 
 
+def cochange_for(root: Path, tracked: set[str]):
+    """Directional co-change rules from the fetched history (bounded by HISTORY_MAX_COMMITS). The shallow-clone
+    boundary commit is excluded: against 'nothing' it appears to add every file at once."""
+    try:
+        commits = read_history(root, "HEAD", max_commits=config.HISTORY_MAX_COMMITS)
+    except Exception as e:  # noqa: BLE001  history is optional: no rules is a valid (empty) model
+        log.warning("co-change history unavailable: %s", type(e).__name__)
+        commits = []
+    return build_cochange(commits, tracked=tracked, max_files=config.COCHANGE_RULE_MAX_FILES,
+                          exclude=shallow_boundary(root))
+
+
 def decide(requested_mode: str, previous_ready: bool, previous_version: int | None, has_files: bool) -> tuple[str, str]:
     """(mode, reason). Incremental only when the previous analysis is complete, current and trustworthy."""
     if requested_mode == "full":
@@ -230,7 +245,14 @@ def analyze_checkout(conn, repo_id: int, job_id: int, root: Path, sha: str, *, p
 
     by_path: dict[str, ParseResult] = {path_of[fid]: res for fid, res in results.items()}
     if incremental:
-        by_path.update(db.load_parse_summaries(conn, repo_id, reused_ids))
+        reused = db.load_parse_summaries(conn, repo_id, reused_ids)
+        db.load_call_inputs(conn, repo_id, reused)
+        by_path.update(reused)
+
+    progress("call graph", 81)
+    with timer("callgraph"):
+        calls = build_call_graph({p: r for p, r in by_path.items() if supported(p)}, resolutions)
+        db.save_call_graph(conn, repo_id, job_id, file_ids, calls)
 
     progress("graph", 82)
     with timer("graph"):
@@ -243,6 +265,7 @@ def analyze_checkout(conn, repo_id: int, job_id: int, root: Path, sha: str, *, p
     with timer("git"):
         git = gitstats.collect(root, tracked=set(file_ids))
         db.save_git_stats(conn, repo_id, job_id, file_ids, git)
+        db.save_cochange_rules(conn, repo_id, job_id, file_ids, cochange_for(root, set(file_ids)))
 
     progress("duplication", 86)
     with timer("duplication"):

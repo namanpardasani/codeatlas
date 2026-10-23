@@ -4,7 +4,7 @@ import tree_sitter_python as tsp
 
 from .base import MAX_DEPTH, LanguagePlugin, signature, text
 from .complexity import PY_RULES, measure
-from .types import ParseResult, RawImport, Symbol
+from .types import CallSite, ParseResult, RawImport, Symbol, VarType
 
 
 def _param_names(params: ts.Node | None) -> list[str]:
@@ -32,6 +32,38 @@ def _has_docstring(body: ts.Node | None) -> bool:
     first = body.named_children[0]
     return first.type == "expression_statement" and bool(first.named_children) \
         and first.named_children[0].type == "string"
+
+
+def _dotted(node: ts.Node | None) -> str | None:
+    """`a`, `a.b.c`, `self.x` as text when the expression is a plain chain of names; else None."""
+    if node is None:
+        return None
+    if node.type == "identifier":
+        return text(node)
+    if node.type == "attribute":
+        base = _dotted(node.child_by_field_name("object"))
+        attr = node.child_by_field_name("attribute")
+        return f"{base}.{text(attr)}" if base is not None and attr is not None else None
+    return None
+
+
+def _is_class_name(name: str) -> bool:
+    """Classes are CapWords by convention (PEP 8): `x = Foo()` is an instance, `x = load()` tells nothing."""
+    last = name.rsplit(".", 1)[-1]
+    return bool(last) and last[0].isupper()
+
+
+def _simple_type(node: ts.Node | None) -> str | None:
+    """`Foo` / `mod.Foo` / `"Foo"` (forward reference) from a type annotation; None for generics, unions, etc."""
+    if node is None:
+        return None
+    if node.type == "type" and node.named_children:
+        node = node.named_children[0]
+    if node.type == "string":
+        raw = text(node).strip("'\"")
+        return raw if raw.replace(".", "").replace("_", "").isalnum() else None
+    d = _dotted(node)
+    return d if d and _is_class_name(d) else None
 
 
 class PythonPlugin(LanguagePlugin):
@@ -79,6 +111,11 @@ class PythonPlugin(LanguagePlugin):
             name = text(node.child_by_field_name("name"))
             self._add(result, node, name, "class", parent, parent_kind, [],
                       _has_docstring(node.child_by_field_name("body")))
+            supers = node.child_by_field_name("superclasses")
+            if name and supers is not None and result.symbols:
+                # Base, mod.Base, and generic Base[T] (keyword arguments like metaclass=... are not bases)
+                result.symbols[-1].bases = [b for b in (_dotted(c.child_by_field_name("value") if c.type == "subscript" else c)
+                                                        for c in supers.named_children) if b]
             self._children(node, name, "class", result, depth)
             return
         if t == "assignment":  # f = lambda x: ...
@@ -111,6 +148,54 @@ class PythonPlugin(LanguagePlugin):
         if kind in ("function", "method"):
             sym.complexity, sym.max_nesting = measure(node, PY_RULES)
         result.symbols.append(sym)
+
+    # ---- calls + type hints -------------------------------------------------
+    def extract_calls(self, root: ts.Node, result: ParseResult) -> None:
+        stack = [(root, 0)]
+        while stack:
+            node, depth = stack.pop()
+            if depth > MAX_DEPTH:
+                continue
+            t = node.type
+            line = node.start_point.row + 1
+            if t == "call":
+                fn = node.child_by_field_name("function")
+                result.calls.append(self._call(fn, line))
+            elif t == "assignment":
+                left, right = node.child_by_field_name("left"), node.child_by_field_name("right")
+                name = _dotted(left)
+                if name is not None:
+                    ann = _simple_type(node.child_by_field_name("type"))
+                    if ann:
+                        result.var_types.append(VarType(name, ann, line))
+                    elif right is not None and right.type == "call":
+                        callee = _dotted(right.child_by_field_name("function"))
+                        if callee and _is_class_name(callee):
+                            result.var_types.append(VarType(name, callee, line))
+            elif t in ("typed_parameter", "typed_default_parameter"):
+                ann = _simple_type(node.child_by_field_name("type"))
+                nm = node.child_by_field_name("name") if t == "typed_default_parameter" else (
+                    node.named_children[0] if node.named_children else None)
+                if ann and nm is not None and nm.type == "identifier":
+                    result.var_types.append(VarType(text(nm), ann, line))
+            stack.extend((c, depth + 1) for c in reversed(node.named_children))
+
+    @staticmethod
+    def _call(fn: ts.Node | None, line: int) -> CallSite:
+        if fn is None:
+            return CallSite("", None, line, "dynamic")
+        if fn.type == "identifier":
+            return CallSite(text(fn), None, line)
+        if fn.type == "attribute":
+            attr = text(fn.child_by_field_name("attribute"))
+            obj = fn.child_by_field_name("object")
+            q = _dotted(obj)
+            if q is None and obj is not None and obj.type == "call":
+                inner = obj.child_by_field_name("function")
+                if inner is not None and inner.type == "identifier" and text(inner) == "super":
+                    q = "super"
+            return CallSite(attr, q if q is not None else "<expr>", line)
+        return CallSite("", None, line, "dynamic")   # obj[k](), getattr(o, n)(), f()(), lambda: ...
 
     @staticmethod
     def _exports(root, result):

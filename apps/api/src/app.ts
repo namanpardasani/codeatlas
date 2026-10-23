@@ -11,6 +11,8 @@ import { authRouter, loadUser, originGuard, requireLogin } from "./auth.js";
 import { admit, checkRepoOnGithub, type Admission } from "./limits.js";
 import { keywordSearch } from "./keywordSearch.js";
 import { buildTree, key as docKey, renderExport, renderFile, renderFolder, renderRepo, type DocsData } from "./docs.js";
+import { blastRouter } from "./blast.js";
+import type { Deps } from "./githubApp.js";
 
 const submitSchema = z.object({ url: z.string().min(1).max(200) });
 
@@ -29,7 +31,7 @@ const searchSchema = z.object({
   kind: z.string().max(30).optional(),
 });
 
-export function createApp(opts: { fetchImpl?: typeof fetch } = {}) {
+export function createApp(opts: { fetchImpl?: typeof fetch; blastFetch?: typeof fetch; githubDeps?: Deps } = {}) {
   const app = express();
   app.disable("x-powered-by");
   // Only trust X-Forwarded-For when the number of proxy hops is configured; otherwise clients could spoof their IP
@@ -46,10 +48,14 @@ export function createApp(opts: { fetchImpl?: typeof fetch } = {}) {
     next();
   });
   app.use(cors({ origin: config.corsOrigin, credentials: true }));
-  app.use(express.json({ limit: "10kb" }));
+  // 10 kb JSON everywhere except the two routes that parse their own body: a Blast Radius diff (up to ~1 MB) and the
+  // GitHub webhook (raw bytes, needed to verify its HMAC signature)
+  const json = express.json({ limit: "10kb" });
+  app.use((req, res, next) => (req.path === "/github/webhook" || /^\/repos\/\d+\/blast-radius$/.test(req.path) ? next() : json(req, res, next)));
   app.use(loadUser);
   app.use(originGuard);
   app.use(authRouter(opts.fetchImpl));
+  app.use(blastRouter({ fetchImpl: opts.blastFetch, deps: opts.githubDeps }));
 
   app.get("/health", async (_req, res) => {
     try {

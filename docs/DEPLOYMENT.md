@@ -95,6 +95,38 @@ The demo does not depend on any host being up: the full pipeline runs locally wi
 | `TRUST_PROXY` | number of reverse-proxy hops (0 = none) |
 | `SEARCH_URL` | internal URL of the Python service, if deployed |
 
+## Blast Radius in each tier
+
+- **Tier 1 (read-only demo):** saved Blast Radius results ship in `demo-data/` and are served from Postgres; the Blast
+  Radius tab, share links and the Replay page work. New analyses are refused (no Python service on the free tier).
+- **Tier 2 (local, full):** the Python service (`analyzer.service`) runs `/blast`; the API, the UI and the MCP tools
+  call it. Optional: `GITHUB_TOKEN` (any free personal token, no scopes needed for public repos) raises the GitHub API
+  limit for PR URLs from 60 to 5,000 requests per hour.
+- **GitHub App (PR comments + check runs):** needs a public HTTPS URL for the webhook. Render's free tier sleeps and
+  takes 30-60 s to wake, longer than GitHub waits for a webhook (10 s), so first deliveries after idle time fail; GitHub
+  lets you redeliver them from the App's settings. A tunnel such as smee.io (free) works for a local demo.
+
+### Creating the GitHub App (only you can do this)
+
+1. GitHub > Settings > Developer settings > GitHub Apps > New GitHub App.
+2. Webhook URL: `https://<your API host>/api/github/webhook` (local: a smee.io channel forwarding to
+   `http://localhost:4000/github/webhook`). Webhook secret: a random string of 20+ characters.
+3. Repository permissions: **Pull requests: Read and write** (comments), **Checks: Read and write**, **Contents: Read-only**,
+   **Metadata: Read-only**. Subscribe to the **Pull request** event. Nothing else.
+4. Create the App, note its **App ID**, and generate a **private key** (.pem).
+5. Set on the API: `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY` (the PEM; newlines may be written as `\n`),
+   `GITHUB_WEBHOOK_SECRET`; optional `GITHUB_APP_RUNS_PER_HOUR` (default 30).
+6. Install the App on a public repository. Opening a PR or pushing to one posts (or updates) one comment and a neutral
+   check run. Repositories not analysed yet are analysed first (up to about 15 minutes) unless the deployment is a
+   read-only demo.
+
+| Variable | Purpose |
+|---|---|
+| `GITHUB_APP_ID`, `GITHUB_APP_PRIVATE_KEY`, `GITHUB_WEBHOOK_SECRET` | GitHub App identity and webhook verification |
+| `BLAST_PER_HOUR` (30) | Blast Radius analyses per client per hour |
+| `BLAST_CLONE_DIR`, `BLAST_MAX_DIFF_BYTES`, `BLAST_RISK_MODEL` | service: clone cache, diff size limit, optional trained risk model |
+| `GITHUB_TOKEN` | optional, service: higher GitHub API limit for PR URLs |
+
 ## Sources (looked up 2026-10-21)
 
 - [GitHub: Authorizing OAuth apps](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/authorizing-oauth-apps) (state, PKCE S256, token exchange, `GET /user`)

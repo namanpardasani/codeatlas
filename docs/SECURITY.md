@@ -38,3 +38,19 @@ fixed**. Private repositories are out of scope for the demo and refused at the A
 - Set `NODE_ENV=production`, `CLIENT_SALT`, strong DB/Redis passwords, `PUBLIC_URL` (https), `GITHUB_CLIENT_ID/SECRET`, `AUTH_REQUIRED=1`, `TRUST_PROXY` = your proxy hops.
 - Keep Postgres, Redis and the search service off the public internet.
 - The local-LLM and paid-provider guards from Day 6 still apply (`LLM_ALLOW_PAID=1` is required for paid providers).
+
+## Blast Radius surfaces (reviewed 2026-10-23)
+
+| Surface | Risk | Control |
+|---|---|---|
+| PR URL input (API, MCP, webhook) | SSRF: making the server fetch an attacker URL | Strict pattern `https://github.com/<owner>/<repo>/pull/<n>`; the URL is never fetched as given: only `api.github.com` is contacted, built from the parsed parts. The PR must belong to the analysed repo (checked against the database). Tests cover userinfo (`github.com@evil.com`), look-alike hosts, `file://`, metadata IPs, query strings. |
+| Commit SHA input | Option injection into git | Validated as 7-40 hex characters; every revision passes after `--end-of-options`; `git fetch origin <sha>` only with a validated SHA. |
+| Uploaded diff | Memory/CPU exhaustion, path traversal | 1 MB at the API (the global JSON limit stays 10 kb), 5 MB / 3,000 files in the parser; hunk lengths checked; `..`, absolute paths and NUL rejected; files are only ever read from the analysed tree; the patch must apply line by line to the analysed version. |
+| Repository contents | Executing untrusted code | Never executed: parsing in the sandboxed child process (timeout, memory limit, crash isolation), git with hooks disabled and symlinks off. The only code-running path is the optional offline coverage experiment, which was not built. |
+| Service `/blast` | Exposure, resource use | Bound to 127.0.0.1 (the API and MCP call it); one analysis at a time; at most 4 cached base models and 8 cached clones (least recently used evicted); API rate limit 30 analyses per hour per client; MCP per-key limits and a 120 s budget. |
+| GitHub webhook | Forged events, replays, floods | HMAC-SHA256 over the raw body (`X-Hub-Signature-256`), constant-time comparison; deliveries de-duplicated by `X-GitHub-Delivery`; runs unique per (repo, PR, head SHA) and claimed atomically before processing; private repositories ignored; 30 runs per installation per hour; the endpoint answers 503 when the App is not configured. |
+| GitHub App credentials | Token leakage | App JWT (RS256, 9-minute lifetime) and installation tokens live in memory only; never logged or stored (a test checks the database); errors record the API path with ids masked. Production start-up refuses an App id without a private key and a 20+ character webhook secret. |
+| PR comment content | Markdown/HTML injection, @mention spam | Repo-derived text (paths, names, reasons) is escaped: table pipes, `<` `>`, backticks; `@` gets a zero-width space so a file or author called `@someone` cannot ping people; one comment per PR, edited on each push; the check run is always neutral (never blocks a merge). |
+| MCP tools | Oversized output, prompt injection via repo text | Repo id from the authorised key, never from arguments; outputs capped (12,000 characters) and shrunk list by list; hidden/bidi characters stripped; the standing note tells agents that repo strings are data. |
+| LLM summary | Prompt injection | Not built: Blast Radius uses no LLM at all, so this surface does not exist yet. |
+| Stored results | Enumeration | Results are for public repositories only; share links use 96-bit random ids. |

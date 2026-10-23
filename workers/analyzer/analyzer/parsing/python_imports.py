@@ -13,9 +13,12 @@ def collect_imports(root, result):
             # import os, os.path as p  ->  one RawImport per module
             for child in node.named_children:
                 if child.type == "dotted_name":
-                    result.imports.append(RawImport(text(child), "import", line))
+                    # `import a.b` binds `a`, but calls are written `a.b.f()`: bind the full dotted path
+                    result.imports.append(RawImport(text(child), "import", line, bindings=[(text(child), "*")]))
                 elif child.type == "aliased_import":
-                    result.imports.append(RawImport(text(child.child_by_field_name("name")), "import", line))
+                    name = text(child.child_by_field_name("name"))
+                    alias = text(child.child_by_field_name("alias"))
+                    result.imports.append(RawImport(name, "import", line, bindings=[(alias or name, "*")]))
             continue
 
         if node.type == "import_from_statement":
@@ -31,16 +34,21 @@ def collect_imports(root, result):
                 specifier = text(module)
 
             names = []
+            bindings = []
             for child in node.named_children:
                 if module is not None and child.id == module.id:
                     continue
                 if child.type == "dotted_name":
                     names.append(text(child))
+                    bindings.append((text(child), text(child)))
                 elif child.type == "aliased_import":
-                    names.append(text(child.child_by_field_name("name")))
+                    name = text(child.child_by_field_name("name"))
+                    names.append(name)
+                    bindings.append((text(child.child_by_field_name("alias")) or name, name))
                 elif child.type == "wildcard_import":
                     names.append("*")
-            result.imports.append(RawImport(specifier, "from", line, names, level))
+                    bindings.append(("*", "*"))
+            result.imports.append(RawImport(specifier, "from", line, names, level, bindings=bindings))
             continue
 
         stack.extend(node.children)  # imports can also hide inside functions / try blocks

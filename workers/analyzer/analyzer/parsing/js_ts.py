@@ -5,7 +5,7 @@ import tree_sitter_typescript as tst
 
 from .base import MAX_DEPTH, LanguagePlugin, signature, text
 from .complexity import JS_RULES, measure
-from .types import ParseResult, RawImport, Symbol
+from .types import CallSite, ParseResult, RawImport, Symbol, TestCase, VarType
 
 FUNCTION_VALUES = {"arrow_function", "function_expression", "function", "generator_function"}
 CLASS_VALUES = {"class", "class_expression"}
@@ -53,6 +53,142 @@ def _has_jsdoc(node: ts.Node) -> bool:
         and text(prev).startswith("/**")
         and prev.end_point.row >= node.start_point.row - 1
     )
+
+
+def _dotted(node: ts.Node | None) -> str | None:
+    """`a`, `this.x`, `a.b.c` when the expression is a plain chain of names; else None."""
+    if node is None:
+        return None
+    if node.type in ("identifier", "this", "super", "type_identifier", "property_identifier"):
+        return text(node)
+    if node.type in ("member_expression", "nested_type_identifier", "nested_identifier"):
+        obj = node.child_by_field_name("object") or (node.named_children[0] if node.named_children else None)
+        prop = node.child_by_field_name("property") or node.child_by_field_name("name") or (
+            node.named_children[-1] if node.named_children else None)
+        base = _dotted(obj)
+        return f"{base}.{text(prop)}" if base is not None and prop is not None and prop.id != obj.id else None
+    return None
+
+
+def _split(node: ts.Node | None) -> tuple[str | None, str]:
+    """(qualifier, name) of a callee: `f` -> (None, "f"); `a.b.f` -> ("a.b", "f"); unnamed -> (None, "")."""
+    d = _dotted(node)
+    if d is None:
+        return None, ""
+    q, _, name = d.rpartition(".")
+    return (q or None), name
+
+
+def _call_site(fn: ts.Node | None, line: int) -> CallSite | None:
+    if fn is None:
+        return CallSite("", None, line, "dynamic")
+    if fn.type == "import":                       # import('./x') is an import, recorded elsewhere
+        return None
+    if fn.type == "identifier" and text(fn) == "require":
+        return None
+    if fn.type == "super":                        # super(...) in a constructor = the base class constructor
+        return CallSite("constructor", "super", line)
+    if fn.type == "member_expression":
+        prop = fn.child_by_field_name("property")
+        q = _dotted(fn.child_by_field_name("object"))
+        if prop is None or prop.type not in ("property_identifier", "private_property_identifier"):
+            return CallSite("", None, line, "dynamic")
+        return CallSite(text(prop), q if q is not None else "<expr>", line)
+    if fn.type == "identifier":
+        return CallSite(text(fn), None, line)
+    return CallSite("", None, line, "dynamic")    # obj[k](), f()(), (a || b)()
+
+
+TEST_FNS = {"it": "test", "test": "test", "specify": "test", "describe": "suite", "suite": "suite", "context": "suite"}
+
+
+def _test_case(call: ts.Node) -> TestCase | None:
+    """it("adds", ...), test.only("x", ...), describe.each(rows)("x %s", ...) -> TestCase; anything else -> None."""
+    fn = call.child_by_field_name("function")
+    root = fn
+    while root is not None and root.type in ("member_expression", "call_expression"):
+        root = root.child_by_field_name("object") if root.type == "member_expression" else root.child_by_field_name("function")
+    if root is None or root.type != "identifier" or text(root) not in TEST_FNS:
+        return None
+    args = call.child_by_field_name("arguments")
+    first = args.named_children[0] if args is not None and args.named_children else None
+    if first is None or first.type not in ("string", "template_string"):
+        return None
+    if not any(a.type in FUNCTION_VALUES for a in args.named_children[1:]):
+        return None                                   # it("todo") without a body is not a runnable test
+    name = text(first)[1:-1]
+    return TestCase(name, TEST_FNS[text(root)], call.start_point.row + 1, call.end_point.row + 1)
+
+
+def _type_name(node: ts.Node | None) -> str | None:
+    if node is None:
+        return None
+    if node.type in ("type_identifier", "nested_type_identifier", "identifier", "member_expression"):
+        return _dotted(node)
+    return None                                   # generics, unions, literal types: no single class
+
+
+def _annotated(node: ts.Node) -> str | None:
+    ann = node.child_by_field_name("type") or next((c for c in node.named_children if c.type == "type_annotation"), None)
+    if ann is not None and ann.type == "type_annotation":
+        ann = ann.named_children[0] if ann.named_children else None
+    return _type_name(ann)
+
+
+def _new_type(value: ts.Node | None) -> str | None:
+    if value is not None and value.type == "new_expression":
+        return _type_name(value.child_by_field_name("constructor"))
+    return None
+
+
+def _bases(cls: ts.Node) -> list[str]:
+    out: list[str] = []
+    for c in cls.named_children:
+        if c.type == "class_heritage":
+            for clause in c.named_children:
+                if clause.type == "extends_clause":
+                    out += [b for b in (_dotted(v) for v in clause.named_children) if b]
+                elif clause.type not in ("implements_clause",):   # JS grammar: class_heritage holds the expression
+                    b = _dotted(clause)
+                    if b:
+                        out.append(b)
+    return out
+
+
+def _wrapped_function(value: ts.Node) -> ts.Node | None:
+    """The function passed to a wrapper call (memo(fn), forwardRef(fn), $constructor("X", fn), asyncHandler(fn)), or
+    None. Only direct arguments count, so `const x = compute(a)` stays a plain value."""
+    if value.type == "await_expression" and value.named_children:
+        value = value.named_children[0]
+    if value.type != "call_expression":
+        return None
+    args = value.child_by_field_name("arguments")
+    if args is None:
+        return None
+    return next((a for a in args.named_children if a.type in FUNCTION_VALUES), None)
+
+
+def _require_bindings(call: ts.Node) -> list[tuple[str, str]]:
+    """const x = require('m') -> [("x", "*")]; const {a, b: c} = require('m') -> [("a", "a"), ("c", "b")]."""
+    decl = call.parent
+    if decl is None or decl.type != "variable_declarator":
+        return []
+    name = decl.child_by_field_name("name")
+    if name is None:
+        return []
+    if name.type == "identifier":
+        return [(text(name), "*")]
+    if name.type == "object_pattern":
+        out = []
+        for p in name.named_children:
+            if p.type == "shorthand_property_identifier_pattern":
+                out.append((text(p), text(p)))
+            elif p.type == "pair_pattern":
+                k, v = p.child_by_field_name("key"), p.child_by_field_name("value")
+                if k is not None and v is not None and v.type == "identifier":
+                    out.append((text(v), text(k)))
+        return out
+    return []
 
 
 class JsTsPlugin(LanguagePlugin):
@@ -107,7 +243,7 @@ class JsTsPlugin(LanguagePlugin):
         elif t in CLASS_DECLS:
             name = text(node.child_by_field_name("name"))
             if name:
-                self._add(result, node, name, "class", parent, None, exported, default, doc_node)
+                self._add(result, node, name, "class", parent, None, exported, default, doc_node).bases = _bases(node)
                 self._class_body(node, name, result, pending, depth)
                 return
         elif t in TS_TYPE_DECLS:
@@ -131,11 +267,100 @@ class JsTsPlugin(LanguagePlugin):
                                     doc_node or node)
                     self._recurse(value, name, result, pending, depth)
                 elif value.type in CLASS_VALUES:
-                    self._add(result, decl, name, "class", parent, None, exported, default, doc_node or node)
+                    self._add(result, decl, name, "class", parent, None, exported, default,
+                              doc_node or node).bases = _bases(value)
                     self._class_body(value, name, result, pending, depth)
+                elif value.type in ("call_expression", "await_expression") and _wrapped_function(value) is not None:
+                    # const Comp = memo(() => ...); const ZodX = $constructor("X", (inst) => {...}): the wrapped
+                    # function IS this declaration's code, so calls inside it belong to `name`
+                    fn = _wrapped_function(value)
+                    self._add(result, decl, name, "function", parent, _param_names(
+                        fn.child_by_field_name("parameters") or fn.child_by_field_name("parameter")),
+                        exported, default, doc_node or node)
+                    self._recurse(value, name, result, pending, depth)
+                else:   # objects, `module.exports = function`, other values: look inside
+                    self._walk_symbols(value, parent, result, pending, depth + 1)
+            return
+
+        elif t in ("function_expression", "function") and node.child_by_field_name("name") is not None:
+            # a named function expression anywhere else: `cond && function httpAdapter(c) {...}`, callbacks
+            name = text(node.child_by_field_name("name"))
+            self._add(result, node, name, "function", parent, _param_names(node.child_by_field_name("parameters")))
+            self._recurse(node, name, result, pending, depth)
+            return
+        elif t == "assignment_expression" and self._assigned_function(node, parent, result, pending, depth):
+            return
+        elif t == "object":
+            self._object_methods(node, parent, result, pending, depth)
             return
 
         self._recurse(node, parent, result, pending, depth)
+
+    def _assigned_function(self, node, parent, result, pending, depth) -> bool:
+        """CommonJS / prototype style: exports.f = function () {}, module.exports = function f() {},
+        Foo.prototype.bar = function () {}, app.use = function use() {}. Returns True when handled."""
+        left, right = node.child_by_field_name("left"), node.child_by_field_name("right")
+        chain = _dotted(left)
+        if chain is None or right is None:
+            return False
+        if chain == "module.exports":
+            if right.type == "identifier":
+                result.export_aliases.append(("default", text(right)))
+                result.exports.append("default")
+                return False
+            if right.type in FUNCTION_VALUES or right.type in CLASS_VALUES:
+                own = right.child_by_field_name("name")
+                name = text(own) if own is not None else "default"
+                kind = "class" if right.type in CLASS_VALUES else "function"
+                sym = self._add(result, right, name, kind, None, None if kind == "class" else _param_names(
+                    right.child_by_field_name("parameters") or right.child_by_field_name("parameter")), True, True, node)
+                if name != "default":
+                    result.export_aliases.append(("default", name))
+                if kind == "class":
+                    sym.bases = _bases(right)
+                    self._class_body(right, name, result, pending, depth)
+                else:
+                    self._recurse(right, name, result, pending, depth)
+                return True
+            return False
+        if right.type not in FUNCTION_VALUES or "." not in chain:
+            return False
+        owner, _, name = chain.rpartition(".")
+        params = _param_names(right.child_by_field_name("parameters") or right.child_by_field_name("parameter"))
+        if owner in ("exports", "module.exports"):
+            self._add(result, right, name, "function", None, params, True, False, node)
+        else:
+            cls = owner[: -len(".prototype")] if owner.endswith(".prototype") else owner
+            self._add(result, right, name, "method", cls.rsplit(".", 1)[-1], params, doc_node=node)
+        self._recurse(right, name, result, pending, depth)
+        return True
+
+    def _object_methods(self, obj, parent, result, pending, depth):
+        """Methods of an object literal ({ read(k) {...}, write: function () {...}, run: () => ... }) become
+        methods whose parent is the variable holding the object (or the enclosing symbol)."""
+        holder = parent
+        decl = obj.parent
+        if decl is not None and decl.type == "variable_declarator" and decl.child_by_field_name("name") is not None:
+            holder = text(decl.child_by_field_name("name"))
+        elif decl is not None and decl.type == "export_statement":
+            holder = "default"
+        for member in obj.named_children:
+            if member.type == "method_definition":
+                mname = text(member.child_by_field_name("name"))
+                if mname and holder:
+                    self._add(result, member, mname, "method", holder, _param_names(member.child_by_field_name("parameters")))
+                    self._recurse(member, mname, result, pending, depth + 1)
+                    continue
+            elif member.type == "pair":
+                key, value = member.child_by_field_name("key"), member.child_by_field_name("value")
+                if holder and key is not None and key.type in ("property_identifier", "string") and value is not None \
+                        and value.type in FUNCTION_VALUES:
+                    kname = text(key).strip("'\"")
+                    self._add(result, value, kname, "method", holder,
+                              _param_names(value.child_by_field_name("parameters") or value.child_by_field_name("parameter")))
+                    self._recurse(value, kname, result, pending, depth + 1)
+                    continue
+            self._walk_symbols(member, parent, result, pending, depth + 1)
 
     def _recurse(self, node, parent, result, pending, depth):
         for child in node.named_children:
@@ -170,9 +395,16 @@ class JsTsPlugin(LanguagePlugin):
             names = self._export_clause_names(node) or ["*"]
             exported = [alias for _, alias in self._export_specifiers(node)] or ["*"]
             result.exports.extend(exported)
+            # bindings of a re-export = names this module now exports: (exported, name in the source module)
+            spec_pairs = [(alias, local) for local, alias in self._export_specifiers(node)]
+            ns = next((c for c in node.named_children if c.type == "namespace_export"), None)
+            if ns is not None:
+                ident = next((g for g in ns.named_children if g.type in ("identifier", "string")), None)
+                spec_pairs = [(text(ident).strip("'\""), "*")] if ident is not None else [("*", "*")]
             result.imports.append(RawImport(
                 specifier=source, kind="reexport", line=node.start_point.row + 1,
-                names=names, is_type_only=any(c.type == "type" for c in node.children)))
+                names=names, is_type_only=any(c.type == "type" for c in node.children),
+                bindings=spec_pairs or [("*", "*")]))
             return
         if decl is not None:
             self._walk_symbols(decl, parent, result, pending, depth + 1,
@@ -188,18 +420,22 @@ class JsTsPlugin(LanguagePlugin):
                           True, True, node)
                 self._recurse(value, "default", result, pending, depth)
             elif value.type in CLASS_VALUES:
-                self._add(result, value, "default", "class", parent, None, True, True, node)
+                self._add(result, value, "default", "class", parent, None, True, True, node).bases = _bases(value)
                 self._class_body(value, "default", result, pending, depth)
             elif value.type == "identifier":
                 pending.append((text(value), True))
                 result.exports.append("default")
+                result.export_aliases.append(("default", text(value)))
             else:
                 result.exports.append("default")
+                self._walk_symbols(value, parent, result, pending, depth + 1)
             return
         # export { a, b as c }
         for local, exported_name in self._export_specifiers(node):
             pending.append((local, False))
             result.exports.append(exported_name)
+            if local != exported_name:
+                result.export_aliases.append((exported_name, local))
 
     @staticmethod
     def _export_specifiers(node):
@@ -248,7 +484,8 @@ class JsTsPlugin(LanguagePlugin):
                 if fn.type == "import":
                     result.imports.append(RawImport(spec, "dynamic", node.start_point.row + 1))
                 elif fn.type == "identifier" and text(fn) == "require":
-                    result.imports.append(RawImport(spec, "require", node.start_point.row + 1))
+                    result.imports.append(RawImport(spec, "require", node.start_point.row + 1,
+                                                    bindings=_require_bindings(node)))
         for child in node.named_children:
             if child.type != "export_statement" or child.child_by_field_name("source") is None:
                 self._walk_imports(child, result, depth + 1)
@@ -262,25 +499,82 @@ class JsTsPlugin(LanguagePlugin):
                 spec = _string_value(next((g for g in c.named_children if g.type == "string"), None))
                 if spec is not None:
                     names = [text(g) for g in c.named_children if g.type == "identifier"][:1]
-                    result.imports.append(RawImport(spec, "require", line, names))
+                    result.imports.append(RawImport(spec, "require", line, names, bindings=[(n, "*") for n in names]))
                 return
         spec = _string_value(node.child_by_field_name("source"))
         if spec is None:
             return
         names: list[str] = []
+        bindings: list[tuple[str, str]] = []
         for c in node.named_children:
             if c.type != "import_clause":
                 continue
             for part in c.named_children:
                 if part.type == "identifier":
                     names.append("default")
+                    bindings.append((text(part), "default"))
                 elif part.type == "namespace_import":
                     names.append("*")
+                    ident = next((g for g in part.named_children if g.type == "identifier"), None)
+                    if ident is not None:
+                        bindings.append((text(ident), "*"))
                 elif part.type == "named_imports":
                     for spec_node in part.named_children:
                         if spec_node.type == "import_specifier":
-                            names.append(text(spec_node.child_by_field_name("name")))
-        result.imports.append(RawImport(spec, "import", line, names, is_type_only=type_only))
+                            name = text(spec_node.child_by_field_name("name"))
+                            alias = spec_node.child_by_field_name("alias")
+                            names.append(name)
+                            bindings.append((text(alias) if alias is not None else name, name))
+        result.imports.append(RawImport(spec, "import", line, names, is_type_only=type_only, bindings=bindings))
+
+    # ---- calls + type hints -------------------------------------------------
+    def extract_calls(self, root: ts.Node, result: ParseResult) -> None:
+        stack = [(root, 0)]
+        while stack:
+            node, depth = stack.pop()
+            if depth > MAX_DEPTH:
+                continue
+            t = node.type
+            line = node.start_point.row + 1
+            if t == "call_expression":
+                site = _call_site(node.child_by_field_name("function"), line)
+                if site is not None:
+                    result.calls.append(site)
+                tc = _test_case(node)
+                if tc is not None:
+                    result.tests.append(tc)
+            elif t == "new_expression":
+                ctor = node.child_by_field_name("constructor")
+                q, name = _split(ctor)
+                result.calls.append(CallSite(name, q, line, "new") if name else CallSite("", None, line, "dynamic"))
+            elif t in ("jsx_opening_element", "jsx_self_closing_element"):
+                q, name = _split(node.child_by_field_name("name"))
+                if name and (q is not None or name[:1].isupper()):     # <div> is a DOM tag, <Foo> a component
+                    result.calls.append(CallSite(name, q, line, "jsx"))
+            elif t == "variable_declarator":
+                nm = node.child_by_field_name("name")
+                if nm is not None and nm.type == "identifier":
+                    ty = _annotated(node) or _new_type(node.child_by_field_name("value"))
+                    if ty:
+                        result.var_types.append(VarType(text(nm), ty, line))
+            elif t == "assignment_expression":
+                left = _dotted(node.child_by_field_name("left"))
+                ty = _new_type(node.child_by_field_name("right"))
+                if left and ty:
+                    result.var_types.append(VarType(left, ty, line))
+            elif t in ("public_field_definition", "field_definition"):
+                nm = node.child_by_field_name("name") or node.child_by_field_name("property")
+                ty = _annotated(node) or _new_type(node.child_by_field_name("value"))
+                if nm is not None and ty:
+                    result.var_types.append(VarType(f"this.{text(nm)}", ty, line))
+            elif t in ("required_parameter", "optional_parameter"):
+                pat = node.child_by_field_name("pattern")
+                ty = _annotated(node)
+                if pat is not None and pat.type == "identifier" and ty:
+                    result.var_types.append(VarType(text(pat), ty, line))
+                    if any(c.type == "accessibility_modifier" for c in node.children):   # constructor(private s: Svc)
+                        result.var_types.append(VarType(f"this.{text(pat)}", ty, line))
+            stack.extend((c, depth + 1) for c in reversed(node.named_children))
 
 
 def make_plugins() -> list[JsTsPlugin]:
