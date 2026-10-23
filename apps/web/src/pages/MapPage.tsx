@@ -297,7 +297,7 @@ export default function MapPage() {
         title="Who imports whom"
         actions={<Segmented label="View" value={effectiveView} onChange={(v) => setView(v)} options={[{ id: "files", label: "Files" }, { id: "folders", label: "Folders" }]} />}
       >
-        {built.shown} of {built.total} {effectiveView === "folders" ? "folders" : "files"}, sized by how many files import them.
+        {effectiveView === "folders" ? <>{built.shown} of {built.total} folders, sized by how many files they hold.</> : <>{built.shown} of {built.total} files, sized by how many files import them.</>}
         {built.truncated && effectiveView === "files" ? " Cycle members and the most central files come first; switch to Folders to see everything." : ""}
       </PageHead>
 

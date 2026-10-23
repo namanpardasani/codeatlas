@@ -16,7 +16,6 @@ export function JumpToFile({ open, files, onPick, onClose }: { open: boolean; fi
     if (open) {
       setQ("");
       setI(0);
-      setTimeout(() => input.current?.focus(), 30);
     }
   }, [open]);
   useEffect(() => {
@@ -28,6 +27,7 @@ export function JumpToFile({ open, files, onPick, onClose }: { open: boolean; fi
       <input
         id="jump"
         ref={input}
+        data-autofocus
         value={q}
         onChange={(e) => setQ(e.target.value)}
         placeholder="Jump to file…"
@@ -39,7 +39,9 @@ export function JumpToFile({ open, files, onPick, onClose }: { open: boolean; fi
         onKeyDown={(e) => {
           if (e.key === "ArrowDown") (e.preventDefault(), setI((v) => Math.min(hits.length - 1, v + 1)));
           if (e.key === "ArrowUp") (e.preventDefault(), setI((v) => Math.max(0, v - 1)));
-          if (e.key === "Enter" && hits[i]) onPick(hits[i]!);
+          // preventDefault: the dialog closes and returns focus to the opener during this keydown; without it the
+          // browser applies Enter's default action to that element too (a tab button), which navigated straight back
+          if (e.key === "Enter" && hits[i]) (e.preventDefault(), onPick(hits[i]!));
         }}
         className="w-full border-0 border-b-2 border-ink bg-transparent px-1 py-3 font-mono text-[16px] text-ink outline-none placeholder:text-pencil focus-visible:border-signal focus-visible:outline-none"
       />

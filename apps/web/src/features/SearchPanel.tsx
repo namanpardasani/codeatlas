@@ -39,7 +39,7 @@ export function SearchPanel({ repoId, onOpen }: { repoId: string; onOpen?: (t: V
             placeholder="e.g. where are requests retried?  or  prepare_body"
             className="min-h-10 flex-1 border-0 border-b-2 border-ink bg-transparent px-1 text-body text-ink outline-none placeholder:text-pencil focus-visible:border-signal focus-visible:outline-none"
           />
-          <Button disabled={busy || !query.trim()}>{busy ? "Searching…" : "Search"}</Button>
+          <Button type="submit" disabled={busy || !query.trim()}>{busy ? "Searching…" : "Search"}</Button>
         </div>
         <div className="mt-2 flex flex-wrap gap-3 text-small text-pencil">
           <label className="flex items-center gap-2">
