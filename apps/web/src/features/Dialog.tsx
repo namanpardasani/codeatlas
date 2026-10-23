@@ -9,7 +9,8 @@ export function Dialog({ open, title, onClose, children, wide = false }: { open:
   useEffect(() => {
     if (!open) return;
     const prev = document.activeElement as HTMLElement | null;
-    ref.current?.focus();
+    // focus the element that asked for it (e.g. a search box) in the same frame, so the first keystrokes are not lost
+    (ref.current?.querySelector<HTMLElement>("[data-autofocus]") ?? ref.current)?.focus();
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
     window.addEventListener("keydown", onKey);
     return () => {
