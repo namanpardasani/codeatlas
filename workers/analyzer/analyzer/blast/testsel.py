@@ -65,6 +65,8 @@ class TestSelection:
         return list(dict.fromkeys(s.unit.file for s in self.selected))
 
     def summary(self) -> str:
+        if self.total == 0 and not self.new_tests:
+            return "this repository has no tests"
         if self.full_suite:
             return f"run the full suite ({'; '.join(self.full_suite_reasons)})"
         extra = f" + {len(self.new_tests)} new" if self.new_tests else ""
@@ -209,6 +211,8 @@ def select_tests(snap: Snapshot, calls: CallGraph, changes: ChangeSet, impact: I
 
 
 def _fallbacks(sel: TestSelection, snap: Snapshot, calls: CallGraph, changes: ChangeSet) -> None:
+    if sel.total == 0 and not sel.new_tests:
+        return                                   # no tests exist: "run the full suite" would be advice about nothing
     reasons: list[str] = []
     cats = {f.category for f in changes.files if not f.cosmetic_only}
     if "test_setup" in cats:

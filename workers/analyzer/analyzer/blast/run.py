@@ -79,11 +79,18 @@ def ensure_clone(r: RepoRow) -> Path:
     return dest
 
 
+def _has_parent(repo: Path, sha: str) -> bool:
+    out = subprocess.run(["git", "-c", "core.hooksPath=/dev/null", "-C", str(repo), "rev-list", "--parents", "-n", "1", "--end-of-options", sha],
+                         env=git_env(), capture_output=True, text=True, timeout=60, check=True).stdout.split()
+    return len(out) > 1
+
+
 def ensure_commit(repo: Path, sha: str) -> None:
     """Make `sha` (and its parent) available: fetch it from origin if the bounded clone does not have it."""
     try:
         GitSource(repo, sha)
-        GitSource(repo, sha + "^")
+        if _has_parent(repo, sha):                 # a root commit has no parent and is compared with the empty tree
+            GitSource(repo, sha + "^")
         return
     except SourceError:
         pass

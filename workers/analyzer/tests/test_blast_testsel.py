@@ -73,6 +73,14 @@ def test_full_suite_when_no_test_reaches_changed_source(tmp_path):
     assert sel.full_suite and "no test reaches it" in sel.full_suite_reasons[0]
 
 
+def test_a_repository_without_tests_says_so_instead_of_advising_a_full_suite(tmp_path):
+    # found by running a real repo (a small Flask app with no tests): "run the full suite" was advice about nothing
+    r = repo_with(tmp_path, {"app.py": "def home():\n    return 1\n"}, {"app.py": "def home():\n    return 2\n"})
+    sel = analyze_commit(r, "HEAD", parser=P).tests
+    assert sel.total == 0 and not sel.full_suite and sel.command == ""
+    assert sel.summary() == "this repository has no tests"
+
+
 def test_js_vitest_command_with_names(tmp_path):
     lib = "export function add(a, b) { return a + b }\n"
     tst = ("import { describe, it, expect } from 'vitest'\nimport { add } from './add.js'\n"

@@ -116,7 +116,7 @@ export default function BlastPage() {
               {recent.slice(0, 8).map((r) => (
                 <li key={r.id}>
                   <button onClick={() => setParams({ result: r.id })} className={`group flex items-baseline gap-2 text-left text-small ${result?.id === r.id ? "text-ink" : "text-ink-2"}`}>
-                    <span className={`font-mono text-[12px] font-semibold ${r.risk_label === "high" ? "text-signal-ink" : r.risk_label === "medium" ? "text-caution-ink" : "text-verified-ink"}`}>{r.risk_score ?? "?"}</span>
+                    <span className={`font-mono text-[12px] font-semibold ${r.risk_label === "high" ? "text-signal-ink" : r.risk_label === "medium" ? "text-caution-ink" : "text-verified-ink"}`} title={r.risk_score === null ? "first commit: nothing to compare with" : undefined}>{r.risk_score ?? "·"}</span>
                     <span className={`max-w-[260px] truncate font-mono underline-offset-4 group-hover:underline ${result?.id === r.id ? "underline decoration-signal" : ""}`}>{r.title ?? (r.kind === "pr" ? r.ref.replace(/^https:\/\/github\.com\//, "") : r.ref.slice(0, 12))}</span>
                   </button>
                 </li>
@@ -152,10 +152,12 @@ export default function BlastPage() {
               </div>
               {result.pr && <p className="mt-1 font-display text-[19px] italic text-ink-2">{result.pr.title}</p>}
               <p className="mt-3 max-w-3xl font-display text-[clamp(26px,3vw,36px)] font-semibold leading-[1.12] tracking-[-0.025em] text-ink">
-                It changes {result.change.files.length} file{result.change.files.length === 1 ? "" : "s"} and {changedFns} function{changedFns === 1 ? "" : "s"}, and reaches{" "}
-                <span className="text-signal-ink underline decoration-signal decoration-2 underline-offset-[6px]">{beyond.length} more file{beyond.length === 1 ? "" : "s"}</span>
-                {strong > 0 && strong < beyond.length ? <> ({strong} strongly)</> : null}.{" "}
-                {result.tests && (result.tests.full_suite ? "Run the full test suite." : <>Run {result.tests.selected_count} of {result.tests.total} tests.</>)}
+                It changes {result.change.files.length} file{result.change.files.length === 1 ? "" : "s"} and {changedFns} function{changedFns === 1 ? "" : "s"}, and{" "}
+                {beyond.length === 0 ? "reaches no other files" : (
+                  <>reaches <span className="text-signal-ink underline decoration-signal decoration-2 underline-offset-[6px]">{beyond.length} more file{beyond.length === 1 ? "" : "s"}</span>
+                  {strong > 0 && strong < beyond.length ? <> ({strong} strongly)</> : null}</>
+                )}.{" "}
+                {result.tests && (result.tests.total === 0 && result.tests.new_tests.length === 0 ? "The repository has no tests." : result.tests.full_suite ? "Run the full test suite." : <>Run {result.tests.selected_count} of {result.tests.total} tests.</>)}
               </p>
               {result.risk && (
                 <ul className="mt-5 grid gap-x-8 gap-y-1.5 text-[14.5px] text-ink-2 md:grid-cols-2">
@@ -227,7 +229,12 @@ export default function BlastPage() {
             </Panel>
 
             <div className="flex flex-col gap-12">
-              {result.tests && (
+              {result.tests && result.tests.total === 0 && result.tests.new_tests.length === 0 && (
+                <Panel title="Tests to run">
+                  <p className="text-wonk text-[17px] leading-snug text-pencil">This repository has no tests, so there is nothing to select. The risk score counts that: a change nobody can check is riskier.</p>
+                </Panel>
+              )}
+              {result.tests && !(result.tests.total === 0 && result.tests.new_tests.length === 0) && (
                 <Panel title="Tests to run" description={result.tests.full_suite ? undefined : result.tests.summary}>
                   {result.tests.full_suite && (
                     <Card variant="risk" className="mb-3 text-small">Run the full suite: {result.tests.full_suite_reasons.join("; ")}</Card>
