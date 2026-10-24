@@ -141,7 +141,11 @@ export default function Landing() {
         {/* ---------- hero: words left, the map right ---------- */}
         <section className="mx-auto grid max-w-[1240px] 2xl:max-w-[1440px] grid-cols-[minmax(0,1fr)] items-start gap-x-14 gap-y-16 px-4 pb-24 pt-10 sm:px-6 md:pt-16 lg:grid-cols-[1.08fr_0.92fr]">
           <div>
-            <p className="mono-label text-table-muted">Sheet 01 · <span className="text-table-signal">for any public GitHub repository</span></p>
+            <p className="mono-label text-table-muted">
+              Sheet 01 · {me?.demoMode
+                ? <span className="text-table-signal">live read-only demo · {samples.length || 5} repositories already mapped</span>
+                : <span className="text-table-signal">for any public GitHub repository</span>}
+            </p>
             <h1 data-split className="text-display mt-6 text-balance">
               Know what a change <span className="text-wonk text-signal">will break</span> before you merge it.
             </h1>
