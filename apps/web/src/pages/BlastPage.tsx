@@ -127,7 +127,16 @@ export default function BlastPage() {
       </form>
 
       {busy && !result && <Skeleton className="h-96" />}
-      {!result && !busy && !error && <EmptyState message="Paste a pull request link, a commit SHA or a diff. You'll get the files it reaches, why, and the tests to run." />}
+      {!result && !busy && !error && (
+        <EmptyState
+          message="Paste a pull request link, a commit SHA or a diff. You'll get the files it reaches, why, and the tests to run."
+          action={recent && recent.length > 0 ? (
+            <Button variant="secondary" onClick={() => setParams({ result: recent[0]!.id })}>
+              Or open a saved example: risk {recent[0]!.risk_score ?? "?"}, {recent[0]!.title ?? recent[0]!.ref.slice(0, 8)}
+            </Button>
+          ) : undefined}
+        />
+      )}
 
       {result && !result.impact && (
         <Card variant="ruled"><p className="text-ink-2">This is the repository&apos;s first commit: nothing existed before it, so nothing can break.</p></Card>
@@ -247,11 +256,11 @@ export default function BlastPage() {
                   {result.change.files.slice(0, 30).map((f) => (
                     <li key={f.path} className="border-b border-rule py-2 text-small">
                       <span className="flex items-baseline gap-2">
+                        {f.category !== "code" && <Badge>{f.category}</Badge>}
                         <span className="min-w-0 truncate font-mono text-ink">{f.path}</span>
                         <span className="ml-auto shrink-0 font-mono text-[11.5px]"><span className="text-verified-ink">+{f.added}</span> <span className="text-signal-ink">−{f.deleted}</span></span>
                       </span>
                       {f.symbols.length > 0 && <span className="mt-0.5 block text-[12.5px] text-pencil">{f.symbols.slice(0, 6).map((sy) => `${sy.change} ${sy.name}`).join(", ")}</span>}
-                      {f.category !== "code" && <span className="mt-0.5 block font-mono text-[11px] uppercase tracking-[0.1em] text-pencil">{f.category}</span>}
                       {f.error && <span className="block text-[12px] text-signal-ink">{f.error}</span>}
                     </li>
                   ))}
