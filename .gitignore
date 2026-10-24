@@ -33,7 +33,7 @@ docker-compose.override.yml
 .docker/
 
 # Data / clones / models
-data/
+/data/
 clones/
 repos_cache/
 *.sqlite
