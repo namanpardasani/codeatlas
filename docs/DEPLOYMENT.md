@@ -9,7 +9,7 @@ disagree with the vendors' own pages, so re-check the vendor page before relying
 |---|---|---|---|
 | Frontend | static files | served by the API process (single origin) | works |
 | API (Node) | always-on-ish web process | Render free web service | works, sleeps after 15 min idle, ~30-60 s cold start, 750 h/month shared pool |
-| Postgres + pgvector | HNSW, tsvector | Neon free: 0.5 GB per project, 100 CU-hours/month, scales to zero after 5 min, pgvector included | works. Our 4 demo repos are about 25 MB |
+| Postgres + pgvector | HNSW, tsvector | Neon free: 0.5 GB per project, 100 CU-hours/month, scales to zero after 5 min, pgvector included | works. Our 5 demo repos are about 30 MB |
 | Redis | job queue + progress pub/sub | Upstash free: 500,000 commands/month, 256 MB | works but only needed when analysis runs |
 | Python worker | **long-running** clone/parse/embed jobs (minutes, RAM for the embedding model) | none verified | **does not fit a free web host** (free instances sleep and are not for production; no free background worker confirmed) |
 | Search + chat service | embedding model in RAM (~0.5 GB with runtime), LLM | none verified for the model; chat also needs an LLM | semantic search/chat not live on free tiers; keyword search is |
@@ -27,7 +27,7 @@ ARM capacity can be unavailable in a region, and over-provisioning can get insta
 ```
 Browser ──► Render free web service  (image: Dockerfile, API + built web app, DEMO_MODE=1)
                    │
-                   └──► Neon free Postgres + pgvector   (4 pre-analysed repos, ~25 MB)
+                   └──► Neon free Postgres + pgvector   (5 pre-analysed repos, ~30 MB)
 ```
 
 No Redis, no worker, no search service. Steps:
@@ -40,7 +40,7 @@ No Redis, no worker, no search service. Steps:
    uv run python -m analyzer.migrate
    # data exported earlier from your local DB (4.8 MB gzip):
    DATABASE_URL=<local url> uv run python ../../scripts/demo_data.py export ../../demo-data \
-       sindresorhus/p-limit pallets/itsdangerous chalk/chalk psf/requests
+       sindresorhus/p-limit pallets/itsdangerous chalk/chalk psf/requests namanpardasani/saarthi
    uv run python ../../scripts/demo_data.py import ../../demo-data
    ```
 3. Render: New Web Service from this repo, Runtime Docker, Dockerfile path `Dockerfile`, free instance. Environment:
