@@ -1,6 +1,18 @@
 @import "tailwindcss";
 
 /*
+ * Fonts are self-hosted (public/fonts, SIL Open Font License): no third-party request, and what is tested is what ships.
+ * Fraunces is the variable "full" build (weight, optical size, SOFT and WONK axes); latin subset.
+ */
+@font-face { font-family: "Fraunces"; src: url("/fonts/fraunces.woff2") format("woff2"); font-weight: 100 900; font-style: normal; font-display: swap; }
+@font-face { font-family: "Fraunces"; src: url("/fonts/fraunces-italic.woff2") format("woff2"); font-weight: 100 900; font-style: italic; font-display: swap; }
+@font-face { font-family: "IBM Plex Sans"; src: url("/fonts/plex-sans-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "IBM Plex Sans"; src: url("/fonts/plex-sans-500.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "IBM Plex Sans"; src: url("/fonts/plex-sans-600.woff2") format("woff2"); font-weight: 600 700; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("/fonts/plex-mono-400.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "IBM Plex Mono"; src: url("/fonts/plex-mono-500.woff2") format("woff2"); font-weight: 500 600; font-display: swap; }
+
+/*
  * DESIGN SYSTEM v4: "a paper atlas on a dark table".
  *
  * Two materials. The TABLE is the dark stage the app sits on (header, tabs, margins). PAPER is where the evidence
@@ -279,8 +291,8 @@
   font-size: clamp(44px, 6.4vw, 92px);
   line-height: 0.92;
   letter-spacing: -0.045em;
-  font-optical-sizing: auto;
-  font-variation-settings: "SOFT" 30;
+  /* optical size pinned: at 90px the automatic setting switches to Fraunces' tightest cut and the words run together */
+  font-variation-settings: "SOFT" 30, "opsz" 72;
 }
 @utility text-title {
   font-family: var(--font-display);

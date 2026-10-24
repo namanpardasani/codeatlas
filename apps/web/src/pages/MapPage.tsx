@@ -111,7 +111,7 @@ export default function MapPage() {
   const [hover, setHover] = useState<string | null>(null);
   const [detail, setDetail] = useState<FileGraphDetail | null>(null);
   const [hidden, setHidden] = useState<Set<string>>(new Set());
-  const [narrow, setNarrow] = useState(() => window.matchMedia("(max-width: 1023px)").matches);
+  const [narrow, setNarrow] = useState(() => window.matchMedia("(max-width: 1279px)").matches);
   const [flyTo, setFlyTo] = useState<string | null>(params.get("file"));
 
   // a jump (Ctrl+K) while the map is already open changes ?file= without remounting: follow it
@@ -124,7 +124,7 @@ export default function MapPage() {
   }, [fileParam]);
 
   useEffect(() => {
-    const mq = window.matchMedia("(max-width: 1023px)");
+    const mq = window.matchMedia("(max-width: 1279px)");
     const f = () => setNarrow(mq.matches);
     mq.addEventListener("change", f);
     return () => mq.removeEventListener("change", f);
@@ -301,12 +301,12 @@ export default function MapPage() {
         {built.truncated && effectiveView === "files" ? " Cycle members and the most central files come first; switch to Folders to see everything." : ""}
       </PageHead>
 
-      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[200px_minmax(0,1fr)_280px]">
-        <aside aria-label="Legend and regions" className="order-2 flex flex-col gap-6 lg:order-1">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[200px_minmax(0,1fr)_280px]">
+        <aside aria-label="Legend and regions" className="order-2 flex flex-col gap-6 xl:order-1">
           {narrow ? <details><summary className="mono-label cursor-pointer">Legend and folders</summary><div className="mt-4 flex flex-col gap-5">{legendBlock}{regionsBlock}</div></details> : <>{legendBlock}{regionsBlock}</>}
         </aside>
 
-        <div className="relative order-1 h-[72vh] min-h-[420px] overflow-hidden bg-graticule border-[1.5px] border-ink bg-paper outline outline-1 outline-offset-[3px] outline-ink lg:order-2" aria-label="Map canvas">
+        <div className="relative order-1 h-[72vh] min-h-[420px] overflow-hidden bg-graticule border-[1.5px] border-ink bg-paper outline outline-1 outline-offset-[3px] outline-ink xl:order-2" aria-label="Map canvas">
           <MapDefs />
           <MapCtx.Provider value={ctx}>
             <div onPointerOver={(e) => { const el = (e.target as HTMLElement).closest("[data-id]") as HTMLElement | null; const id = el?.dataset.id ?? null; setHover(id && !id.startsWith("region:") ? id : null); }} onPointerLeave={() => setHover(null)} className="h-full w-full">
@@ -321,7 +321,7 @@ export default function MapPage() {
           </div>
         </div>
 
-        <aside aria-label="Cycle and selected file" className="order-3 flex flex-col gap-4">
+        <aside aria-label="Cycle and selected file" className="order-3 grid grid-cols-[minmax(0,1fr)] content-start gap-4 md:grid-cols-2 xl:flex xl:flex-col">
           {cycle && (
             <Card variant="risk">
               <div className="mono-label text-signal-ink">Import cycle</div>

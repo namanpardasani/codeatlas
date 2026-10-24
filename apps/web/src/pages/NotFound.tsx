@@ -12,10 +12,11 @@ export default function NotFound() {
         <Link to="/" aria-label="CodeAtlas home" className="rounded-ui"><Logo /></Link>
       </header>
       <div className="relative mx-auto flex w-full max-w-5xl flex-1 items-center pb-20">
-        <div className="absolute right-0 top-[18%] hidden lg:block">
+        <div className="relative w-full max-w-2xl">
+        <div className="absolute -top-16 left-full ml-6 hidden w-44 lg:block">
           <MarginNote tone="hl" arrow="down-left" rotate={4}>you are somewhere around here</MarginNote>
         </div>
-        <div className="sheet torn tilt relative w-full max-w-2xl px-7 pb-20 pt-9 sm:px-12" style={{ "--tilt": "-1.5deg" } as React.CSSProperties}>
+        <div className="sheet torn tilt relative w-full px-7 pb-20 pt-9 sm:px-12" style={{ "--tilt": "-1.5deg" } as React.CSSProperties}>
           <div className="bg-graticule pointer-events-none absolute inset-0 opacity-70" aria-hidden />
           <div className="relative">
             <div className="mono-label">Sheet 404 · uncharted</div>
@@ -29,6 +30,7 @@ export default function NotFound() {
             </div>
             <Compass size={88} mode="hunt" className="absolute -top-2 right-0 hidden text-ink sm:block" title="Compass looking for north" />
           </div>
+        </div>
         </div>
       </div>
     </main>

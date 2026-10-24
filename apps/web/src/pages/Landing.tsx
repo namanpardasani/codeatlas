@@ -119,7 +119,7 @@ export default function Landing() {
 
   return (
     <div ref={root} className="min-h-screen overflow-x-clip bg-table text-table-ink">
-      <header className="mx-auto flex max-w-[1240px] items-center gap-7 px-4 py-5 sm:px-6">
+      <header className="mx-auto flex max-w-[1240px] 2xl:max-w-[1440px] items-center gap-7 px-4 py-5 sm:px-6">
         <Link to="/" aria-label="CodeAtlas home" className="rounded-ui"><Logo needle="track" /></Link>
         <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
           <Link className={navLink} to="/replay">Replay a real bug</Link>
@@ -139,7 +139,7 @@ export default function Landing() {
 
       <main>
         {/* ---------- hero: words left, the map right ---------- */}
-        <section className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] items-start gap-x-14 gap-y-16 px-4 pb-24 pt-10 sm:px-6 md:pt-16 lg:grid-cols-[1.08fr_0.92fr]">
+        <section className="mx-auto grid max-w-[1240px] 2xl:max-w-[1440px] grid-cols-[minmax(0,1fr)] items-start gap-x-14 gap-y-16 px-4 pb-24 pt-10 sm:px-6 md:pt-16 lg:grid-cols-[1.08fr_0.92fr]">
           <div>
             <p className="mono-label text-table-muted">Sheet 01 · <span className="text-table-signal">for any public GitHub repository</span></p>
             <h1 data-split className="text-display mt-6 text-balance">
@@ -208,12 +208,12 @@ export default function Landing() {
           </div>
         </section>
 
-        <p className="mx-auto max-w-[1240px] border-y border-table-line px-4 py-3 font-mono text-[12px] uppercase tracking-[0.12em] text-table-muted sm:px-6">
+        <p className="mx-auto max-w-[1240px] 2xl:max-w-[1440px] border-y border-table-line px-4 py-3 font-mono text-[12px] uppercase tracking-[0.12em] text-table-muted sm:px-6">
           Code is read, never run <span className="px-2 text-table-line">/</span> public repositories only <span className="px-2 text-table-line">/</span> free and open source
         </p>
 
         {/* ---------- the worked example ---------- */}
-        <section id="example" className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[360px_minmax(0,1fr)]">
+        <section id="example" className="mx-auto grid max-w-[1240px] 2xl:max-w-[1440px] grid-cols-[minmax(0,1fr)] gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[360px_minmax(0,1fr)]">
           <div className="lg:sticky lg:top-10 lg:self-start">
             <p className="mono-label text-table-muted">A real change, start to finish</p>
             <h2 className="mt-4 font-display text-[clamp(32px,4vw,46px)] font-semibold leading-[1.02] tracking-[-0.035em]">
@@ -288,7 +288,7 @@ export default function Landing() {
         </section>
 
         {/* ---------- what it answers: three different objects, not three identical cards ---------- */}
-        <section className="mx-auto max-w-[1240px] px-4 py-20 sm:px-6">
+        <section className="mx-auto max-w-[1240px] 2xl:max-w-[1440px] px-4 py-20 sm:px-6">
           <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-10 lg:grid-cols-[300px_minmax(0,1fr)]">
             <div>
               <p className="mono-label text-table-muted">What else is in the atlas</p>
@@ -321,7 +321,7 @@ export default function Landing() {
 
         {/* ---------- measured, honestly ---------- */}
         <section id="measured" className="scroll-mt-8 border-t border-table-line">
-          <div className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] items-start gap-10 px-4 py-24 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+          <div className="mx-auto grid max-w-[1240px] 2xl:max-w-[1440px] grid-cols-[minmax(0,1fr)] items-start gap-10 px-4 py-24 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)]">
             <div>
               <p className="mono-label text-table-muted">Measured, not claimed</p>
               <h2 className="mt-4 font-display text-[40px] font-semibold leading-none tracking-[-0.035em]">We tested it on bugs that really happened</h2>
@@ -361,7 +361,7 @@ export default function Landing() {
 
         {/* ---------- the index of mapped repositories ---------- */}
         {samples.length > 0 && (
-          <section className="mx-auto max-w-[1240px] px-4 pb-24 sm:px-6" aria-labelledby="index-title">
+          <section className="mx-auto max-w-[1240px] 2xl:max-w-[1440px] px-4 pb-24 sm:px-6" aria-labelledby="index-title">
             <Sheet className="px-5 py-7 sm:px-10">
               <div className="flex flex-wrap items-baseline justify-between gap-3 border-b-2 border-ink pb-3">
                 <h2 id="index-title" className="font-display text-[28px] font-semibold tracking-[-0.03em]">Index of mapped repositories</h2>
@@ -388,7 +388,7 @@ export default function Landing() {
 
         {/* ---------- MCP: on the table, like a terminal on the desk ---------- */}
         <section id="mcp" className="scroll-mt-8 border-t border-table-line">
-          <div className="mx-auto grid max-w-[1240px] grid-cols-[minmax(0,1fr)] items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1fr_1.1fr]">
+          <div className="mx-auto grid max-w-[1240px] 2xl:max-w-[1440px] grid-cols-[minmax(0,1fr)] items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1fr_1.1fr]">
             <div>
               <p className="mono-label text-table-muted">For coding agents</p>
               <h2 className="mt-4 font-display text-[40px] font-semibold leading-none tracking-[-0.035em]">Give your agent the same map</h2>

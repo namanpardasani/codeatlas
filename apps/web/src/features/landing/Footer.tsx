@@ -12,7 +12,7 @@ const LINKS: [string, string][] = [
 export function Colophon() {
   return (
     <footer className="border-t border-table-line">
-      <div className="mx-auto flex max-w-[1240px] flex-wrap items-baseline justify-between gap-x-8 gap-y-3 px-4 py-8 sm:px-6">
+      <div className="mx-auto flex max-w-[1240px] 2xl:max-w-[1440px] flex-wrap items-baseline justify-between gap-x-8 gap-y-3 px-4 py-8 sm:px-6">
         <p className="text-wonk text-[15px] text-table-muted">
           CodeAtlas. Open source, set in Fraunces and IBM Plex. Code is read, never run.
         </p>

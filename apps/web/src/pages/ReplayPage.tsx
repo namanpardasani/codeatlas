@@ -87,7 +87,7 @@ export default function ReplayPage() {
                   <div className="mono-label">3 · Where the bug was fixed</div>
                   {!revealed ? (
                     <div className="mt-4 flex flex-col items-start gap-3">
-                      <p className="text-wonk text-[17px] text-pencil">Sealed until you look. The prediction on the right was made without it.</p>
+                      <p className="text-wonk text-[17px] text-pencil">Sealed until you look. The prediction in section 2 was made without it.</p>
                       <Button onClick={() => setRevealed(true)}>Open the envelope</Button>
                     </div>
                   ) : (
