@@ -118,8 +118,10 @@ async function connect(principal: Principal = ANONYMOUS, deps: Partial<Parameter
 }
 async function call(client: Client, name: string, args: Record<string, unknown>) {
   const r: any = await client.callTool({ name, arguments: args });
-  const body = JSON.parse(r.content[0].text);
-  return { isError: !!r.isError, body, raw: r.content[0].text as string };
+  const text = r.content[0].text as string;
+  // arguments that fail the tool's input schema are rejected by the SDK with a plain-text "MCP error ..." reply (not JSON)
+  const body = text.startsWith("MCP error") ? { error: text } : JSON.parse(text);
+  return { isError: !!r.isError || text.startsWith("MCP error"), body, raw: text };
 }
 const PUB = "mcptest/public";
 
@@ -536,7 +538,7 @@ describe("HTTP transport", () => {
     const theirs = await rpc(app, keyB, callBody("find_symbol", { repo: "mcptest/private", name: "topSecretFn" }));
     expect(theirs.body.result.isError).toBe(true);
     const list = await rpc(app, keyB, { jsonrpc: "2.0", id: 3, method: "tools/list" });
-    expect(list.body.result.tools).toHaveLength(6);
+    expect(list.body.result.tools).toHaveLength(9);   // six read tools + get_blast_radius, suggest_tests, check_change_risk
   }));
 
   it("rejects unexpected Host headers (DNS rebinding) and non-POST methods", guard(async () => {

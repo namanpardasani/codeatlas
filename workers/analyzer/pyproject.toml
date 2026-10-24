@@ -23,6 +23,11 @@ dev = [
 ]
 
 [tool.uv]
+# fastembed 0.9.0 (the latest) caps pillow below 13, but pillow 12.3 has 37 published advisories (image parsing; fixed in
+# 13.0.0). We only embed TEXT, never images, so fastembed's image code path is unused; the override takes the fixed version.
+# Verified: fastembed imports, a real text embedding still runs and the whole test suite passes. Drop this once fastembed
+# lifts its cap.
+override-dependencies = ["pillow>=13.0.0"]
 package = false
 
 [tool.pytest.ini_options]

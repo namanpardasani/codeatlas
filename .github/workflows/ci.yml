@@ -90,7 +90,8 @@ jobs:
       - run: uv python install 3.12
       - run: uv sync --frozen
       - name: Byte-compile (syntax lint)
-        run: uv run python -m compileall -q analyzer tests
+        # tests/fixtures holds files that are broken ON PURPOSE (parser error handling), so they are not compiled
+        run: uv run python -m compileall -q -x 'tests/fixtures' analyzer tests
       - name: Apply migrations
         run: uv run python -m analyzer.migrate
       - name: Test
