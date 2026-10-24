@@ -9,7 +9,7 @@ agents through MCP before they edit shared code. Static analysis and git history
 Underneath it is a full codebase-intelligence platform: dependency graph and cycles, hotspot ranking, search and chat with
 **verified citations**, generated documentation and incremental re-analysis.
 
-> **Live demo:** _placeholder: add the URL after deploying Tier 1 from [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)_ (read-only, pre-analysed repositories)
+> **Live demo:** **https://codeatlas-demo.onrender.com** (read-only, 5 pre-analysed repositories). It runs on a free server, so the first visit after idle can take up to a minute. Analysing any repository you type in runs locally or on your own server: see [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 > **Demo video:** _placeholder: add the link after recording_
 > **Scope:** public GitHub repositories only. **Private repositories are not supported.**
 

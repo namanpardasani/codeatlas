@@ -45,7 +45,7 @@ Earlier, supporting features:
 | Missing | Why it matters | How to get it |
 |---|---|---|
 | Human-written evaluation questions and a human-graded answer-quality score | all quality numbers rest on AI-authored questions; there is no trustworthy answer-accuracy number | grade `eval/spotcheck.csv` (15 answers); write ~20 questions yourself |
-| Live demo URL, uptime, real users, stars | nothing is deployed yet | deploy Tier 1 of docs/DEPLOYMENT.md |
+| Uptime, real users, stars | the read-only demo is live at https://codeatlas-demo.onrender.com (free tier, sleeps when idle); no usage numbers exist yet | check the Render and GitHub dashboards after some weeks |
 | Larger-repo scaling (largest analysed: 124 files) | "handles large repos" is unproven | analyse a 1,000-5,000 file repo and record time and memory |
 | Query latency under load / p95 | only a single-user ~15 ms/query figure from Day 5 exists, not re-measured | run a small load test |
 | Cost per analysis / per answer | budget is zero by design, but unmeasured in tokens for hosted LLMs | log tokens with a free-tier provider |
