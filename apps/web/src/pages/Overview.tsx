@@ -130,7 +130,7 @@ export default function Overview() {
                     <span className="w-5 font-mono text-[11px] text-pencil">{i + 1}.</span>
                     <span className="min-w-0 truncate font-mono text-small text-ink" title={n.path}>{basename(n.path)}</span>
                     <span aria-hidden className="min-w-4 flex-1 border-b border-dotted border-rule-strong" />
-                    <span className="shrink-0 text-small text-pencil"><span className="font-mono text-ink">{n.fan_in}</span> importers</span>
+                    <span className="shrink-0 text-small text-pencil"><span className="font-mono text-ink">{n.fan_in}</span> importer{Number(n.fan_in) === 1 ? "" : "s"}</span>
                   </li>
                 ))}
               </ol>

@@ -245,6 +245,20 @@ def test_root_commit_and_merge_commit(tmp_path):
     assert {(s.change, s.name) for s in merged.changes.changed_symbols} == {("added", "g")}
 
 
+def test_ensure_commit_accepts_a_root_commit_but_still_refuses_unknown_ones(tmp_path):
+    # regression: the check required `sha^` to exist, so a repo's first commit was reported as "not found"
+    from analyzer.blast.run import ensure_commit
+    r = tmp_path / "r"
+    init(r)
+    commit(r, T0, "ann", {"a.py": "def f():\n    return 1\n"})
+    head = lambda: subprocess.run(["git", "-C", str(r), "rev-parse", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
+    ensure_commit(r, head())                                   # root commit: no parent, nothing to fetch
+    commit(r, T0 + DAY, "ann", {"a.py": "def f():\n    return 2\n"})
+    ensure_commit(r, head())                                 # normal commit still passes
+    with pytest.raises(InputError):
+        ensure_commit(r, "0123456789abcdef0123456789abcdef01234567")   # unknown: refused (no origin to fetch from)
+
+
 def test_commit_input_rejects_option_like_revisions(tmp_path):
     r = two_commits(tmp_path, {"a.py": "x = 1\n"}, {"a.py": "x = 2\n"})
     for bad in ("--output=/tmp/x", "-p", "a b", "HEAD;rm"):
